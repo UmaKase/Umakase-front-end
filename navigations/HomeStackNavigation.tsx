@@ -4,8 +4,8 @@ import { HomeStackNavigationProps } from "../Types/Navigations/HomeStack";
 import InitialStepsNavigation from "./InitialStepsNavigation";
 import * as SecureStore from "expo-secure-store";
 import { CONFIG_KEY } from "../Constants/securestoreKey";
-import HomeTabNavigation from "./HomeTabNavigation";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
+import HomeTabNavigation from "./HomeTabNavigation";
 
 const HomeStack = createNativeStackNavigator<HomeStackNavigationProps>();
 
@@ -17,17 +17,25 @@ const HomeStackNavigation: React.FC = ({}) => {
     console.log(isConfig);
     if (isConfig) {
       console.log("is config");
-      setConfig(true);
+      return true;
     } else {
       console.log("not config");
-      setConfig(false);
+      return false;
     }
   };
 
   useEffect(() => {
-    checkConfig();
-    setFetching(false);
-    console.log("this is config:", config);
+    checkConfig()
+      .then((isConfig) => {
+        if (isConfig) {
+          setConfig(true);
+        } else {
+          setConfig(false);
+        }
+      })
+      .then(() => {
+        setFetching(false);
+      });
   }, []);
 
   return fetching ? (

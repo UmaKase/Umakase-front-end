@@ -3,14 +3,19 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 //import navigations
 import AuthNavigation from "../navigations/AuthNavigation";
-import HomeStackNavigation from "../navigations/HomeStackNavigation";
+import HomeStackNavigationProps from "../navigations/HomeStackNavigation";
 //import secureStore
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { AuthAPI } from "../Constants/backendAPI";
-import { ACCESS_KEY, REFRESH_KEY } from "../Constants/securestoreKey";
+import {
+  ACCESS_KEY,
+  CONFIG_KEY,
+  REFRESH_KEY,
+} from "../Constants/securestoreKey";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
 import { RootNavigationProps } from "../Types/Navigations/Root";
+import HomeStackNavigation from "../navigations/HomeStackNavigation";
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
@@ -20,6 +25,8 @@ const RootRouter: React.FC = () => {
   const [access, setAccess] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string>("");
   const tokenValidation = async () => {
+    //use this while the account is not logout and you reinstall the DB
+    // await SecureStore.deleteItemAsync(ACCESS_KEY);
     const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
     console.log("accessToken:", localAccessToken);
     const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);

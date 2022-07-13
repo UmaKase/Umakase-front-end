@@ -6,11 +6,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { bg_LessDarkColor } from "../Constants/cssConst";
 import RandomScreen from "../Screens/Home/RandomScreen";
 import { HomeTabNavigationProps } from "../Types/Navigations/HomeTab";
+import ProfileScreen from "../Screens/Home/ProfileScreen";
 
-type Props = {};
+const BottomTab = createMaterialTopTabNavigator<HomeTabNavigationProps>();
 
-const HomeTabNavigation: React.FC<Props> = ({}) => {
-  const BottomTab = createMaterialTopTabNavigator<HomeTabNavigationProps>();
+const HomeTabNavigation: React.FC = ({}) => {
   return (
     <BottomTab.Navigator
       initialRouteName="RandomScreen"
@@ -36,6 +36,16 @@ const HomeTabNavigation: React.FC<Props> = ({}) => {
               size={24}
               color={color}
             />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="ProfileScreen"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: "Profile",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="md-person-sharp" size={24} color={color} />
           ),
         }}
       />

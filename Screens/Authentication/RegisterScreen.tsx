@@ -20,7 +20,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI } from "../../Constants/backendAPI";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthNavigationProps } from "../../Types/Navigations/Auth";
-import AuthInput from "../../Components/Auth/AuthInput";
+import AuthInputWithErrMsg from "../../Components/Auth/AuthInputWithErrMsg";
 import { registerError } from "../../Types/api";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
@@ -31,6 +31,9 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
+  const [emailErrMsgShow, setEmailErrMsgShow] = useState(false);
+  const [usernameErrMsgShow, setUsernameErrMsgShow] = useState(false);
+  const [passwordErrMsgShow, setPasswordErrMsgShow] = useState(false);
 
   const RegisterProcess = async () => {
     if (
@@ -58,18 +61,31 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       },
     })
       .then((result) => {
-        return Alert.alert("Register", result.data.message, [
+        return Alert.alert("Register", "Register success!", [
           { text: "OK", onPress: () => navigation.pop() },
         ]);
       })
       .catch((e) => {
-        const errors = e.response.data.errors as registerError[];
+        setEmailErrMsgShow(false);
+        setUsernameErrMsgShow(false);
+        setPasswordErrMsgShow(false);
+        console.log(JSON.stringify(e.response.data));
+        const errors = e.response.data.data.error as registerError[];
         let errorMsg = "";
         errors.forEach((error) => {
           if (errorMsg === "") {
             errorMsg = `${errorMsg}${error.param}:${error.msg}`;
           } else {
             errorMsg = `${errorMsg}\n${error.param}:${error.msg}`;
+          }
+          if (error.param == "email") {
+            setEmailErrMsgShow(true);
+          }
+          if (error.param == "username") {
+            setUsernameErrMsgShow(true);
+          }
+          if (error.param == "password") {
+            setPasswordErrMsgShow(true);
           }
         });
         return Alert.alert("Register error", errorMsg);
@@ -96,7 +112,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           </View>
           {/* Body */}
           <View style={styles.mainContainer}>
-            <AuthInput
+            <AuthInputWithErrMsg
               InputIcon={
                 <Fontisto name="email" size={windowWidth * 0.07} color="#FFF" />
               }
@@ -104,7 +120,16 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               PlaceHolder="Enter email"
               PasswordMode={false}
             />
-            <AuthInput
+            {emailErrMsgShow ? (
+              <View style={styles.errMsgContainer}>
+                <Text style={styles.errMsg}>
+                  Email should be 12345@123.12 format
+                </Text>
+              </View>
+            ) : (
+              <></>
+            )}
+            <AuthInputWithErrMsg
               InputIcon={
                 <Feather name="user" size={windowWidth * 0.07} color="#FFF" />
               }
@@ -112,7 +137,16 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               PlaceHolder="Enter user name"
               PasswordMode={false}
             />
-            <AuthInput
+            {usernameErrMsgShow ? (
+              <View style={styles.errMsgContainer}>
+                <Text style={styles.errMsg}>
+                  Username should be at least 5 letters long
+                </Text>
+              </View>
+            ) : (
+              <></>
+            )}
+            <AuthInputWithErrMsg
               InputIcon={
                 <Fontisto
                   name="locked"
@@ -124,7 +158,16 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               PlaceHolder="Enter password"
               PasswordMode={true}
             />
-            <AuthInput
+            {passwordErrMsgShow ? (
+              <View style={styles.errMsgContainer}>
+                <Text style={styles.errMsg}>
+                  Password should be at least 8 letters long
+                </Text>
+              </View>
+            ) : (
+              <></>
+            )}
+            <AuthInputWithErrMsg
               InputIcon={
                 <Fontisto
                   name="locked"
@@ -136,6 +179,15 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               PlaceHolder="Enter password again"
               PasswordMode={true}
             />
+            {passwordErrMsgShow ? (
+              <View style={styles.errMsgContainer}>
+                <Text style={styles.errMsg}>
+                  Password should be at least 8 letters long
+                </Text>
+              </View>
+            ) : (
+              <></>
+            )}
           </View>
         </KeyboardAvoidingView>
         {/* Footer */}
@@ -218,5 +270,13 @@ const styles = StyleSheet.create({
   btnText: {
     fontSize: windowWidth * 0.075,
     color: "#FFF",
+  },
+  errMsgContainer: {
+    width: windowWidth * 0.85,
+    // alignItems: "flex-start",
+    // justifyContent: "flex-start",
+  },
+  errMsg: {
+    color: "#F00",
   },
 });
