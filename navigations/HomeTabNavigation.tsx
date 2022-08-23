@@ -3,9 +3,9 @@ import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { Ionicons } from "@expo/vector-icons";
 //screens
-import { bg_LessDarkColor } from "../Constants/cssConst";
+// import { bg_LessDarkColor } from "../Constants/cssConst";
 import RandomScreen from "../Screens/Home/RandomScreen";
-import { HomeTabNavigationProps } from "../Types/Navigations/HomeTab";
+import { HomeTabNavigationProps } from "../types/Navigations/HomeTab";
 import ProfileScreen from "../Screens/Home/ProfileScreen";
 
 const BottomTab = createMaterialTopTabNavigator<HomeTabNavigationProps>();
@@ -16,7 +16,7 @@ const HomeTabNavigation: React.FC = ({}) => {
       initialRouteName="RandomScreen"
       tabBarPosition="bottom"
       screenOptions={{
-        tabBarStyle: { backgroundColor: bg_LessDarkColor },
+        tabBarStyle: { backgroundColor: "#456" },
         tabBarActiveTintColor: "#FFF",
         tabBarIndicatorStyle: {
           backgroundColor: "white",

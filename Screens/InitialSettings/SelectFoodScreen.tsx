@@ -3,21 +3,21 @@ import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from "@react-navigation/native-stack";
-import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
+import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import { CONFIG_KEY } from "../../Constants/securestoreKey";
 
-type Props = NativeStackScreenProps<InitialStepsProps, "Step2">;
+type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
-const Step2: React.FC<Props> = ({ navigation, route }) => {
+const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const settingComplete = async () => {
     await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
     console.log("saved");
     navigation.dispatch(
-      CommonActions.reset({ routes: [{ name: "HomeTabNavigation" }] })
+      CommonActions.reset({ routes: [{ name: "HomeDrawerNavigation" }] })
     );
   };
   return (
@@ -35,7 +35,7 @@ const Step2: React.FC<Props> = ({ navigation, route }) => {
   );
 };
 
-export default Step2;
+export default SelectFoodScreen;
 
 const styles = StyleSheet.create({
   safeArea: {

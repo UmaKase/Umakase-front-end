@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 //import screens
 import LoginScreen from "../Screens/Authentication/LoginScreen";
 import RegisterScreen from "../Screens/Authentication/RegisterScreen";
-import { AuthNavigationProps } from "../Types/Navigations/Auth";
+import { AuthNavigationProps } from "../types/Navigations/Auth";
 
 const RootStack = createNativeStackNavigator<AuthNavigationProps>();
 const AuthNavigation: React.FC = () => {

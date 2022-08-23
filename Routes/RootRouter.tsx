@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 //import navigations
-import AuthNavigation from "../navigations/AuthNavigation";
-import HomeStackNavigationProps from "../navigations/HomeStackNavigation";
+import AuthNavigation from "../Navigations/AuthNavigation";
+import HomeStackNavigation from "../Navigations/HomeStackNavigation";
 //import secureStore
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
@@ -14,8 +14,7 @@ import {
   REFRESH_KEY,
 } from "../Constants/securestoreKey";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
-import { RootNavigationProps } from "../Types/Navigations/Root";
-import HomeStackNavigation from "../navigations/HomeStackNavigation";
+import { RootNavigationProps } from "../types/Navigations/Root";
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
@@ -27,6 +26,7 @@ const RootRouter: React.FC = () => {
   const tokenValidation = async () => {
     //use this while the account is not logout and you reinstall the DB
     // await SecureStore.deleteItemAsync(ACCESS_KEY);
+    // await SecureStore.deleteItemAsync(CONFIG_KEY);
     const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
     console.log("accessToken:", localAccessToken);
     const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
@@ -38,8 +38,9 @@ const RootRouter: React.FC = () => {
       url: `${AuthAPI}/token/access`,
       headers: { Authorization: `Bearer ${localAccessToken}` },
     });
-    if (accessResult.data.success) {
+    if (accessResult.data.ok) {
       setAccessToken(localAccessToken);
+      console.log("success");
       return true;
     }
     const refreshResult = await axios({
@@ -48,6 +49,7 @@ const RootRouter: React.FC = () => {
       headers: { Authorization: `Bearer ${REFRESH_KEY}` },
     });
     if (refreshResult.status != 200) {
+      console.log(refreshResult);
       return false;
     }
     await SecureStore.setItemAsync(ACCESS_KEY, refreshResult.data.accessToken);
@@ -56,14 +58,19 @@ const RootRouter: React.FC = () => {
 
   useEffect(() => {
     try {
-      tokenValidation().then((isAccess) => {
-        if (isAccess) {
-          setAccess(true);
-        } else {
+      tokenValidation()
+        .then((isAccess) => {
+          if (isAccess) {
+            setAccess(true);
+          } else {
+            setAccess(false);
+          }
+          setFetching(false);
+        })
+        .catch((e) => {
+          console.log(e.response.data.error);
           setAccess(false);
-        }
-        setFetching(false);
-      });
+        });
     } catch (error) {
       console.error(error);
     }

@@ -1,11 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import { HomeStackNavigationProps } from "../Types/Navigations/HomeStack";
+import { HomeStackNavigationProps } from "../types/Navigations/HomeStack";
 import InitialStepsNavigation from "./InitialStepsNavigation";
 import * as SecureStore from "expo-secure-store";
 import { CONFIG_KEY } from "../Constants/securestoreKey";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
-import HomeTabNavigation from "./HomeTabNavigation";
+// import HomeTabNavigation from "./HomeTabNavigation";
+import HomeDrawerNavigation from "./HomeDrawerNavigation";
 
 const HomeStack = createNativeStackNavigator<HomeStackNavigationProps>();
 
@@ -14,7 +15,7 @@ const HomeStackNavigation: React.FC = ({}) => {
   const [fetching, setFetching] = useState<boolean>(true);
   const checkConfig = async () => {
     const isConfig = await SecureStore.getItemAsync(CONFIG_KEY);
-    console.log(isConfig);
+    CONFIG_KEY;
     if (isConfig) {
       console.log("is config");
       return true;
@@ -42,12 +43,14 @@ const HomeStackNavigation: React.FC = ({}) => {
     <LoadingSpinner />
   ) : (
     <HomeStack.Navigator
-      initialRouteName={config ? "HomeTabNavigation" : "InitialStepsNavigation"}
+      initialRouteName={
+        config ? "HomeDrawerNavigation" : "InitialStepsNavigation"
+      }
       screenOptions={{ headerShown: false }}
     >
       <HomeStack.Screen
-        name="HomeTabNavigation"
-        component={HomeTabNavigation}
+        name="HomeDrawerNavigation"
+        component={HomeDrawerNavigation}
       />
       <HomeStack.Screen
         name="InitialStepsNavigation"
