@@ -12,9 +12,11 @@ import {
 import { Tag } from "../../types/InitialSteps/Tag";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { USERNAME_KEY } from "../../Constants/securestoreKey";
+import { CONFIG_KEY, USERNAME_KEY } from "../../Constants/securestoreKey";
 import { TagAPI } from "../../Constants/backendAPI";
 import { FlatList } from "react-native-gesture-handler";
+import Footer from "../../Components/InitialStep/Footer";
+import { CommonActions } from "@react-navigation/native";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -74,6 +76,14 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     ];
   };
 
+  const skipSetting = async () => {
+    await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
+    console.log("saved");
+    navigation.dispatch(
+      CommonActions.reset({ routes: [{ name: "HomeDrawerNavigation" }] })
+    );
+  };
+
   useEffect(() => {
     // getTags();
     fetchTags().then((tags) => {
@@ -115,8 +125,14 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
             );
           }}
         />
+        {/* footer 2 */}
+        <Footer
+          goBackFunc={() => navigation.goBack()}
+          goNextFunc={() => navigation.navigate("SelectFoodScreen")}
+          skipFunc={() => skipSetting()}
+        />
         {/* footer */}
-        <View style={styles.footer}>
+        {/* <View style={styles.footer}>
           <TouchableOpacity
             onPress={() => navigation.navigate("SelectFoodScreen")}
             style={styles.button}
@@ -133,7 +149,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           <TouchableOpacity onPress={handleSubmit} style={styles.button}>
             <Text style={styles.buttonFont}>submit</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
