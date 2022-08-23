@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import {
-  bg_DarkColor,
+  backgroundColor,
   cornerRadius,
   windowHeight,
   windowWidth,
@@ -19,9 +19,9 @@ import { Fontisto, Feather, FontAwesome } from "@expo/vector-icons";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI } from "../../Constants/backendAPI";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AuthNavigationProps } from "../../Types/Navigations/Auth";
+import { AuthNavigationProps } from "../../types/Navigations/Auth";
 import AuthInputWithErrMsg from "../../Components/Auth/AuthInputWithErrMsg";
-import { registerError } from "../../Types/api";
+import { registerError } from "../../types/api";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
@@ -212,7 +212,7 @@ export default RegisterScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: bg_DarkColor,
+    backgroundColor: backgroundColor,
   },
   //Header
   topContainer: {
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
   cuttingBottomContainer: {
     flex: 1,
-    backgroundColor: bg_DarkColor,
+    backgroundColor: backgroundColor,
     borderTopLeftRadius: cornerRadius,
     borderBottomRightRadius: windowHeight * 0.3,
     alignItems: "center",

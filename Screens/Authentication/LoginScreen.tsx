@@ -10,10 +10,10 @@ import AuthInput from "../../Components/Auth/AuthInput";
 //navigation
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { CommonActions } from "@react-navigation/native";
-import { AuthNavigationProps } from "../../Types/Navigations/Auth";
+import { AuthNavigationProps } from "../../types/Navigations/Auth";
 //css const
 import {
-  bg_DarkColor,
+  backgroundColor,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
@@ -51,17 +51,23 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         await SecureStore.setItemAsync(ACCESS_KEY, loginResult.data.accessToken);
         // prettier-ignore
         await SecureStore.setItemAsync(REFRESH_KEY, loginResult.data.refreshToken);
-        // // prettier-ignore
+
         // await SecureStore.setItemAsync(USERID_KEY, loginResult.data.profile.id);
-        // // prettier-ignore
-        // await SecureStore.setItemAsync(USERNAME_KEY, loginResult.data.profile.username);
-        // // prettier-ignore
+
+        await SecureStore.setItemAsync(USERNAME_KEY, username);
+
         // await SecureStore.setItemAsync(SHOWNAME_KEY, loginResult.data.profile.showname);
         navigation.dispatch(
           CommonActions.reset({ routes: [{ name: "HomeStackNavigation" }] })
         );
       })
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        if (e.response.status == 400) {
+          Alert.alert("Login failed", e.response.data.message);
+        } else {
+          console.log(e.response.data);
+        }
+      });
   };
 
   return (
@@ -123,7 +129,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: bg_DarkColor,
+    backgroundColor: backgroundColor,
   },
   //Header
   topContainer: {

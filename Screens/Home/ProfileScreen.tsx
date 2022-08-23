@@ -4,13 +4,17 @@ import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI } from "../../Constants/backendAPI";
-import { HomeTabNavigationProps } from "../../Types/Navigations/HomeTab";
+import { HomeTabNavigationProps } from "../../types/Navigations/HomeTab";
 import * as SecureStore from "expo-secure-store";
 import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
-import { CommonActions } from "@react-navigation/native";
+import { CommonActions, DrawerActions } from "@react-navigation/native";
+import { backgroundColor } from "../../Constants/cssConst";
+import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
+import { DrawerScreenProps } from "@react-navigation/drawer";
+import { HomeDrawerNavigationProps } from "../../types/Navigations/HomeDrawer";
 
-type RandomScreenProps = NativeStackScreenProps<
-  HomeTabNavigationProps,
+type RandomScreenProps = DrawerScreenProps<
+  HomeDrawerNavigationProps,
   "ProfileScreen"
 >;
 
@@ -43,6 +47,9 @@ const ProfileScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.background}>
+          <CustomHeader
+            toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+          ></CustomHeader>
           <TouchableOpacity
             onPress={() => logoutProcess()}
             style={styles.logoutBtn}
@@ -59,7 +66,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: backgroundColor,
   },
   background: {
     flex: 1,
