@@ -2,10 +2,17 @@ import React, { useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import ToggleCard from "../../Components/InitialStep/ToggleCard";
 import {
   backgroundColor,
+  drawerColor,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
@@ -17,12 +24,17 @@ import { TagAPI } from "../../Constants/backendAPI";
 import { FlatList } from "react-native-gesture-handler";
 import Footer from "../../Components/InitialStep/Footer";
 import { CommonActions } from "@react-navigation/native";
+import { FontAwesome } from "@expo/vector-icons";
+import ToggleTag from "../../Components/InitialStep/ToggleTag";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
 const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
+  // tag var
   const [selectedTag, setSelectedTag] = useState<string[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  // text input state
+  const [inputText, setInputText] = useState<string>("");
   const getTags = async () => {
     axios({
       method: "get",
@@ -43,7 +55,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     return [
       {
         id: "tag1",
-        name: "name1name1name1name1name1",
+        name: "name1",
       },
       {
         id: "tag2",
@@ -84,6 +96,10 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     );
   };
 
+  const goNectStep = async () => {
+    navigation.navigate("SelectFoodScreen");
+  };
+
   useEffect(() => {
     // getTags();
     fetchTags().then((tags) => {
@@ -96,7 +112,25 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
       <SafeAreaView style={styles.safeArea}>
         {/* header */}
         <View style={styles.header}>
-          <Text style={styles.headerFont}>choose the tag you want</Text>
+          <Text style={styles.headerFont}>
+            お気入り料理の種類を{"\n"}
+            選択してください
+          </Text>
+        </View>
+        {/* search bar */}
+        <View style={styles.searchbarContainer}>
+          <TextInput
+            style={styles.searchbar}
+            onChangeText={(newText) => setInputText(newText)}
+            value={inputText}
+            placeholder="enter tag name to find"
+            placeholderTextColor={drawerColor}
+            autoCapitalize="none"
+            caretHidden={true}
+          ></TextInput>
+          <View style={styles.searchBtn}>
+            <FontAwesome name="search" size={windowWidth * 0.07} color="#FFF" />
+          </View>
         </View>
         {/* card container */}
         <FlatList
@@ -109,9 +143,9 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
               ? true
               : false;
             return (
-              <ToggleCard
+              <ToggleTag
                 tag={item}
-                checked={isChecked}
+                check={isChecked}
                 onPressHandler={() => {
                   if (isChecked) {
                     setSelectedTag((prev) =>
@@ -121,35 +155,16 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
                     setSelectedTag((prev) => [...prev, item.id]);
                   }
                 }}
-              ></ToggleCard>
+              ></ToggleTag>
             );
           }}
         />
-        {/* footer 2 */}
+        {/* footer */}
         <Footer
           goBackFunc={() => navigation.goBack()}
-          goNextFunc={() => navigation.navigate("SelectFoodScreen")}
+          goNextFunc={() => goNectStep()}
           skipFunc={() => skipSetting()}
         />
-        {/* footer */}
-        {/* <View style={styles.footer}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("SelectFoodScreen")}
-            style={styles.button}
-          >
-            <Text style={styles.buttonFont}>skip</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            // onPress={() => navigation.navigate("SelectFoodScreen")}
-            onPress={() => getTags()}
-            style={styles.button}
-          >
-            <Text style={styles.buttonFont}>get tags</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-            <Text style={styles.buttonFont}>submit</Text>
-          </TouchableOpacity>
-        </View> */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -163,24 +178,34 @@ const styles = StyleSheet.create({
     backgroundColor: backgroundColor,
   },
   header: {
-    height: windowHeight * 0.1,
+    height: windowHeight * 0.12,
     width: windowWidth,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-end",
   },
   headerFont: {
     fontSize: windowWidth * 0.08,
     color: "#FFF",
   },
-  cardContainer: {
-    height: windowHeight * 0.8,
+  searchbarContainer: {
+    width: windowWidth,
+    height: windowHeight * 0.06,
+    flexDirection: "row",
+    paddingLeft: windowWidth * 0.1,
+    paddingRight: windowWidth * 0.05,
   },
-  singleTag: {
-    height: 50,
-    width: 200,
-    borderWidth: 1,
-    borderColor: "red",
-    marginVertical: 10,
+  searchbar: {
+    flex: 5,
+    fontSize: windowWidth * 0.065,
+    color: drawerColor,
+  },
+  searchBtn: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardContainer: {
+    flex: 1,
   },
   footer: {
     height: windowHeight * 0.1,
