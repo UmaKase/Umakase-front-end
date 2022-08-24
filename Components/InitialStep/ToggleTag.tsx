@@ -36,15 +36,15 @@ const styles = StyleSheet.create({
   tagContainer: {
     width: windowWidth * 0.4,
     height: windowHeight * 0.06,
-    borderRadius: windowWidth * 0.04,
+    borderRadius: windowWidth * 0.05,
     borderWidth: 3,
     backgroundColor: "#FFF",
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: windowWidth * 0.05,
-    marginTop: windowHeight * 0.02,
+    marginTop: windowHeight * 0.03,
   },
   tagFont: {
-    fontSize: windowWidth * 0.04,
+    fontSize: windowWidth * 0.035,
   },
 });
