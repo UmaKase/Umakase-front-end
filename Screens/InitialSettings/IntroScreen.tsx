@@ -9,7 +9,6 @@ import {
 } from "../../Constants/cssConst";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { color } from "react-native-reanimated";
 import { FontAwesome } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
 
