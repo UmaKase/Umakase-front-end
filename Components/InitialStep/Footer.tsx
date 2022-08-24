@@ -47,7 +47,7 @@ export default Footer;
 
 const styles = StyleSheet.create({
   footer: {
-    height: windowHeight * 0.15,
+    height: windowHeight * 0.08,
     width: windowWidth,
     flexDirection: "row",
   },
