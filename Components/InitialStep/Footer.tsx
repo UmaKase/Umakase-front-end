@@ -31,7 +31,7 @@ const Footer: React.FC<Props> = ({ goBackFunc, goNextFunc, skipFunc }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.sideContainer}>
-        <TouchableOpacity onPress={() => goBackFunc()}>
+        <TouchableOpacity onPress={() => goNextFunc()}>
           <FontAwesome
             name="arrow-circle-right"
             size={windowWidth * 0.145}
