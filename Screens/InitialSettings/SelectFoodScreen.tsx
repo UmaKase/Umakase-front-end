@@ -23,57 +23,36 @@ import {
   backgroundColor,
   windowHeight,
 } from "../../Constants/cssConst";
-import { Tag } from "../../types/InitialSteps/Tag";
 import ToggleCard from "../../Components/InitialStep/ToggleCard";
 import Footer from "../../Components/InitialStep/Footer";
+import { Food } from "../../types/InitialSteps";
+import axios from "axios";
+import { FoodAPI } from "../../Constants/backendAPI";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
 const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
-  // tag var
-  const [selectedTag, setSelectedTag] = useState<string[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
+  // food var
+  const [selectedFood, setSelectedFood] = useState<string[]>([]);
+  const [food, setFoods] = useState<Food[]>([]);
+  // target tag list
+  const tags: string[] = ["簡単"];
   // text input state
   const [inputText, setInputText] = useState<string>("");
 
-  //
-  const fetchTags = async (): Promise<Tag[]> => {
-    return [
-      {
-        id: "tag1",
-        name: "name1name1name1name1name1",
-      },
-      {
-        id: "tag2",
-        name: "name2",
-      },
-      {
-        id: "tag3",
-        name: "name3",
-      },
-      {
-        id: "tag4",
-        name: "name4",
-      },
-      {
-        id: "tag5",
-        name: "name5",
-      },
-      {
-        id: "tag6",
-        name: "name6",
-      },
-      {
-        id: "tag7",
-        name: "name7",
-      },
-      {
-        id: "tag8",
-        name: "name8",
-      },
-    ];
+  // fetch Food API
+  const fetchFoods = async () => {
+    axios({
+      url: `${FoodAPI}/db?tagName=${tags[0]}`,
+      method: "get",
+    })
+      .then((res) => {
+        setFoods(res.data.foods);
+      })
+      .catch((e) => console.log(e.response));
   };
 
+  // setting complete function
   const settingComplete = async () => {
     await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
     console.log("saved");
@@ -81,7 +60,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       CommonActions.reset({ routes: [{ name: "HomeDrawerNavigation" }] })
     );
   };
-
+  // skip setting function
   const skipSetting = async () => {
     await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
     console.log("saved");
@@ -92,7 +71,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
   useEffect(() => {
     // fetch foods
-    fetchTags().then((tags) => setTags(tags));
+    fetchFoods();
   }, []);
 
   return (
@@ -111,7 +90,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             style={styles.searchbar}
             onChangeText={(newText) => setInputText(newText)}
             value={inputText}
-            placeholder="enter tag name to find"
+            placeholder="enter food name to find"
             placeholderTextColor={drawerColor}
             autoCapitalize="none"
             selectionColor="#FFF"
@@ -129,12 +108,12 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         </View>
         {/* card container */}
         <FlatList
-          data={tags}
+          data={food}
           keyExtractor={(item, index) => index.toString()}
           style={styles.cardContainer}
           numColumns={2}
           renderItem={({ item }) => {
-            const isChecked = selectedTag.find((tagId) => tagId === item.id)
+            const isChecked = selectedFood.find((foodId) => foodId === item.id)
               ? true
               : false;
             return (
@@ -143,11 +122,11 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                 checked={isChecked}
                 onPressHandler={() => {
                   if (isChecked) {
-                    setSelectedTag((prev) =>
+                    setSelectedFood((prev) =>
                       prev.filter((id) => id !== item.id)
                     );
                   } else {
-                    setSelectedTag((prev) => [...prev, item.id]);
+                    setSelectedFood((prev) => [...prev, item.id]);
                   }
                 }}
               ></ToggleCard>
@@ -193,7 +172,7 @@ const styles = StyleSheet.create({
   searchbar: {
     flex: 5,
     fontSize: windowWidth * 0.065,
-    color: drawerColor,
+    color: "#FFF",
   },
   searchBtn: {
     flex: 1,
