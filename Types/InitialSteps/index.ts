@@ -1,7 +1,7 @@
 export interface Tag {
   id: string;
   name: string;
-  food?: TagsOnFoods[];
+  food: TagsOnFoods[];
 }
 
 export interface TagsOnFoods {
