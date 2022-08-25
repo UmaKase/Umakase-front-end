@@ -3,91 +3,73 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import ToggleCard from "../../Components/InitialStep/ToggleCard";
 import {
   backgroundColor,
   drawerColor,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
-import { Tag } from "../../types/InitialSteps/Tag";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { CONFIG_KEY, USERNAME_KEY } from "../../Constants/securestoreKey";
+import { CONFIG_KEY } from "../../Constants/securestoreKey";
 import { TagAPI } from "../../Constants/backendAPI";
 import { FlatList } from "react-native-gesture-handler";
 import Footer from "../../Components/InitialStep/Footer";
 import { CommonActions } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
 import ToggleTag from "../../Components/InitialStep/ToggleTag";
+import { Tag } from "../../types/InitialSteps";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
 const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // tag var
-  const [selectedTag, setSelectedTag] = useState<string[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string[]>([]);
   // text input state
   const [inputText, setInputText] = useState<string>("");
+  // api request page number
+  const [page, setPage] = useState<number>(1);
+  // fetch tags http request
   const getTags = async () => {
     axios({
       method: "get",
-      url: `${TagAPI}/`,
+      url: `${TagAPI}/?take=20&page=${page}`,
     })
       .then((res) => {
-        console.log(JSON.stringify(res.data));
+        setTags(res.data.data.tags);
+        // show what is in the res.data.data.tags
+        res.data.data.tags.forEach((t: Tag) => {
+          console.log(t.name + " " + t.id);
+        });
       })
       .catch((e) => {
         console.log(e);
       });
   };
-  const handleSubmit = () => {
-    console.log(selectedTag);
+  // function activate after FlatList reached the end
+  const onScrollToButtom = () => {
+    setPage((prev) => prev + 1);
+    console.log(page);
+    axios({
+      method: "get",
+      url: `${TagAPI}/?take=20&page=${page}`,
+    })
+      .then((res) => {
+        setTags((prev) => [...prev, ...res.data.data.tags]);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
-
-  const fetchTags = async (): Promise<Tag[]> => {
-    return [
-      {
-        id: "tag1",
-        name: "name1",
-      },
-      {
-        id: "tag2",
-        name: "name2",
-      },
-      {
-        id: "tag3",
-        name: "name3",
-      },
-      {
-        id: "tag4",
-        name: "name4",
-      },
-      {
-        id: "tag5",
-        name: "name5",
-      },
-      {
-        id: "tag6",
-        name: "name6",
-      },
-      {
-        id: "tag7",
-        name: "name7",
-      },
-      {
-        id: "tag8",
-        name: "name8",
-      },
-    ];
-  };
-
+  //
   const skipSetting = async () => {
     await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
     console.log("saved");
@@ -96,15 +78,12 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     );
   };
 
-  const goNectStep = async () => {
+  const goNextStep = async () => {
     navigation.navigate("SelectFoodScreen");
   };
 
   useEffect(() => {
-    // getTags();
-    fetchTags().then((tags) => {
-      setTags(tags);
-    });
+    getTags();
   }, []);
 
   return (
@@ -126,10 +105,21 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
             placeholder="enter tag name to find"
             placeholderTextColor={drawerColor}
             autoCapitalize="none"
-            caretHidden={true}
+            // caretHidden={true}
+            selectionColor="#FFF"
           ></TextInput>
           <View style={styles.searchBtn}>
-            <FontAwesome name="search" size={windowWidth * 0.07} color="#FFF" />
+            <TouchableOpacity
+              onPress={() =>
+                Alert.alert("this is search btutton", "Hi! I am search button.")
+              }
+            >
+              <FontAwesome
+                name="search"
+                size={windowWidth * 0.07}
+                color="#FFF"
+              />
+            </TouchableOpacity>
           </View>
         </View>
         {/* card container */}
@@ -138,6 +128,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           keyExtractor={(item, index) => index.toString()}
           style={styles.cardContainer}
           numColumns={2}
+          onEndReached={() => onScrollToButtom()}
           renderItem={({ item }) => {
             const isChecked = selectedTag.find((tagId) => tagId === item.id)
               ? true
@@ -162,7 +153,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
         {/* footer */}
         <Footer
           goBackFunc={() => navigation.goBack()}
-          goNextFunc={() => goNectStep()}
+          goNextFunc={() => goNextStep()}
           skipFunc={() => skipSetting()}
         />
       </SafeAreaView>
@@ -197,7 +188,7 @@ const styles = StyleSheet.create({
   searchbar: {
     flex: 5,
     fontSize: windowWidth * 0.065,
-    color: drawerColor,
+    color: "#FFF",
   },
   searchBtn: {
     flex: 1,
