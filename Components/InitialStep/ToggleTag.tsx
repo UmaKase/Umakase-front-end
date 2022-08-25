@@ -45,6 +45,6 @@ const styles = StyleSheet.create({
     marginTop: windowHeight * 0.03,
   },
   tagFont: {
-    fontSize: windowWidth * 0.035,
+    fontSize: windowWidth * 0.04,
   },
 });
