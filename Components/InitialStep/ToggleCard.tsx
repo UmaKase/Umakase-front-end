@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { Tag } from "../../types/InitialSteps/Tag";
+import { Food } from "../../types/InitialSteps";
 import {
   backgroundColor,
   drawerColor,
@@ -9,13 +9,13 @@ import {
 } from "../../Constants/cssConst";
 
 interface ToggleCardProps {
-  tag: Tag;
+  food: Food;
   checked: boolean;
   onPressHandler: () => void;
 }
 
 const ToggleCard: React.FC<ToggleCardProps> = ({
-  tag,
+  food,
   checked,
   onPressHandler,
 }) => {
@@ -32,7 +32,7 @@ const ToggleCard: React.FC<ToggleCardProps> = ({
         <Text
           style={[styles.name, { color: checked ? backgroundColor : "#FFF" }]}
         >
-          {tag.name}
+          {food.name}
         </Text>
       </View>
     </TouchableOpacity>
