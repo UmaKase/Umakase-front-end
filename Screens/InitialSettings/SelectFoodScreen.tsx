@@ -118,7 +118,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
               : false;
             return (
               <ToggleCard
-                tag={item}
+                food={item}
                 checked={isChecked}
                 onPressHandler={() => {
                   if (isChecked) {
