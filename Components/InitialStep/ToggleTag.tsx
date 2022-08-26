@@ -1,12 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { Tag } from "../../types/InitialSteps/Tag";
+
 import {
   drawerColor,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { Tag } from "../../types/InitialSteps";
 
 type Props = {
   tag: Tag;
