@@ -26,6 +26,7 @@ import { CommonActions } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
 import ToggleTag from "../../Components/InitialStep/ToggleTag";
 import { Tag } from "../../types/InitialSteps";
+import SearchBar from "../../Components/InitialStep/SearchBar";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -97,31 +98,14 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           </Text>
         </View>
         {/* search bar */}
-        <View style={styles.searchbarContainer}>
-          <TextInput
-            style={styles.searchbar}
-            onChangeText={(newText) => setInputText(newText)}
-            value={inputText}
-            placeholder="enter tag name to find"
-            placeholderTextColor={drawerColor}
-            autoCapitalize="none"
-            // caretHidden={true}
-            selectionColor="#FFF"
-          ></TextInput>
-          <View style={styles.searchBtn}>
-            <TouchableOpacity
-              onPress={() =>
-                Alert.alert("this is search btutton", "Hi! I am search button.")
-              }
-            >
-              <FontAwesome
-                name="search"
-                size={windowWidth * 0.07}
-                color="#FFF"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <SearchBar
+          input={inputText}
+          setInput={setInputText}
+          placeholderText="enter tag name to search"
+          textOnChange={() => {}}
+          searchBtnFunc={() => {}}
+        ></SearchBar>
+
         {/* card container */}
         <FlatList
           data={tags}
