@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -27,6 +27,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import ToggleTag from "../../Components/InitialStep/ToggleTag";
 import { Tag } from "../../types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
+import _ from "lodash";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -38,6 +39,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   const [inputText, setInputText] = useState<string>("");
   // api request page number
   const [page, setPage] = useState<number>(1);
+
   // fetch tags http request
   const getTags = async () => {
     axios({
@@ -55,6 +57,15 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
         console.log(e);
       });
   };
+
+  // search tag http request
+  const debounceSearchTags = useCallback(
+    _.debounce((input: string) => {
+      console.log(input);
+    }, 500),
+    []
+  );
+
   // function activate after FlatList reached the end
   const onScrollToButtom = () => {
     setPage((prev) => prev + 1);
@@ -70,7 +81,8 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
         console.log(e);
       });
   };
-  //
+
+  // skip function
   const skipSetting = async () => {
     await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
     console.log("saved");
@@ -78,11 +90,12 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
       CommonActions.reset({ routes: [{ name: "HomeDrawerNavigation" }] })
     );
   };
-
+  // next step function
   const goNextStep = async () => {
     navigation.navigate("SelectFoodScreen");
   };
 
+  // initial loading function
   useEffect(() => {
     getTags();
   }, []);
@@ -102,7 +115,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           input={inputText}
           setInput={setInputText}
           placeholderText="enter tag name to search"
-          textOnChange={() => {}}
+          searchFunction={(input: string) => debounceSearchTags(input)}
           searchBtnFunc={() => {}}
         ></SearchBar>
 
@@ -110,7 +123,8 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
         <FlatList
           data={tags}
           keyExtractor={(item, index) => index.toString()}
-          style={styles.cardContainer}
+          style={styles.tagContainer}
+          columnWrapperStyle={{ justifyContent: "space-evenly" }}
           numColumns={2}
           onEndReached={() => onScrollToButtom()}
           renderItem={({ item }) => {
@@ -179,8 +193,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cardContainer: {
+  tagContainer: {
     flex: 1,
+    // flexWrap: "wrap",
+    // justifyContent: "space-between",
   },
   footer: {
     height: windowHeight * 0.1,
