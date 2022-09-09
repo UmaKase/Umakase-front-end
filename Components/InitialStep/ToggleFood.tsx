@@ -23,21 +23,22 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
   checked,
   onPressHandler,
 }) => {
-  const [img, setImg] = useState();
+  const [img, setImg] = useState<string>();
 
   const fetchImg = async () => {
     const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
-    console.log(`${ImgAPI}/food/${food.img}`);
+    console.log(`${ImgAPI}/food/:${food.img}`);
     axios({
       method: "get",
+      responseType: "blob",
       headers: { Authorization: `Bearer ${localAccessToken}` },
       url: `${ImgAPI}/food/${food.img}`,
     })
       .then((res) => {
-        console.log(res.data);
+        setImg(URL.createObjectURL(res.data));
       })
       .catch((e) => {
-        console.error(e.response.data);
+        console.error("this is error :" + e);
       });
   };
 
@@ -56,8 +57,10 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
     >
       <View style={styles.imgContainer}>
         <Image
-          source={{ uri: `${ImgAPI}/food/${food.img}` }}
+          // source={{ uri: "data:image/jpeg;base64," + img }}
+          source={{ uri: img }}
           style={styles.img}
+          resizeMode="cover"
         ></Image>
       </View>
       <View style={styles.nameContainer}>
@@ -94,6 +97,8 @@ const styles = StyleSheet.create({
   },
   img: {
     flex: 1,
+    borderTopLeftRadius: borderRadius,
+    borderTopRightRadius: borderRadius,
     resizeMode: "contain",
   },
   nameContainer: {
