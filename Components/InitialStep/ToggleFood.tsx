@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Food } from "../../types/InitialSteps";
 import {
   backgroundColor,
@@ -7,18 +7,45 @@ import {
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
+import { ImgAPI } from "../../Constants/backendAPI";
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+import { ACCESS_KEY } from "../../Constants/securestoreKey";
 
-interface ToggleCardProps {
+interface ToggleFoodProps {
   food: Food;
   checked: boolean;
   onPressHandler: () => void;
 }
 
-const ToggleCard: React.FC<ToggleCardProps> = ({
+const ToggleFood: React.FC<ToggleFoodProps> = ({
   food,
   checked,
   onPressHandler,
 }) => {
+  const [img, setImg] = useState();
+
+  const fetchImg = async () => {
+    const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
+    console.log(`${ImgAPI}/food/${food.img}`);
+    axios({
+      method: "get",
+      headers: { Authorization: `Bearer ${localAccessToken}` },
+      url: `${ImgAPI}/food/${food.img}`,
+    })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.error(e.response.data);
+      });
+  };
+
+  useEffect(() => {
+    fetchImg();
+    return () => {};
+  }, []);
+
   return (
     <TouchableOpacity
       onPress={onPressHandler}
@@ -27,7 +54,12 @@ const ToggleCard: React.FC<ToggleCardProps> = ({
         { backgroundColor: checked ? "#FFF" : backgroundColor },
       ]}
     >
-      <View style={styles.imgContainer}>{/* <Image ></Image> */}</View>
+      <View style={styles.imgContainer}>
+        <Image
+          source={{ uri: `${ImgAPI}/food/${food.img}` }}
+          style={styles.img}
+        ></Image>
+      </View>
       <View style={styles.nameContainer}>
         <Text
           style={[styles.name, { color: checked ? backgroundColor : "#FFF" }]}
@@ -39,7 +71,7 @@ const ToggleCard: React.FC<ToggleCardProps> = ({
   );
 };
 
-export default ToggleCard;
+export default ToggleFood;
 
 const width = windowWidth * 0.35;
 const height = (width * 4) / 3;
@@ -47,23 +79,25 @@ const borderRadius = windowWidth * 0.04;
 
 const styles = StyleSheet.create({
   cardBackground: {
-    width: width,
+    width: width - 0.1,
     height: height,
     borderRadius: borderRadius,
-    marginLeft: windowWidth * 0.1,
+    // marginLeft: windowWidth * 0.1,
     marginVertical: windowHeight * 0.01,
   },
   imgContainer: {
-    width: width,
-    height: (height * 3) / 4,
+    flex: 3,
     resizeMode: "contain",
-    borderRadius: borderRadius,
-
+    borderTopLeftRadius: borderRadius,
+    borderTopRightRadius: borderRadius,
     backgroundColor: drawerColor,
   },
+  img: {
+    flex: 1,
+    resizeMode: "contain",
+  },
   nameContainer: {
-    width: width,
-    height: height / 4,
+    flex: 1,
     borderRadius: borderRadius,
     alignItems: "center",
     justifyContent: "center",
