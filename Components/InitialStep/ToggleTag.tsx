@@ -18,10 +18,7 @@ type Props = {
 const ToggleTag: React.FC<Props> = ({ tag, check, onPressHandler }) => {
   return (
     <TouchableOpacity
-      style={[
-        styles.tagContainer,
-        { borderColor: check ? drawerColor : "#FFF" },
-      ]}
+      style={[styles.tag, { borderColor: check ? drawerColor : "#FFF" }]}
       onPress={() => onPressHandler()}
     >
       <Text style={[styles.tagFont, { color: check ? drawerColor : "#000" }]}>
@@ -34,7 +31,7 @@ const ToggleTag: React.FC<Props> = ({ tag, check, onPressHandler }) => {
 export default ToggleTag;
 
 const styles = StyleSheet.create({
-  tagContainer: {
+  tag: {
     width: windowWidth * 0.4,
     height: windowHeight * 0.06,
     borderRadius: windowWidth * 0.05,
@@ -42,7 +39,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: windowWidth * 0.05,
     marginTop: windowHeight * 0.03,
   },
   tagFont: {
