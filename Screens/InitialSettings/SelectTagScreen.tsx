@@ -28,6 +28,7 @@ import ToggleTag from "../../Components/InitialStep/ToggleTag";
 import { Tag } from "../../types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import _ from "lodash";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -39,6 +40,9 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   const [inputText, setInputText] = useState<string>("");
   // api request page number
   const [page, setPage] = useState<number>(1);
+
+  // search mode contorller boolean
+  const [searchMode, setSearchMode] = useState(false);
 
   // fetch tags http request
   const getTags = async () => {
@@ -116,9 +120,8 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           setInput={setInputText}
           placeholderText="enter tag name to search"
           searchFunction={(input: string) => debounceSearchTags(input)}
-          searchBtnFunc={() => {}}
+          searchBtnFunc={() => setSearchMode((prev) => !prev)}
         ></SearchBar>
-
         {/* card container */}
         <FlatList
           data={tags}
@@ -154,6 +157,26 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           goNextFunc={() => goNextStep()}
           skipFunc={() => skipSetting()}
         />
+        {/* modal */}
+        {searchMode ? (
+          <BottomSheet
+            snapPoints={["100%"]}
+            handleIndicatorStyle={{ backgroundColor: "#b77" }}
+            backgroundStyle={{ backgroundColor: "#b77" }}
+          >
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setSearchMode((prev) => !prev)}>
+                <FontAwesome
+                  name="arrow-circle-left"
+                  size={windowWidth * 0.145}
+                  color="#FFF"
+                />
+              </TouchableOpacity>
+            </View>
+          </BottomSheet>
+        ) : (
+          <></>
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -217,5 +240,15 @@ const styles = StyleSheet.create({
   buttonFont: {
     fontSize: windowWidth * 0.05,
     color: "#000",
+  },
+
+  modalHeader: {
+    // backgroundColor: "#FFF",
+    width: windowWidth,
+    height: windowHeight * 0.1,
+    borderWidth: 3,
+    borderColor: "#77C",
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
