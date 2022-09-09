@@ -17,7 +17,7 @@ type Props = {
   placeholderText: string;
   input: string;
   setInput: (value: React.SetStateAction<string>) => void;
-  textOnChange: () => void;
+  searchFunction: (value: string) => void;
   searchBtnFunc: () => void;
 };
 
@@ -25,15 +25,18 @@ const SearchBar: React.FC<Props> = ({
   input,
   setInput,
   placeholderText,
-  textOnChange,
+  searchFunction,
   searchBtnFunc,
 }) => {
   return (
     <View style={styles.searchbarContainer}>
       <TextInput
         style={styles.searchbar}
-        onChangeText={(newText) => setInput(newText)}
         value={input}
+        onChangeText={(newText) => {
+          setInput(newText);
+          searchFunction(newText);
+        }}
         placeholder={placeholderText}
         placeholderTextColor={drawerColor}
         autoCapitalize="none"
@@ -41,11 +44,7 @@ const SearchBar: React.FC<Props> = ({
         selectionColor="#FFF"
       ></TextInput>
       <View style={styles.searchBtn}>
-        <TouchableOpacity
-          onPress={() =>
-            Alert.alert("this is search btutton", "Hi! I am search button.")
-          }
-        >
+        <TouchableOpacity onPress={() => searchBtnFunc()}>
           <FontAwesome name="search" size={windowWidth * 0.07} color="#FFF" />
         </TouchableOpacity>
       </View>
