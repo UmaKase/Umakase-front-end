@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
@@ -6,6 +6,7 @@ import {
 import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -15,7 +16,7 @@ import {
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
-import { CONFIG_KEY } from "../../Constants/securestoreKey";
+import { ACCESS_KEY, CONFIG_KEY } from "../../Constants/securestoreKey";
 import { FontAwesome } from "@expo/vector-icons";
 import {
   drawerColor,
@@ -23,11 +24,13 @@ import {
   backgroundColor,
   windowHeight,
 } from "../../Constants/cssConst";
-import ToggleCard from "../../Components/InitialStep/ToggleCard";
+import ToggleFood from "../../Components/InitialStep/ToggleFood";
 import Footer from "../../Components/InitialStep/Footer";
 import { Food } from "../../types/InitialSteps";
 import axios from "axios";
 import { FoodAPI } from "../../Constants/backendAPI";
+import _ from "lodash";
+import SearchBar from "../../Components/InitialStep/SearchBar";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -51,6 +54,27 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       })
       .catch((e) => console.log(e.response));
   };
+
+  // search food
+  const debounceSearchFood = useCallback(
+    _.debounce(async (input: string) => {
+      const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
+      console.log(input);
+      // axios({
+      //   method: "post",
+      //   url: `${FoodAPI}/db`,
+      //   data: {
+      //     target: input,
+      //     foods: selectedFood,
+      //   },
+      // })
+      //   .then((res) => {
+      //     console.log(res);
+      //   })
+      //   .catch((e) => Alert.alert("Error", e));
+    }, 500),
+    []
+  );
 
   // setting complete function
   const settingComplete = async () => {
@@ -85,39 +109,28 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           </Text>
         </View>
         {/* search bar */}
-        <View style={styles.searchbarContainer}>
-          <TextInput
-            style={styles.searchbar}
-            onChangeText={(newText) => setInputText(newText)}
-            value={inputText}
-            placeholder="enter food name to find"
-            placeholderTextColor={drawerColor}
-            autoCapitalize="none"
-            selectionColor="#FFF"
-            // caretHidden={true}
-          ></TextInput>
-          <View style={styles.searchBtn}>
-            <TouchableOpacity onPress={() => {}}>
-              <FontAwesome
-                name="search"
-                size={windowWidth * 0.07}
-                color="#FFF"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-        {/* card container */}
+        <SearchBar
+          input={inputText}
+          setInput={setInputText}
+          placeholderText="enter food name to search"
+          searchFunction={(input: string) => {
+            debounceSearchFood(input);
+          }}
+          searchBtnFunc={() => {}}
+        ></SearchBar>
+        {/* tag container */}
         <FlatList
           data={food}
           keyExtractor={(item, index) => index.toString()}
           style={styles.cardContainer}
+          columnWrapperStyle={{ justifyContent: "space-evenly" }}
           numColumns={2}
           renderItem={({ item }) => {
-            const isChecked = selectedFood.find((foodId) => foodId === item.id)
-              ? true
-              : false;
+            const isChecked = !!selectedFood.find!!(
+              (foodId) => foodId === item.id
+            );
             return (
-              <ToggleCard
+              <ToggleFood
                 food={item}
                 checked={isChecked}
                 onPressHandler={() => {
@@ -129,7 +142,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                     setSelectedFood((prev) => [...prev, item.id]);
                   }
                 }}
-              ></ToggleCard>
+              ></ToggleFood>
             );
           }}
         />
