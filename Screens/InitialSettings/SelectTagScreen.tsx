@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { createRef, useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -29,6 +29,7 @@ import { Tag } from "../../types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import _ from "lodash";
 import BottomSheet from "@gorhom/bottom-sheet";
+import ToggleTagForSearch from "../../Components/InitialStep/ToggleTagForSearch";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -106,7 +107,9 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView
+        style={[styles.safeArea, { opacity: searchMode ? 0.7 : 1 }]}
+      >
         {/* header */}
         <View style={styles.header}>
           <Text style={styles.headerFont}>
@@ -114,14 +117,21 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
             選択してください
           </Text>
         </View>
-        {/* search bar */}
-        <SearchBar
-          input={inputText}
-          setInput={setInputText}
-          placeholderText="enter tag name to search"
-          searchFunction={(input: string) => debounceSearchTags(input)}
-          searchBtnFunc={() => setSearchMode((prev) => !prev)}
-        ></SearchBar>
+        {/* search Btn */}
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              setSearchMode((prev) => !prev);
+            }}
+          >
+            <FontAwesome
+              name="search"
+              size={windowWidth * 0.07}
+              // color={backgroundColor}
+              color="#FFF"
+            />
+          </TouchableOpacity>
+        </View>
         {/* card container */}
         <FlatList
           data={tags}
@@ -157,27 +167,61 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           goNextFunc={() => goNextStep()}
           skipFunc={() => skipSetting()}
         />
-        {/* modal */}
-        {searchMode ? (
-          <BottomSheet
-            snapPoints={["100%"]}
-            handleIndicatorStyle={{ backgroundColor: "#b77" }}
-            backgroundStyle={{ backgroundColor: "#b77" }}
-          >
-            <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setSearchMode((prev) => !prev)}>
-                <FontAwesome
-                  name="arrow-circle-left"
-                  size={windowWidth * 0.145}
-                  color="#FFF"
-                />
-              </TouchableOpacity>
-            </View>
-          </BottomSheet>
-        ) : (
-          <></>
-        )}
       </SafeAreaView>
+      {/* modal */}
+      {searchMode ? (
+        <BottomSheet
+          snapPoints={["75%"]}
+          handleIndicatorStyle={{ backgroundColor: "#FFF" }}
+          backgroundStyle={{ backgroundColor: "#FFF" }}
+        >
+          <SearchBar
+            input={inputText}
+            setInput={setInputText}
+            placeholderText="種類を入力してください"
+            searchFunction={(input: string) => debounceSearchTags(input)}
+            searchBtnFunc={() => setSearchMode((prev) => !prev)}
+          ></SearchBar>
+          <FlatList
+            data={tags}
+            keyExtractor={(item, index) => index.toString()}
+            style={styles.tagContainer}
+            columnWrapperStyle={{ justifyContent: "space-evenly" }}
+            numColumns={2}
+            onEndReached={() => onScrollToButtom()}
+            renderItem={({ item }) => {
+              const isChecked = selectedTag.find((tagId) => tagId === item.id)
+                ? true
+                : false;
+              return (
+                <ToggleTagForSearch
+                  tag={item}
+                  check={isChecked}
+                  onPressHandler={() => {
+                    if (isChecked) {
+                      setSelectedTag((prev) =>
+                        prev.filter((id) => id !== item.id)
+                      );
+                    } else {
+                      setSelectedTag((prev) => [...prev, item.id]);
+                    }
+                  }}
+                ></ToggleTagForSearch>
+              );
+            }}
+          />
+          <View style={styles.modalFooter}>
+            <TouchableOpacity
+              onPress={() => setSearchMode((prev) => !prev)}
+              style={styles.modalSubmit}
+            >
+              <Text style={styles.modalSubmitText}>確定</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
+      ) : (
+        <></>
+      )}
     </SafeAreaProvider>
   );
 };
@@ -199,22 +243,12 @@ const styles = StyleSheet.create({
     fontSize: windowWidth * 0.08,
     color: "#FFF",
   },
-  searchbarContainer: {
+  searchContainer: {
     width: windowWidth,
     height: windowHeight * 0.06,
-    flexDirection: "row",
-    paddingLeft: windowWidth * 0.1,
-    paddingRight: windowWidth * 0.05,
-  },
-  searchbar: {
-    flex: 5,
-    fontSize: windowWidth * 0.065,
-    color: "#FFF",
-  },
-  searchBtn: {
-    flex: 1,
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "center",
+    paddingRight: windowWidth * 0.1,
   },
   tagContainer: {
     flex: 1,
@@ -242,13 +276,24 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
-  modalHeader: {
+  modalFooter: {
     // backgroundColor: "#FFF",
     width: windowWidth,
     height: windowHeight * 0.1,
-    borderWidth: 3,
-    borderColor: "#77C",
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+  },
+  modalSubmit: {
+    width: windowWidth * 0.6,
+    height: windowHeight * 0.05,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: backgroundColor,
+    borderRadius: windowWidth * 0.03,
+  },
+  modalSubmitText: {
+    fontSize: windowWidth * 0.05,
+    color: "#FFF",
   },
 });
