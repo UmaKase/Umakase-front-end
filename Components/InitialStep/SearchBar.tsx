@@ -10,6 +10,7 @@ import {
   windowWidth,
   windowHeight,
   drawerColor,
+  backgroundColor,
 } from "../../Constants/cssConst";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -33,6 +34,7 @@ const SearchBar: React.FC<Props> = ({
       <TextInput
         style={styles.searchbar}
         value={input}
+        autoFocus={true}
         onChangeText={(newText) => {
           setInput(newText);
           searchFunction(newText);
@@ -41,11 +43,16 @@ const SearchBar: React.FC<Props> = ({
         placeholderTextColor={drawerColor}
         autoCapitalize="none"
         // caretHidden={true}
-        selectionColor="#FFF"
+        selectionColor={backgroundColor}
       ></TextInput>
       <View style={styles.searchBtn}>
         <TouchableOpacity onPress={() => searchBtnFunc()}>
-          <FontAwesome name="search" size={windowWidth * 0.07} color="#FFF" />
+          <FontAwesome
+            name="search"
+            size={windowWidth * 0.07}
+            // color={backgroundColor}
+            color={backgroundColor}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -64,8 +71,8 @@ const styles = StyleSheet.create({
   },
   searchbar: {
     flex: 5,
-    fontSize: windowWidth * 0.065,
-    color: "#FFF",
+    fontSize: windowWidth * 0.06,
+    color: backgroundColor,
     borderBottomWidth: 1,
     borderColor: "#FFF",
   },
