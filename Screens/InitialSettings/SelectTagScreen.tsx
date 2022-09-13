@@ -45,10 +45,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     })
       .then((res) => {
         setTags(res.data.data.tags);
-        // show what is in the res.data.data.tags
-        res.data.data.tags.forEach((t: Tag) => {
-          console.log(t.name + " " + t.id);
-        });
+        console.log(`${TagAPI}/?take=20&page=${page}`);
       })
       .catch((e) => {
         console.log(e);
@@ -66,17 +63,6 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // function activate after FlatList reached the end
   const onScrollToButtom = () => {
     setPage((prev) => prev + 1);
-    console.log(page);
-    axios({
-      method: "post",
-      url: `${TagAPI}/?take=20&page=${page}`,
-    })
-      .then((res) => {
-        setTags((prev) => [...prev, ...res.data.data.tags]);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
   };
 
   // skip function
@@ -93,10 +79,20 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     navigation.navigate("SelectFoodScreen", { TargetTags: selectedTag });
   };
 
-  // initial loading function
+  // get tags function (base on page change)
   useEffect(() => {
-    getTags();
-  }, []);
+    axios({
+      method: "post",
+      url: `${TagAPI}/?take=20&page=${page}`,
+    })
+      .then((res) => {
+        setTags((prev) => [...prev, ...res.data.data.tags]);
+        console.log(`${TagAPI}/?take=20&page=${page}`);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, [page]);
 
   return (
     <SafeAreaProvider>
