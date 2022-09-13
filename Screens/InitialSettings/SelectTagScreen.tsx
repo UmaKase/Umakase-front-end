@@ -1,18 +1,10 @@
-import React, { createRef, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   backgroundColor,
-  drawerColor,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
@@ -48,7 +40,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // fetch tags http request
   const getTags = async () => {
     axios({
-      method: "get",
+      method: "post",
       url: `${TagAPI}/?take=20&page=${page}`,
     })
       .then((res) => {
@@ -76,7 +68,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     setPage((prev) => prev + 1);
     console.log(page);
     axios({
-      method: "get",
+      method: "post",
       url: `${TagAPI}/?take=20&page=${page}`,
     })
       .then((res) => {
