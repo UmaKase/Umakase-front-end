@@ -27,7 +27,6 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
 
   const fetchImg = async () => {
     const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
-    console.log(`${ImgAPI}/food/:${food.img}`);
     axios({
       method: "get",
       responseType: "blob",
