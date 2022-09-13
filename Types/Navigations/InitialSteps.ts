@@ -4,5 +4,7 @@ export type InitialStepsProps = {
   //Screen
   IntroScreen: undefined;
   SelectTagScreen: undefined;
-  SelectFoodScreen: undefined;
+  SelectFoodScreen: {
+    TargetTags: string[];
+  };
 };
