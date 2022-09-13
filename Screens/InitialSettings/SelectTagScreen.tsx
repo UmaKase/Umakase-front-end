@@ -37,21 +37,6 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // search mode contorller boolean
   const [searchMode, setSearchMode] = useState(false);
 
-  // fetch tags http request
-  const getTags = async () => {
-    axios({
-      method: "post",
-      url: `${TagAPI}/?take=20&page=${page}`,
-    })
-      .then((res) => {
-        setTags(res.data.data.tags);
-        console.log(`${TagAPI}/?take=20&page=${page}`);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
   // search tag http request
   const debounceSearchTags = useCallback(
     _.debounce((input: string) => {
