@@ -1,16 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from "@react-navigation/native-stack";
+import React, { useCallback, useEffect, useState } from "react";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
-  Alert,
   FlatList,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -19,7 +14,6 @@ import * as SecureStore from "expo-secure-store";
 import { ACCESS_KEY, CONFIG_KEY } from "../../Constants/securestoreKey";
 import { FontAwesome } from "@expo/vector-icons";
 import {
-  drawerColor,
   windowWidth,
   backgroundColor,
   windowHeight,
@@ -38,21 +32,16 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   // food var
   const [selectedFood, setSelectedFood] = useState<string[]>([]);
   const [food, setFoods] = useState<Food[]>([]);
-  // target tag list
-  const tags: string[] = ["簡単"];
   // text input state
   const [inputText, setInputText] = useState<string>("");
+  const [page, setPage] = useState(1);
 
-  // fetch Food API
-  const fetchFoods = async () => {
-    axios({
-      url: `${FoodAPI}/db?tagName=${tags[0]}`,
-      method: "get",
-    })
-      .then((res) => {
-        setFoods(res.data.foods);
-      })
-      .catch((e) => console.log(e.response));
+  // search food
+  const [searchMode, setSearchMode] = useState(false);
+
+  // on reach end flatlist request
+  const onEndReachedHandler = () => {
+    setPage((prev) => prev + 1);
   };
 
   // search food
@@ -94,9 +83,20 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   };
 
   useEffect(() => {
+    console.log(`${FoodAPI}/db?take=20&page=${page}`);
     // fetch foods
-    fetchFoods();
-  }, []);
+    axios({
+      url: `${FoodAPI}/db?take=20&page=${page}`,
+      method: "post",
+      data: {
+        tagIds: route.params.TargetTags,
+      },
+    })
+      .then((res) => {
+        setFoods((prev) => [...prev, ...res.data.foods]);
+      })
+      .catch((e) => console.log(e.response));
+  }, [page]);
 
   return (
     <SafeAreaProvider>
@@ -121,6 +121,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         {/* tag container */}
         <FlatList
           data={food}
+          onEndReached={() => onEndReachedHandler()}
           keyExtractor={(item, index) => index.toString()}
           style={styles.cardContainer}
           columnWrapperStyle={{ justifyContent: "space-evenly" }}
