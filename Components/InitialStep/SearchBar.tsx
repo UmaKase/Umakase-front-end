@@ -34,17 +34,8 @@ const SearchBar: React.FC<Props> = ({
         placeholder={placeholderText}
         placeholderTextColor={drawerColor}
         autoCapitalize="none"
-        // caretHidden={true}
         selectionColor={backgroundColor}
       ></TextInput>
-      <View style={styles.searchBtn}>
-        <FontAwesome
-          name="search"
-          size={windowWidth * 0.07}
-          // color={backgroundColor}
-          color={backgroundColor}
-        />
-      </View>
     </View>
   );
 };
@@ -58,17 +49,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingLeft: windowWidth * 0.1,
     paddingRight: windowWidth * 0.05,
+    marginTop: windowHeight * 0.02,
   },
   searchbar: {
-    flex: 5,
+    flex: 0.9,
     fontSize: windowWidth * 0.06,
     color: backgroundColor,
     borderBottomWidth: 1,
-    borderColor: "#FFF",
-  },
-  searchBtn: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    borderColor: drawerColor,
   },
 });
