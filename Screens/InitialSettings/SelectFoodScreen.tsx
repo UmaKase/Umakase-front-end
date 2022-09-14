@@ -116,7 +116,6 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           searchFunction={(input: string) => {
             debounceSearchFood(input);
           }}
-          searchBtnFunc={() => {}}
         ></SearchBar>
         {/* tag container */}
         <FlatList

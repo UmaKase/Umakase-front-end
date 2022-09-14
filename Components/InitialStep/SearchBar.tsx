@@ -1,10 +1,4 @@
-import {
-  Alert,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 import React from "react";
 import {
   windowWidth,
@@ -19,7 +13,6 @@ type Props = {
   input: string;
   setInput: (value: React.SetStateAction<string>) => void;
   searchFunction: (value: string) => void;
-  searchBtnFunc: () => void;
 };
 
 const SearchBar: React.FC<Props> = ({
@@ -27,7 +20,6 @@ const SearchBar: React.FC<Props> = ({
   setInput,
   placeholderText,
   searchFunction,
-  searchBtnFunc,
 }) => {
   return (
     <View style={styles.searchbarContainer}>
@@ -46,14 +38,12 @@ const SearchBar: React.FC<Props> = ({
         selectionColor={backgroundColor}
       ></TextInput>
       <View style={styles.searchBtn}>
-        <TouchableOpacity onPress={() => searchBtnFunc()}>
-          <FontAwesome
-            name="search"
-            size={windowWidth * 0.07}
-            // color={backgroundColor}
-            color={backgroundColor}
-          />
-        </TouchableOpacity>
+        <FontAwesome
+          name="search"
+          size={windowWidth * 0.07}
+          // color={backgroundColor}
+          color={backgroundColor}
+        />
       </View>
     </View>
   );
