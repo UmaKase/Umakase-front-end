@@ -34,11 +34,15 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   const [inputText, setInputText] = useState<string>("");
   // api request page number
   const [page, setPage] = useState<number>(1);
+  // fetch tag API reached end page
+  const [tagEnd, setTagEnd] = useState(false);
 
   // search tags
   const [searchTags, setSearchTags] = useState<Tag[]>([]);
   // search request page
   const [searchPage, setSearchPage] = useState<number>(1);
+  // search API reached end page
+  const [searchEnd, setSearchEnd] = useState(false);
 
   // search mode contorller boolean
   const [searchMode, setSearchMode] = useState(false);
@@ -95,26 +99,31 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // get tags function (base on page change)
   useEffect(() => {
-    axios({
-      method: "post",
-      url: `${TagAPI}/?take=20&page=${page}`,
-      data: {
-        excludes: selectedTagId,
-      },
-    })
-      .then((res) => {
-        setTags((prev) => [...prev, ...res.data.data.tags]);
-        console.log(`${TagAPI}/?take=20&page=${page}`);
+    if (!tagEnd) {
+      axios({
+        method: "post",
+        url: `${TagAPI}/?take=20&page=${page}`,
+        data: {
+          excludes: selectedTagId,
+        },
       })
-      .catch((e) => {
-        console.log(e);
-      });
+        .then((res) => {
+          if (res.data.data.tags[0]) {
+            setTags((prev) => [...prev, ...res.data.data.tags]);
+          } else {
+            setTagEnd(true);
+          }
+          console.log(`${TagAPI}/?take=20&page=${page}`);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }, [page]);
 
   // search tag on reachend handler
   useEffect(() => {
-    console.log(searchPage);
-    if (searchPage !== 1) {
+    if (searchPage !== 1 && !searchEnd) {
       axios({
         method: "post",
         url: `${TagAPI}/?name=${inputText}&take=20&page=${searchPage}`,
@@ -123,7 +132,11 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
         },
       })
         .then((res) => {
-          setSearchTags((prev) => [...prev, ...res.data.data.tags]);
+          if (res.data.data.tags[0]) {
+            setSearchTags((prev) => [...prev, ...res.data.data.tags]);
+          } else {
+            setSearchEnd(true);
+          }
         })
         .catch((e) => {
           console.log(e);
