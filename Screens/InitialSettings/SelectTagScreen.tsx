@@ -20,8 +20,8 @@ import ToggleTag from "../../Components/InitialStep/ToggleTag";
 import { Tag } from "../../types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import _ from "lodash";
-import BottomSheet from "@gorhom/bottom-sheet";
 import ToggleTagForSearch from "../../Components/InitialStep/ToggleTagForSearch";
+import Modal from "react-native-modal";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -81,6 +81,14 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // search modal on reached end handler
   const onModalScrollToBottom = () => {
     setSearchPage((prev) => prev + 1);
+  };
+
+  // leave search mode
+  const leaveSearchMode = () => {
+    setSearchMode(false);
+    setInputText("");
+    setSearchTags([]);
+    setSearchPage(1);
   };
 
   // skip function
@@ -214,75 +222,72 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           goNextFunc={() => goNextStep()}
           skipFunc={() => skipSetting()}
         />
-      </SafeAreaView>
-      {/* modal */}
-      {searchMode ? (
-        <BottomSheet
-          snapPoints={["75%"]}
-          handleIndicatorStyle={{ backgroundColor: "#FFF" }}
-          backgroundStyle={{ backgroundColor: "#FFF" }}
+        {/* modal */}
+        <Modal
+          isVisible={searchMode}
+          onBackdropPress={() => leaveSearchMode()}
+          style={styles.modal}
         >
-          <SearchBar
-            input={inputText}
-            setInput={setInputText}
-            placeholderText="種類を入力してください"
-            searchFunction={(input: string) => debounceSearchTags(input)}
-          ></SearchBar>
-          <FlatList
-            data={searchTags}
-            extraData={searchTags}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.tagContainer}
-            columnWrapperStyle={{ justifyContent: "space-evenly" }}
-            numColumns={2}
-            onEndReached={() => onModalScrollToBottom()}
-            renderItem={({ item, index }) => {
-              const isChecked = selectedTagId.find((tagId) => tagId === item.id)
-                ? true
-                : false;
-              return (
-                <ToggleTagForSearch
-                  tag={item}
-                  check={isChecked}
-                  onPressHandler={() => {
-                    const tempSearchTag = searchTags[index];
-                    if (isChecked) {
-                      setSelectedTagId((prev) =>
-                        prev.filter((id) => id !== item.id)
-                      );
-                    } else {
-                      setSelectedTagId((prev) => [...prev, item.id]);
-                      setTags((prev) => {
-                        return [
-                          tempSearchTag,
-                          ...prev.filter(
-                            (target) => target.id != tempSearchTag.id
-                          ),
-                        ];
-                      });
-                    }
-                  }}
-                ></ToggleTagForSearch>
-              );
-            }}
-          />
-          <View style={styles.modalFooter}>
-            <TouchableOpacity
-              onPress={() => {
-                setSearchMode((prev) => !prev);
-                setInputText("");
-                setSearchTags([]);
-                setSearchPage(1);
+          <View style={styles.modalBackground}>
+            <SearchBar
+              input={inputText}
+              setInput={setInputText}
+              placeholderText="種類を入力してください"
+              searchFunction={(input: string) => debounceSearchTags(input)}
+            ></SearchBar>
+            <FlatList
+              data={searchTags}
+              extraData={searchTags}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.tagContainer}
+              columnWrapperStyle={{ justifyContent: "space-evenly" }}
+              numColumns={2}
+              onEndReached={() => onModalScrollToBottom()}
+              renderItem={({ item, index }) => {
+                const isChecked = selectedTagId.find(
+                  (tagId) => tagId === item.id
+                )
+                  ? true
+                  : false;
+                return (
+                  <ToggleTagForSearch
+                    tag={item}
+                    check={isChecked}
+                    onPressHandler={() => {
+                      const tempSearchTag = searchTags[index];
+                      if (isChecked) {
+                        setSelectedTagId((prev) =>
+                          prev.filter((id) => id !== item.id)
+                        );
+                      } else {
+                        setSelectedTagId((prev) => [...prev, item.id]);
+                        setTags((prev) => {
+                          return [
+                            tempSearchTag,
+                            ...prev.filter(
+                              (target) => target.id != tempSearchTag.id
+                            ),
+                          ];
+                        });
+                      }
+                    }}
+                  ></ToggleTagForSearch>
+                );
               }}
-              style={styles.modalSubmit}
-            >
-              <Text style={styles.modalSubmitText}>確定</Text>
-            </TouchableOpacity>
+            />
+            <View style={styles.modalFooter}>
+              <TouchableOpacity
+                onPress={() => {
+                  leaveSearchMode();
+                }}
+                style={styles.modalSubmit}
+              >
+                <Text style={styles.modalSubmitText}>確定</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </BottomSheet>
-      ) : (
-        <></>
-      )}
+        </Modal>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 };
@@ -337,8 +342,18 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
+  modal: {
+    margin: 0,
+    justifyContent: "flex-end",
+  },
+  modalBackground: {
+    flex: 0.75,
+    height: windowHeight * 0.75, //giving the height because of the flatlist need a fix height to be scrollable
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: windowWidth * 0.05,
+    borderTopRightRadius: windowWidth * 0.05,
+  },
   modalFooter: {
-    // backgroundColor: "#FFF",
     width: windowWidth,
     height: windowHeight * 0.15,
     flexDirection: "row",
