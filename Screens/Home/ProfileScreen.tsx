@@ -46,17 +46,15 @@ const ProfileScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.background}>
-          <CustomHeader
-            toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-          ></CustomHeader>
-          <TouchableOpacity
-            onPress={() => logoutProcess()}
-            style={styles.logoutBtn}
-          >
-            <Text>Logout</Text>
-          </TouchableOpacity>
-        </View>
+        <CustomHeader
+          toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+        ></CustomHeader>
+        <TouchableOpacity
+          onPress={() => logoutProcess()}
+          style={styles.logoutBtn}
+        >
+          <Text>Logout</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -67,11 +65,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: backgroundColor,
-  },
-  background: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
   logoutBtn: {
     backgroundColor: "#888",
