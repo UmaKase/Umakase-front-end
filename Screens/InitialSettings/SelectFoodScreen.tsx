@@ -26,6 +26,7 @@ import { FoodAPI } from "../../Constants/backendAPI";
 import _ from "lodash";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import Modal from "react-native-modal";
+import customAxiosInstance from "../../Utils/customAxiosInstance";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -33,22 +34,53 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   // food var
   const [selectedFood, setSelectedFood] = useState<string[]>([]);
   const [food, setFoods] = useState<Food[]>([]);
+  const [page, setPage] = useState(1);
+  const [foodEnd, setFoodEnd] = useState(false);
+
   // text input state
   const [inputText, setInputText] = useState<string>("");
-  const [page, setPage] = useState(1);
 
   // search food
   const [searchMode, setSearchMode] = useState(false);
+  const [searchFoods, setSearchFoods] = useState<Food[]>([]);
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchEnd, setSearchEnd] = useState(false);
 
   // on reach end flatlist request
   const onEndReachedHandler = () => {
     setPage((prev) => prev + 1);
   };
 
+  // search modal on reached end handler
+  const onModalScrollToBottom = () => {
+    setSearchPage((prev) => prev + 1);
+  };
+
+  // leave search mode
+  const leaveSearchMode = () => {
+    setSearchMode(false);
+    setInputText("");
+    setSearchFoods([]);
+    setSearchPage(1);
+  };
+
   // search food
   const debounceSearchFood = useCallback(
     _.debounce(async (input: string) => {
-      const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
+      if (input === "") {
+        setSearchFoods([]);
+        setSearchPage(1);
+      } else {
+        axios({
+          method: "post",
+          url: `${FoodAPI}/db?name=${input}&take=20&page=${searchPage}`,
+          data: {
+            tagIds: [],
+            excludeTagIds: [],
+            excludeFoods: [],
+          },
+        });
+      }
       console.log(input);
       // axios({
       //   method: "post",
@@ -129,7 +161,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           data={food}
           onEndReached={() => onEndReachedHandler()}
           keyExtractor={(item, index) => index.toString()}
-          style={styles.cardContainer}
+          style={styles.foodsContainer}
           columnWrapperStyle={{ justifyContent: "space-evenly" }}
           numColumns={2}
           renderItem={({ item }) => {
@@ -162,12 +194,58 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         {searchMode ? (
           <Modal
             isVisible={searchMode}
-            onBackdropPress={() => setSearchMode(false)}
-            onSwipeComplete={() => setSearchMode(false)}
-            swipeDirection="down"
+            onBackdropPress={() => leaveSearchMode()}
             style={styles.modal}
           >
-            <View style={styles.modalBackground}></View>
+            <View style={styles.modalBackground}>
+              <SearchBar
+                input={inputText}
+                setInput={setInputText}
+                placeholderText="料理を入力してください"
+                searchFunction={(input: string) => debounceSearchFood(input)}
+              ></SearchBar>
+              {/* flatlist loop out foods */}
+              <FlatList
+                data={searchFoods}
+                extraData={searchFoods}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.foodsContainer}
+                columnWrapperStyle={{ justifyContent: "space-between" }}
+                numColumns={2}
+                onEndReached={() => onModalScrollToBottom()}
+                renderItem={({ item, index }) => {
+                  const isChecked = !!selectedFood.find!!(
+                    (foodId) => foodId === item.id
+                  );
+                  return (
+                    <ToggleFood
+                      food={item}
+                      checked={isChecked}
+                      onPressHandler={() => {
+                        if (isChecked) {
+                          setSelectedFood((prev) =>
+                            prev.filter((id) => id !== item.id)
+                          );
+                        } else {
+                          setSelectedFood((prev) => [...prev, item.id]);
+                        }
+                      }}
+                    />
+                  );
+                }}
+              />
+              {/* modal footer */}
+              <View style={styles.modalFooter}>
+                <TouchableOpacity
+                  onPress={() => {
+                    leaveSearchMode();
+                  }}
+                  style={styles.modalSubmit}
+                >
+                  <Text style={styles.modalSubmitText}>確定</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </Modal>
         ) : (
           <></>
@@ -202,17 +280,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingRight: windowWidth * 0.1,
   },
-  cardContainer: {
+  foodsContainer: {
     flex: 1,
   },
+
+  // modal
   modal: {
     margin: 0,
     justifyContent: "flex-end",
   },
   modalBackground: {
     flex: 0.75,
+    height: windowHeight * 0.75, //giving the height because of the flatlist need a fix height to be scrollable
     backgroundColor: "#FFF",
     borderTopLeftRadius: windowWidth * 0.05,
     borderTopRightRadius: windowWidth * 0.05,
+  },
+  modalFooter: {
+    width: windowWidth,
+    height: windowHeight * 0.15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalSubmit: {
+    width: windowWidth * 0.6,
+    height: windowHeight * 0.05,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: backgroundColor,
+    borderRadius: windowWidth * 0.03,
+  },
+  modalSubmitText: {
+    fontSize: windowWidth * 0.05,
+    color: "#FFF",
   },
 });
