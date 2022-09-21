@@ -76,6 +76,7 @@ const RootRouter: React.FC = () => {
   };
 
   useEffect(() => {
+    // SecureStore.deleteItemAsync(CONFIG_KEY);
     authentication();
   }, []);
 
