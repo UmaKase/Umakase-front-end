@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
+import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
   FlatList,
@@ -20,11 +20,12 @@ import {
 } from "../../Constants/cssConst";
 import ToggleFood from "../../Components/InitialStep/ToggleFood";
 import Footer from "../../Components/InitialStep/Footer";
-import { Food } from "../../types/InitialSteps";
+import { Food } from "../../Types/InitialSteps";
 import axios from "axios";
 import { FoodAPI } from "../../Constants/backendAPI";
 import _ from "lodash";
 import SearchBar from "../../Components/InitialStep/SearchBar";
+import Modal from "react-native-modal";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -108,15 +109,21 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             選択してください
           </Text>
         </View>
-        {/* search bar */}
-        <SearchBar
-          input={inputText}
-          setInput={setInputText}
-          placeholderText="enter food name to search"
-          searchFunction={(input: string) => {
-            debounceSearchFood(input);
-          }}
-        ></SearchBar>
+        {/* search Btn */}
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              setSearchMode((prev) => !prev);
+            }}
+          >
+            <FontAwesome
+              name="search"
+              size={windowWidth * 0.07}
+              // color={backgroundColor}
+              color="#FFF"
+            />
+          </TouchableOpacity>
+        </View>
         {/* tag container */}
         <FlatList
           data={food}
@@ -152,6 +159,19 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           goNextFunc={() => settingComplete()}
           skipFunc={() => skipSetting()}
         />
+        {searchMode ? (
+          <Modal
+            isVisible={searchMode}
+            onBackdropPress={() => setSearchMode(false)}
+            onSwipeComplete={() => setSearchMode(false)}
+            swipeDirection="down"
+            style={styles.modal}
+          >
+            <View style={styles.modalBackground}></View>
+          </Modal>
+        ) : (
+          <></>
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -175,24 +195,24 @@ const styles = StyleSheet.create({
     fontSize: windowWidth * 0.08,
     color: "#FFF",
   },
-  searchbarContainer: {
+  searchContainer: {
     width: windowWidth,
     height: windowHeight * 0.06,
-    flexDirection: "row",
-    paddingLeft: windowWidth * 0.1,
-    paddingRight: windowWidth * 0.05,
-  },
-  searchbar: {
-    flex: 5,
-    fontSize: windowWidth * 0.065,
-    color: "#FFF",
-  },
-  searchBtn: {
-    flex: 1,
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "center",
+    paddingRight: windowWidth * 0.1,
   },
   cardContainer: {
     flex: 1,
+  },
+  modal: {
+    margin: 0,
+    justifyContent: "flex-end",
+  },
+  modalBackground: {
+    flex: 0.75,
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: windowWidth * 0.05,
+    borderTopRightRadius: windowWidth * 0.05,
   },
 });
