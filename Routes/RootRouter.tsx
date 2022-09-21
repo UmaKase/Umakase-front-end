@@ -15,13 +15,14 @@ import {
 } from "../Constants/securestoreKey";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
 import { RootNavigationProps } from "../types/Navigations/Root";
+import customAxiosInstance from "../Utils/customAxiosInstance";
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
   //fetching data status
   const [fetching, setFetching] = useState<boolean>(true);
   // ANCHOR start token validation to do conditional navigation
-  const [access, setAccess] = useState<boolean>(false);
+  const [access, setAccess] = useState<boolean>();
   const [accessToken, setAccessToken] = useState<string>("");
   const tokenValidation = async () => {
     //use this while the account is not logout and you reinstall the DB
@@ -56,25 +57,33 @@ const RootRouter: React.FC = () => {
     return true;
   };
 
-  useEffect(() => {
-    try {
-      tokenValidation()
-        .then((isAccess) => {
-          if (isAccess) {
-            setAccess(true);
-          } else {
-            setAccess(false);
-          }
-          setFetching(false);
-        })
-        .catch((e) => {
-          console.log(e.response.data.error);
+  const authentication = async () => {
+    customAxiosInstance({
+      method: "post",
+      url: `${AuthAPI}/token/access`,
+    })
+      .then((res) => {
+        if (res.data.ok) {
+          setAccess(true);
+        } else {
           setAccess(false);
-        });
-    } catch (error) {
-      console.error(error);
-    }
+        }
+      })
+      .catch((e) => {
+        console.log(e.response.data);
+        setAccess(false);
+      });
+  };
+
+  useEffect(() => {
+    authentication();
   }, []);
+
+  useEffect(() => {
+    if (access) {
+      setFetching(false);
+    }
+  }, [access]);
 
   return fetching ? (
     <LoadingSpinner />
