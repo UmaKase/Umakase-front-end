@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { InitialStepsProps } from "../types/Navigations/InitialSteps";
+import { InitialStepsProps } from "../Types/Navigations/InitialSteps";
 
 //import screens
 import SelectTagScreen from "../Screens/InitialSettings/SelectTagScreen";

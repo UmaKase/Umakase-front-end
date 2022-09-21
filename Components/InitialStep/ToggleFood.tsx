@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Food } from "../../types/InitialSteps";
+import { Food } from "../../Types/InitialSteps";
 import {
   backgroundColor,
   drawerColor,

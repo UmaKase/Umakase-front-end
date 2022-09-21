@@ -1,14 +1,14 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
+import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import {
   backgroundColor,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { InitialStepsProps } from "../../types/Navigations/InitialSteps";
+import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
@@ -17,7 +17,7 @@ import Footer from "../../Components/InitialStep/Footer";
 import { CommonActions } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
 import ToggleTag from "../../Components/InitialStep/ToggleTag";
-import { Tag } from "../../types/InitialSteps";
+import { Tag } from "../../Types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import _ from "lodash";
 import ToggleTagForSearch from "../../Components/InitialStep/ToggleTagForSearch";

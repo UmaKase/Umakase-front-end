@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import { HomeStackNavigationProps } from "../types/Navigations/HomeStack";
+import { HomeStackNavigationProps } from "../Types/Navigations/HomeStack";
 import InitialStepsNavigation from "./InitialStepsNavigation";
 import * as SecureStore from "expo-secure-store";
 import { CONFIG_KEY } from "../Constants/securestoreKey";

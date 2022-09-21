@@ -10,7 +10,7 @@ import AuthInput from "../../Components/Auth/AuthInput";
 //navigation
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { CommonActions } from "@react-navigation/native";
-import { AuthNavigationProps } from "../../types/Navigations/Auth";
+import { AuthNavigationProps } from "../../Types/Navigations/Auth";
 //css const
 import {
   backgroundColor,

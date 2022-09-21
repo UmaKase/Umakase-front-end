@@ -5,7 +5,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
 import { windowHeight, windowWidth } from "../../Constants/cssConst";
-import { HomeTabNavigationProps } from "../../types/Navigations/HomeTab";
+import { HomeTabNavigationProps } from "../../Types/Navigations/HomeTab";
 import { Fontisto } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 

@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 //screens
 // import { bg_LessDarkColor } from "../Constants/cssConst";
 import RandomScreen from "../Screens/Home/RandomScreen";
-import { HomeTabNavigationProps } from "../types/Navigations/HomeTab";
+import { HomeTabNavigationProps } from "../Types/Navigations/HomeTab";
 import ProfileScreen from "../Screens/Home/ProfileScreen";
 
 const BottomTab = createMaterialTopTabNavigator<HomeTabNavigationProps>();

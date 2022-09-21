@@ -14,7 +14,7 @@ import {
   REFRESH_KEY,
 } from "../Constants/securestoreKey";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
-import { RootNavigationProps } from "../types/Navigations/Root";
+import { RootNavigationProps } from "../Types/Navigations/Root";
 import customAxiosInstance from "../Utils/customAxiosInstance";
 
 const RootRouter: React.FC = () => {

@@ -3,7 +3,7 @@ import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import RandomScreen from "../Screens/Home/RandomScreen";
 import ProfileScreen from "../Screens/Home/ProfileScreen";
-import { HomeDrawerNavigationProps } from "../types/Navigations/HomeDrawer";
+import { HomeDrawerNavigationProps } from "../Types/Navigations/HomeDrawer";
 import {
   backgroundColor,
   darkTextColor,

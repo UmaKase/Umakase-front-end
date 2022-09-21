@@ -19,9 +19,9 @@ import { Fontisto, Feather, FontAwesome } from "@expo/vector-icons";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI } from "../../Constants/backendAPI";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AuthNavigationProps } from "../../types/Navigations/Auth";
+import { AuthNavigationProps } from "../../Types/Navigations/Auth";
 import AuthInputWithErrMsg from "../../Components/Auth/AuthInputWithErrMsg";
-import { registerError } from "../../types/api";
+import { registerError } from "../../Types/api";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 

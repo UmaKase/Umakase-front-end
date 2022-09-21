@@ -4,14 +4,14 @@ import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI } from "../../Constants/backendAPI";
-import { HomeTabNavigationProps } from "../../types/Navigations/HomeTab";
+import { HomeTabNavigationProps } from "../../Types/Navigations/HomeTab";
 import * as SecureStore from "expo-secure-store";
 import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import { CommonActions, DrawerActions } from "@react-navigation/native";
 import { backgroundColor } from "../../Constants/cssConst";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
 import { DrawerScreenProps } from "@react-navigation/drawer";
-import { HomeDrawerNavigationProps } from "../../types/Navigations/HomeDrawer";
+import { HomeDrawerNavigationProps } from "../../Types/Navigations/HomeDrawer";
 
 type RandomScreenProps = DrawerScreenProps<
   HomeDrawerNavigationProps,

@@ -7,7 +7,7 @@ import {
   windowWidth,
 } from "../../Constants/cssConst";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Tag } from "../../types/InitialSteps";
+import { Tag } from "../../Types/InitialSteps";
 
 type Props = {
   tag: Tag;
