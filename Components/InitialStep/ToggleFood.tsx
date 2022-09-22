@@ -8,9 +8,7 @@ import {
   windowWidth,
 } from "../../Constants/cssConst";
 import { ImgAPI } from "../../Constants/backendAPI";
-import axios from "axios";
-import * as SecureStore from "expo-secure-store";
-import { ACCESS_KEY } from "../../Constants/securestoreKey";
+import customAxiosInstance from "../../Utils/customAxiosInstance";
 
 interface ToggleFoodProps {
   food: Food;
@@ -26,11 +24,10 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
   const [img, setImg] = useState<string>();
 
   const fetchImg = async () => {
-    const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
-    axios({
+    console.log(food.img);
+    customAxiosInstance({
       method: "get",
       responseType: "blob",
-      headers: { Authorization: `Bearer ${localAccessToken}` },
       url: `${ImgAPI}/food/${food.img}`,
     })
       .then((res) => {
@@ -43,11 +40,13 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
 
   useEffect(() => {
     fetchImg();
-  }, [img]);
+  }, [food.img]);
 
   return (
     <TouchableOpacity
-      onPress={onPressHandler}
+      onPress={() => {
+        onPressHandler();
+      }}
       style={[
         styles.cardBackground,
         { backgroundColor: checked ? "#FFF" : backgroundColor },
@@ -80,10 +79,9 @@ const borderRadius = windowWidth * 0.04;
 
 const styles = StyleSheet.create({
   cardBackground: {
-    width: width - 0.1,
+    width: width,
     height: height,
     borderRadius: borderRadius,
-    // marginLeft: windowWidth * 0.1,
     marginVertical: windowHeight * 0.01,
   },
   imgContainer: {
@@ -108,6 +106,5 @@ const styles = StyleSheet.create({
   name: {
     fontSize: windowWidth * 0.04,
     flexWrap: "wrap",
-    // flexShrink: 1,
   },
 });
