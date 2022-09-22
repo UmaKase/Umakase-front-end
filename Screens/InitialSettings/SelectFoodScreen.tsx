@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
-import { ACCESS_KEY, CONFIG_KEY } from "../../Constants/securestoreKey";
+import { CONFIG_KEY } from "../../Constants/securestoreKey";
 import { FontAwesome } from "@expo/vector-icons";
 import {
   windowWidth,
@@ -26,7 +26,7 @@ import { FoodAPI } from "../../Constants/backendAPI";
 import _ from "lodash";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import Modal from "react-native-modal";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
+import ToggleFoodForSearch from "../../Components/InitialStep/ToggleFoodForSearch";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -75,25 +75,17 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           method: "post",
           url: `${FoodAPI}/db?name=${input}&take=20&page=${searchPage}`,
           data: {
-            tagIds: [],
-            excludeTagIds: [],
-            excludeFoods: [],
+            tagIds: route.params.TargetTags,
+            excludeFoods: selectedFood,
           },
-        });
+        })
+          .then((res) => {
+            console.log(res.data.foods);
+            setSearchFoods(res.data.foods);
+          })
+          .catch((e) => console.log(e.response));
       }
       console.log(input);
-      // axios({
-      //   method: "post",
-      //   url: `${FoodAPI}/db`,
-      //   data: {
-      //     target: input,
-      //     foods: selectedFood,
-      //   },
-      // })
-      //   .then((res) => {
-      //     console.log(res);
-      //   })
-      //   .catch((e) => Alert.alert("Error", e));
     }, 500),
     []
   );
@@ -115,21 +107,53 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     );
   };
 
+  // get foods
   useEffect(() => {
-    console.log(`${FoodAPI}/db?take=20&page=${page}`);
     // fetch foods
-    axios({
-      url: `${FoodAPI}/db?take=20&page=${page}`,
-      method: "post",
-      data: {
-        tagIds: route.params.TargetTags,
-      },
-    })
-      .then((res) => {
-        setFoods((prev) => [...prev, ...res.data.foods]);
+    if (!foodEnd) {
+      console.log(route.params.TargetTags);
+      axios({
+        url: `${FoodAPI}/db?take=20&page=${page}`,
+        method: "post",
+        data: {
+          tagIds: route.params.TargetTags,
+          excludeFoods: selectedFood,
+        },
       })
-      .catch((e) => console.log(e.response));
+        .then((res) => {
+          if (res.data.foods[0]) {
+            setFoods((prev) => [...prev, ...res.data.foods]);
+          } else {
+            setFoodEnd(true);
+          }
+        })
+        .catch((e) => console.log(e.response));
+    }
   }, [page]);
+
+  // search food on reachedend handler
+  useEffect(() => {
+    if (searchPage !== 1 && !searchEnd) {
+      axios({
+        url: `${FoodAPI}/db?name=${inputText}&take=20&page=${searchPage}`,
+        method: "post",
+        data: {
+          tagIds: route.params.TargetTags,
+          excludeFoods: selectedFood,
+        },
+      })
+        .then((res) => {
+          if (res.data.foods[0]) {
+            setSearchFoods((prev) => [...prev, ...res.data.foods]);
+          } else {
+            setSearchEnd(true);
+          }
+        })
+        .catch((e) => console.log(e.response));
+    } else {
+      setSearchEnd(true);
+    }
+  }, [searchPage]);
 
   return (
     <SafeAreaProvider>
@@ -159,12 +183,13 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         {/* tag container */}
         <FlatList
           data={food}
+          extraData={food}
           onEndReached={() => onEndReachedHandler()}
           keyExtractor={(item, index) => index.toString()}
           style={styles.foodsContainer}
           columnWrapperStyle={{ justifyContent: "space-evenly" }}
           numColumns={2}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             const isChecked = !!selectedFood.find!!(
               (foodId) => foodId === item.id
             );
@@ -173,12 +198,19 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                 food={item}
                 checked={isChecked}
                 onPressHandler={() => {
+                  const temptFood = food[index];
                   if (isChecked) {
                     setSelectedFood((prev) =>
                       prev.filter((id) => id !== item.id)
                     );
                   } else {
                     setSelectedFood((prev) => [...prev, item.id]);
+                    setFoods((prev) => {
+                      return [
+                        temptFood,
+                        ...prev.filter((target) => target.id != temptFood.id),
+                      ];
+                    });
                   }
                 }}
               ></ToggleFood>
@@ -187,7 +219,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         />
         {/* footer */}
         <Footer
-          goBackFunc={() => navigation.goBack()}
+          goBackFunc={() => navigation.pop()}
           goNextFunc={() => settingComplete()}
           skipFunc={() => skipSetting()}
         />
@@ -210,7 +242,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                 extraData={searchFoods}
                 keyExtractor={(item, index) => index.toString()}
                 style={styles.foodsContainer}
-                columnWrapperStyle={{ justifyContent: "space-between" }}
+                columnWrapperStyle={{ justifyContent: "space-evenly" }}
                 numColumns={2}
                 onEndReached={() => onModalScrollToBottom()}
                 renderItem={({ item, index }) => {
@@ -218,16 +250,25 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                     (foodId) => foodId === item.id
                   );
                   return (
-                    <ToggleFood
+                    <ToggleFoodForSearch
                       food={item}
                       checked={isChecked}
                       onPressHandler={() => {
+                        const tempFood = searchFoods[index];
                         if (isChecked) {
                           setSelectedFood((prev) =>
                             prev.filter((id) => id !== item.id)
                           );
                         } else {
                           setSelectedFood((prev) => [...prev, item.id]);
+                          setFoods((prev) => {
+                            return [
+                              tempFood,
+                              ...prev.filter(
+                                (target) => target.id != tempFood.id
+                              ),
+                            ];
+                          });
                         }
                       }}
                     />
