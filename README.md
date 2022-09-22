@@ -1,2 +1,2 @@
-1. npm install
-2. npm start or yarn start
+1. yarn or npm i
+2. yarn start or npm start
