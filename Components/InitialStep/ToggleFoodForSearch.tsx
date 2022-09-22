@@ -18,7 +18,7 @@ interface ToggleFoodProps {
   onPressHandler: () => void;
 }
 
-const ToggleFood: React.FC<ToggleFoodProps> = ({
+const ToggleFoodForSearch: React.FC<ToggleFoodProps> = ({
   food,
   checked,
   onPressHandler,
@@ -34,15 +34,22 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
       url: `${ImgAPI}/food/${food.img}`,
     })
       .then((res) => {
-        setImg(URL.createObjectURL(res.data));
+        try {
+          setImg(URL.createObjectURL(res.data));
+        } catch (error) {
+          console.log("img loading error:" + error);
+        }
       })
       .catch((e) => {
-        console.log("this is error :" + e);
+        // console.log("food inmg name:", food.img);
+        console.log("food img url:", `${ImgAPI}/food/${food.img}`);
+        // console.log("img axios request failed:", e.response.status);
       });
   };
 
   useEffect(() => {
     fetchImg();
+    return () => {};
   }, [img]);
 
   return (
@@ -50,7 +57,7 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
       onPress={onPressHandler}
       style={[
         styles.cardBackground,
-        { backgroundColor: checked ? "#FFF" : backgroundColor },
+        { backgroundColor: checked ? backgroundColor : "#FFF" },
       ]}
     >
       <View style={styles.imgContainer}>
@@ -61,10 +68,13 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
           resizeMode="cover"
         ></Image>
       </View>
-      <View style={styles.nameContainer}>
-        <Text
-          style={[styles.name, { color: checked ? backgroundColor : "#FFF" }]}
-        >
+      <View
+        style={[
+          styles.nameContainer,
+          { borderColor: checked ? backgroundColor : "#777" },
+        ]}
+      >
+        <Text style={[styles.name, { color: checked ? "#FFF" : "#000" }]}>
           {food.name}
         </Text>
       </View>
@@ -72,7 +82,7 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
   );
 };
 
-export default ToggleFood;
+export default ToggleFoodForSearch;
 
 const width = windowWidth * 0.35;
 const height = (width * 4) / 3;
@@ -101,9 +111,13 @@ const styles = StyleSheet.create({
   },
   nameContainer: {
     flex: 1,
-    borderRadius: borderRadius,
+    borderBottomLeftRadius: borderRadius,
+    borderBottomRightRadius: borderRadius,
     alignItems: "center",
     justifyContent: "center",
+    borderBottomWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
   },
   name: {
     fontSize: windowWidth * 0.04,
