@@ -68,12 +68,7 @@ const ToggleFoodForSearch: React.FC<ToggleFoodProps> = ({
           </View>
         )}
       </View>
-      <View
-        style={[
-          styles.nameContainer,
-          { borderColor: checked ? backgroundColor : "#777" },
-        ]}
-      >
+      <View style={styles.nameContainer}>
         <Text style={[styles.name, { color: checked ? "#FFF" : "#000" }]}>
           {food.name}
         </Text>
@@ -114,9 +109,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: borderRadius,
     alignItems: "center",
     justifyContent: "center",
-    borderBottomWidth: 1,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
   },
   name: {
     fontSize: windowWidth * 0.04,
