@@ -8,9 +8,7 @@ import {
   windowWidth,
 } from "../../Constants/cssConst";
 import { ImgAPI } from "../../Constants/backendAPI";
-import axios from "axios";
-import * as SecureStore from "expo-secure-store";
-import { ACCESS_KEY } from "../../Constants/securestoreKey";
+import customAxiosInstance from "../../Utils/customAxiosInstance";
 
 interface ToggleFoodProps {
   food: Food;
@@ -26,31 +24,26 @@ const ToggleFoodForSearch: React.FC<ToggleFoodProps> = ({
   const [img, setImg] = useState<string>();
 
   const fetchImg = async () => {
-    const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
-    axios({
-      method: "get",
-      responseType: "blob",
-      headers: { Authorization: `Bearer ${localAccessToken}` },
-      url: `${ImgAPI}/food/${food.img}`,
-    })
-      .then((res) => {
-        try {
-          setImg(URL.createObjectURL(res.data));
-        } catch (error) {
-          console.log("img loading error:" + error);
-        }
+    if (food.img) {
+      customAxiosInstance({
+        method: "get",
+        responseType: "blob",
+        url: `${ImgAPI}/food/${food.img}`,
       })
-      .catch((e) => {
-        // console.log("food inmg name:", food.img);
-        console.log("food img url:", `${ImgAPI}/food/${food.img}`);
-        // console.log("img axios request failed:", e.response.status);
-      });
+        .then((res) => {
+          setImg(URL.createObjectURL(res.data));
+        })
+        .catch((e) => {
+          console.log("this is error :" + e);
+        });
+    } else {
+      setImg(undefined);
+    }
   };
 
   useEffect(() => {
     fetchImg();
-    return () => {};
-  }, [img]);
+  }, [food.img]);
 
   return (
     <TouchableOpacity
@@ -61,12 +54,19 @@ const ToggleFoodForSearch: React.FC<ToggleFoodProps> = ({
       ]}
     >
       <View style={styles.imgContainer}>
-        <Image
-          // source={{ uri: "data:image/jpeg;base64," + img }}
-          source={{ uri: img }}
-          style={styles.img}
-          resizeMode="cover"
-        ></Image>
+        {img ? (
+          <Image
+            source={{ uri: img }}
+            style={styles.img}
+            resizeMode="cover"
+          ></Image>
+        ) : (
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <Text style={{ color: "#777" }}>No Image</Text>
+          </View>
+        )}
       </View>
       <View
         style={[
@@ -90,10 +90,9 @@ const borderRadius = windowWidth * 0.04;
 
 const styles = StyleSheet.create({
   cardBackground: {
-    width: width - 0.1,
+    width: width,
     height: height,
     borderRadius: borderRadius,
-    // marginLeft: windowWidth * 0.1,
     marginVertical: windowHeight * 0.01,
   },
   imgContainer: {

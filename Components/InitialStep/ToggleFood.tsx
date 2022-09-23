@@ -25,17 +25,21 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
 
   const fetchImg = async () => {
     console.log(food.img);
-    customAxiosInstance({
-      method: "get",
-      responseType: "blob",
-      url: `${ImgAPI}/food/${food.img}`,
-    })
-      .then((res) => {
-        setImg(URL.createObjectURL(res.data));
+    if (food.img) {
+      customAxiosInstance({
+        method: "get",
+        responseType: "blob",
+        url: `${ImgAPI}/food/${food.img}`,
       })
-      .catch((e) => {
-        console.log("this is error :" + e);
-      });
+        .then((res) => {
+          setImg(URL.createObjectURL(res.data));
+        })
+        .catch((e) => {
+          console.log("this is error :" + e);
+        });
+    } else {
+      setImg(undefined);
+    }
   };
 
   useEffect(() => {
@@ -53,12 +57,19 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
       ]}
     >
       <View style={styles.imgContainer}>
-        <Image
-          // source={{ uri: "data:image/jpeg;base64," + img }}
-          source={{ uri: img }}
-          style={styles.img}
-          resizeMode="cover"
-        ></Image>
+        {img ? (
+          <Image
+            source={{ uri: img }}
+            style={styles.img}
+            resizeMode="cover"
+          ></Image>
+        ) : (
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <Text style={{ color: "#777" }}>No Image</Text>
+          </View>
+        )}
       </View>
       <View style={styles.nameContainer}>
         <Text
