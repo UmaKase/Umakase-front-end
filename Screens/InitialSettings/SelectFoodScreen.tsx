@@ -269,6 +269,14 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                               ),
                             ];
                           });
+                          setSearchFoods((prev) => {
+                            return [
+                              tempFood,
+                              ...prev.filter(
+                                (target) => target.id != tempFood.id
+                              ),
+                            ];
+                          });
                         }
                       }}
                     />
