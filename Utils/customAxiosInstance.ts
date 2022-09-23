@@ -30,7 +30,6 @@ customAxiosInstance.interceptors.request.use(
 // Response interceptor for API calls
 customAxiosInstance.interceptors.response.use(
   (response) => {
-    console.log("validation success?");
     return response;
   },
   async (error) => {
