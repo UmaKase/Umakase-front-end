@@ -5,3 +5,4 @@ export const USERNAME_KEY = "UserName";
 export const SHOWNAME_KEY = "ShowName";
 export const CONFIG_KEY = "Config";
 export const TEMPUSERID_KEY = "TempUserId";
+export const TEMPUSERPASS_KEY = "TempUserPass";
