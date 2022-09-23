@@ -3,6 +3,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -11,7 +12,13 @@ import {
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
-import { CONFIG_KEY } from "../../Constants/securestoreKey";
+import {
+  ACCESS_KEY,
+  CONFIG_KEY,
+  REFRESH_KEY,
+  TEMPUSERID_KEY,
+  TEMPUSERPASS_KEY,
+} from "../../Constants/securestoreKey";
 import { FontAwesome } from "@expo/vector-icons";
 import {
   windowWidth,
@@ -22,15 +29,20 @@ import ToggleFood from "../../Components/InitialStep/ToggleFood";
 import Footer from "../../Components/InitialStep/Footer";
 import { Food } from "../../Types/InitialSteps";
 import axios from "axios";
-import { FoodAPI } from "../../Constants/backendAPI";
+import { AuthAPI, FoodAPI, RoomAPI } from "../../Constants/backendAPI";
 import _ from "lodash";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import Modal from "react-native-modal";
 import ToggleFoodForSearch from "../../Components/InitialStep/ToggleFoodForSearch";
+import customAxiosInstance from "../../Utils/customAxiosInstance";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
 const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
+  // submiting state
+  const [startSubmit, setStartSubmit] = useState(false);
+  const [loadingText, setLoadingText] = useState("setting temp user info");
+
   // food var
   const [selectedFood, setSelectedFood] = useState<string[]>([]);
   const [food, setFoods] = useState<Food[]>([]);
@@ -45,6 +57,61 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const [searchFoods, setSearchFoods] = useState<Food[]>([]);
   const [searchPage, setSearchPage] = useState(1);
   const [searchEnd, setSearchEnd] = useState(false);
+
+  // submit function
+  const submit = async () => {
+    axios({
+      method: "post",
+      url: `${AuthAPI}/register`,
+      data: {
+        isTemp: true,
+      },
+    })
+      .then((res) => {
+        console.log(res.data.data);
+        SecureStore.setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
+        SecureStore.setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
+        const tempData = {
+          id: res.data.data.tmpId,
+          pass: res.data.data.tmpPass,
+        };
+        return tempData;
+      })
+      .then((data) => {
+        axios({
+          method: "post",
+          url: `${AuthAPI}/login`,
+          data: {
+            username: data.id,
+            password: data.pass,
+          },
+        })
+          .then((res) => {
+            SecureStore.setItemAsync(ACCESS_KEY, res.data.accessToken);
+            SecureStore.setItemAsync(REFRESH_KEY, res.data.refreshToken);
+          })
+          .then(() => {
+            customAxiosInstance({
+              method: "post",
+              url: `${RoomAPI}/create`,
+              data: {
+                isDefaultRoom: true,
+                foodIds: selectedFood,
+              },
+            })
+              .then(() => {
+                SecureStore.setItemAsync(CONFIG_KEY, "Completed");
+                console.log("saved");
+                navigation.dispatch(
+                  CommonActions.reset({
+                    routes: [{ name: "HomeDrawerNavigation" }],
+                  })
+                );
+              })
+              .catch((e) => console.log("Start submit Error:", e));
+          });
+      });
+  };
 
   // on reach end flatlist request
   const onEndReachedHandler = () => {
@@ -156,150 +223,171 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [searchPage]);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
-        {/* header */}
-        <View style={styles.header}>
-          <Text style={styles.headerFont}>
-            お気入り料理を{"\n"}
-            選択してください
-          </Text>
-        </View>
-        {/* search Btn */}
-        <View style={styles.searchContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              setSearchMode((prev) => !prev);
+    <SafeAreaProvider
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: startSubmit ? backgroundColor : "#FFF",
+      }}
+    >
+      {startSubmit ? (
+        <>
+          <ActivityIndicator size="large" color="#FFF"></ActivityIndicator>
+          <Text
+            style={{
+              color: "#FFF",
+              fontSize: windowWidth * 0.05,
+              marginTop: windowHeight * 0.03,
             }}
           >
-            <FontAwesome
-              name="search"
-              size={windowWidth * 0.07}
-              // color={backgroundColor}
-              color="#FFF"
-            />
-          </TouchableOpacity>
-        </View>
-        {/* tag container */}
-        <FlatList
-          data={food}
-          extraData={food}
-          onEndReached={() => onEndReachedHandler()}
-          keyExtractor={(item, index) => index.toString()}
-          style={styles.foodsContainer}
-          columnWrapperStyle={{ justifyContent: "space-evenly" }}
-          numColumns={2}
-          renderItem={({ item, index }) => {
-            const isChecked = !!selectedFood.find!!(
-              (foodId) => foodId === item.id
-            );
-            return (
-              <ToggleFood
-                food={item}
-                checked={isChecked}
-                onPressHandler={() => {
-                  const temptFood = food[index];
-                  if (isChecked) {
-                    setSelectedFood((prev) =>
-                      prev.filter((id) => id !== item.id)
-                    );
-                  } else {
-                    setSelectedFood((prev) => [...prev, item.id]);
-                    setFoods((prev) => {
-                      return [
-                        temptFood,
-                        ...prev.filter((target) => target.id != temptFood.id),
-                      ];
-                    });
-                  }
-                }}
-              ></ToggleFood>
-            );
-          }}
-        />
-        {/* footer */}
-        <Footer
-          goBackFunc={() => navigation.pop()}
-          goNextFunc={() => settingComplete()}
-          skipFunc={() => skipSetting()}
-        />
-        {searchMode ? (
-          <Modal
-            isVisible={searchMode}
-            onBackdropPress={() => leaveSearchMode()}
-            style={styles.modal}
-          >
-            <View style={styles.modalBackground}>
-              <SearchBar
-                input={inputText}
-                setInput={setInputText}
-                placeholderText="料理を入力してください"
-                searchFunction={(input: string) => debounceSearchFood(input)}
-              ></SearchBar>
-              {/* flatlist loop out foods */}
-              <FlatList
-                data={searchFoods}
-                extraData={searchFoods}
-                keyExtractor={(item, index) => index.toString()}
-                style={styles.foodsContainer}
-                columnWrapperStyle={{ justifyContent: "space-evenly" }}
-                numColumns={2}
-                onEndReached={() => onModalScrollToBottom()}
-                renderItem={({ item, index }) => {
-                  const isChecked = !!selectedFood.find!!(
-                    (foodId) => foodId === item.id
-                  );
-                  return (
-                    <ToggleFoodForSearch
-                      food={item}
-                      checked={isChecked}
-                      onPressHandler={() => {
-                        const tempFood = searchFoods[index];
-                        if (isChecked) {
-                          setSelectedFood((prev) =>
-                            prev.filter((id) => id !== item.id)
-                          );
-                        } else {
-                          setSelectedFood((prev) => [...prev, item.id]);
-                          setFoods((prev) => {
-                            return [
-                              tempFood,
-                              ...prev.filter(
-                                (target) => target.id != tempFood.id
-                              ),
-                            ];
-                          });
-                          setSearchFoods((prev) => {
-                            return [
-                              tempFood,
-                              ...prev.filter(
-                                (target) => target.id != tempFood.id
-                              ),
-                            ];
-                          });
-                        }
-                      }}
-                    />
-                  );
-                }}
+            {loadingText}
+          </Text>
+        </>
+      ) : (
+        <SafeAreaView style={styles.safeArea}>
+          {/* header */}
+          <View style={styles.header}>
+            <Text style={styles.headerFont}>
+              お気入り料理を{"\n"}
+              選択してください
+            </Text>
+          </View>
+          {/* search Btn */}
+          <View style={styles.searchContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                setSearchMode((prev) => !prev);
+              }}
+            >
+              <FontAwesome
+                name="search"
+                size={windowWidth * 0.07}
+                // color={backgroundColor}
+                color="#FFF"
               />
-              {/* modal footer */}
-              <View style={styles.modalFooter}>
-                <TouchableOpacity
-                  onPress={() => {
-                    leaveSearchMode();
+            </TouchableOpacity>
+          </View>
+          {/* tag container */}
+          <FlatList
+            data={food}
+            extraData={food}
+            onEndReached={() => onEndReachedHandler()}
+            keyExtractor={(item, index) => index.toString()}
+            style={styles.foodsContainer}
+            columnWrapperStyle={{ justifyContent: "space-evenly" }}
+            numColumns={2}
+            renderItem={({ item, index }) => {
+              const isChecked = !!selectedFood.find!!(
+                (foodId) => foodId === item.id
+              );
+              return (
+                <ToggleFood
+                  food={item}
+                  checked={isChecked}
+                  onPressHandler={() => {
+                    const temptFood = food[index];
+                    if (isChecked) {
+                      setSelectedFood((prev) =>
+                        prev.filter((id) => id !== item.id)
+                      );
+                    } else {
+                      setSelectedFood((prev) => [...prev, item.id]);
+                      setFoods((prev) => {
+                        return [
+                          temptFood,
+                          ...prev.filter((target) => target.id != temptFood.id),
+                        ];
+                      });
+                    }
                   }}
-                  style={styles.modalSubmit}
-                >
-                  <Text style={styles.modalSubmitText}>確定</Text>
-                </TouchableOpacity>
+                ></ToggleFood>
+              );
+            }}
+          />
+          {/* footer */}
+          <Footer
+            goBackFunc={() => navigation.pop()}
+            goNextFunc={() => settingComplete()}
+            skipFunc={() => skipSetting()}
+          />
+          {searchMode ? (
+            <Modal
+              isVisible={searchMode}
+              onBackdropPress={() => leaveSearchMode()}
+              style={styles.modal}
+            >
+              <View style={styles.modalBackground}>
+                <SearchBar
+                  input={inputText}
+                  setInput={setInputText}
+                  placeholderText="料理を入力してください"
+                  searchFunction={(input: string) => debounceSearchFood(input)}
+                ></SearchBar>
+                {/* flatlist loop out foods */}
+                <FlatList
+                  data={searchFoods}
+                  extraData={searchFoods}
+                  keyExtractor={(item, index) => index.toString()}
+                  style={styles.foodsContainer}
+                  columnWrapperStyle={{ justifyContent: "space-evenly" }}
+                  numColumns={2}
+                  onEndReached={() => onModalScrollToBottom()}
+                  renderItem={({ item, index }) => {
+                    const isChecked = !!selectedFood.find!!(
+                      (foodId) => foodId === item.id
+                    );
+                    return (
+                      <ToggleFoodForSearch
+                        food={item}
+                        checked={isChecked}
+                        onPressHandler={() => {
+                          const tempFood = searchFoods[index];
+                          if (isChecked) {
+                            setSelectedFood((prev) =>
+                              prev.filter((id) => id !== item.id)
+                            );
+                          } else {
+                            setSelectedFood((prev) => [...prev, item.id]);
+                            setFoods((prev) => {
+                              return [
+                                tempFood,
+                                ...prev.filter(
+                                  (target) => target.id != tempFood.id
+                                ),
+                              ];
+                            });
+                            setSearchFoods((prev) => {
+                              return [
+                                tempFood,
+                                ...prev.filter(
+                                  (target) => target.id != tempFood.id
+                                ),
+                              ];
+                            });
+                          }
+                        }}
+                      />
+                    );
+                  }}
+                />
+                {/* modal footer */}
+                <View style={styles.modalFooter}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      leaveSearchMode();
+                    }}
+                    style={styles.modalSubmit}
+                  >
+                    <Text style={styles.modalSubmitText}>確定</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          </Modal>
-        ) : (
-          <></>
-        )}
-      </SafeAreaView>
+            </Modal>
+          ) : (
+            <></>
+          )}
+        </SafeAreaView>
+      )}
     </SafeAreaProvider>
   );
 };
