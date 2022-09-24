@@ -12,6 +12,7 @@ import { backgroundColor } from "../../Constants/cssConst";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { HomeDrawerNavigationProps } from "../../Types/Navigations/HomeDrawer";
+import ProfileInfo from "../../Components/Home/ProfileInfo";
 
 type RandomScreenProps = DrawerScreenProps<
   HomeDrawerNavigationProps,
@@ -49,6 +50,7 @@ const ProfileScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
+        <ProfileInfo />
         <TouchableOpacity
           onPress={() => logoutProcess()}
           style={styles.logoutBtn}
