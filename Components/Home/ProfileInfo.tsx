@@ -18,7 +18,9 @@ import { UserAPI } from "../../Constants/backendAPI";
 import { REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 
-interface ProfileInfoProps {}
+interface ProfileInfoProps {
+  setUserId: React.Dispatch<React.SetStateAction<string | undefined>>;
+}
 let imgUrl: string = "";
 let imgSrc: ImageSourcePropType; //profile process
 const profileProcess = async (successCallBack: any) => {
@@ -36,22 +38,19 @@ const profileProcess = async (successCallBack: any) => {
     })
     .catch((e) => console.log(e.response.data));
 };
-const ProfileInfo: React.FC<ProfileInfoProps> = () => {
+const ProfileInfo: React.FC<ProfileInfoProps> = ({ setUserId }) => {
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
-  //userProfileContainer = profileInfo.userProfileContainer;
-  // //imgUrl = userProfileContainer.profile.
-  // imgUrl == ""
-  //   ? (imgUrl = require(defaultUserThumbnail))
-  //   : URL.createObjectURL(imgUrl);
   imgUrl = require("../../image/umakase.png");
+  //onload
   useEffect(() => {
-    console.log("useEffect");
     profileProcess((res: any) => {
       try {
-        console.log(res.data.data.user);
+        //convert response to user profile type
         const resData = res.data.data.user as UserProfileContainer;
-        console.log(resData);
+        //set user id in the parent screen
+        setUserId(resData.profile.userId);
+        //set user profile to state
         setUseProfileContainer(resData);
       } catch (e) {
         console.log(e);
@@ -72,11 +71,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = () => {
             justifyContent: "center",
           }}
         >
-          <Text>
-            {userProfileContainer?.profile.firstname +
-              " " +
-              userProfileContainer?.profile.lastname}
-          </Text>
+          <Text>{userProfileContainer?.profile.username}</Text>
           <Text>ID:******</Text>
         </View>
       </View>
@@ -99,8 +94,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = () => {
 };
 
 const width = windowWidth * 0.35;
-const height = (width * 4) / 3;
-const borderRadius = windowWidth * 0.04;
 
 const styles = StyleSheet.create({
   mainContainer: {

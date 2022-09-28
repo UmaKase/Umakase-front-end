@@ -2,7 +2,9 @@ interface UserProfileContainer{
     profile:UserProfile
 }
 interface UserProfile{
-    firstname:"",
-    id:"",
-    lastname:"",
+    firstname:string,
+    id:string,
+    lastname:string,
+    userId:string,
+    username:string,
 }

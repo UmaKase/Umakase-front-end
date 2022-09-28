@@ -1,10 +1,8 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
-import React from "react";
+import React, { EffectCallback, useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI } from "../../Constants/backendAPI";
-import { HomeTabNavigationProps } from "../../Types/Navigations/HomeTab";
 import * as SecureStore from "expo-secure-store";
 import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import { CommonActions, DrawerActions } from "@react-navigation/native";
@@ -20,6 +18,8 @@ type RandomScreenProps = DrawerScreenProps<
 >;
 
 const ProfileScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
+  const [id, setId] = useState<string>();
+  const [userId, setUserId] = useState<string>();
   //logout process
   const logoutProcess = async () => {
     const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
@@ -43,14 +43,17 @@ const ProfileScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
       }
     });
   };
-
+  //get user id
+  useEffect(() => {
+    console.log("Hello:" + userId);
+  }, [setUserId]);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
-        <ProfileInfo />
+        <ProfileInfo setUserId={setUserId} />
         <TouchableOpacity
           onPress={() => logoutProcess()}
           style={styles.logoutBtn}
