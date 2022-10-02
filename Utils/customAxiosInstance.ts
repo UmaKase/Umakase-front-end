@@ -47,7 +47,7 @@ customAxiosInstance.interceptors.response.use(
           url: `${AuthAPI}/token/refresh`,
           headers: { Authorization: `Bearer ${localRefreshToken}` },
         });
-        newAccessToken = res.data.newAccessToken;
+        newAccessToken = res.data.data.newAccessToken;
         await setItemAsync(ACCESS_KEY, newAccessToken);
         refreshTokenValidationResult = true;
       } catch (error) {
