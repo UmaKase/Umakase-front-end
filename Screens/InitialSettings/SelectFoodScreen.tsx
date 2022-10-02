@@ -147,10 +147,9 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           },
         })
           .then((res) => {
-            console.log(res.data.foods);
-            setSearchFoods(res.data.foods);
+            setSearchFoods(res.data.data.foods);
           })
-          .catch((e) => console.log(e.response));
+          .catch((e) => console.log("food request error:", e));
       }
       console.log(input);
     }, 500),
@@ -178,7 +177,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   useEffect(() => {
     // fetch foods
     if (!foodEnd) {
-      console.log(route.params.TargetTags);
+      console.log("Target Tags", route.params.TargetTags);
       axios({
         url: `${FoodAPI}/db?take=20&page=${page}`,
         method: "post",
@@ -188,8 +187,8 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         },
       })
         .then((res) => {
-          if (res.data.foods[0]) {
-            setFoods((prev) => [...prev, ...res.data.foods]);
+          if (res.data.data.foods[0]) {
+            setFoods((prev) => [...prev, ...res.data.data.foods]);
           } else {
             setFoodEnd(true);
           }
@@ -210,8 +209,8 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         },
       })
         .then((res) => {
-          if (res.data.foods[0]) {
-            setSearchFoods((prev) => [...prev, ...res.data.foods]);
+          if (res.data.data.foods[0]) {
+            setSearchFoods((prev) => [...prev, ...res.data.data.foods]);
           } else {
             setSearchEnd(true);
           }
