@@ -15,6 +15,7 @@ export const drawerColor = "#F4A58D";
 //text color
 export const lightTextColor = "#FFF";
 export const darkTextColor = "#000";
+export const errTextColor = "red";
 
 export const inputIconSize = windowWidth * 0.07;
 export const bottomIconSize = windowWidth * 0.07;

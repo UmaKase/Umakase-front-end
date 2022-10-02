@@ -17,9 +17,17 @@ import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { UserAPI } from "../../Constants/backendAPI";
 import { REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
+import { profileUpdateMode } from "../../Constants/ProfileConst";
 
 interface ProfileInfoProps {
   setUserId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  navigation: NativeStackNavigationProp<
+    ProfileStackProps,
+    "ProfileScreen",
+    undefined
+  >;
 }
 let imgUrl: string = "";
 let imgSrc: ImageSourcePropType; //profile process
@@ -38,9 +46,10 @@ const profileProcess = async (successCallBack: any) => {
     })
     .catch((e) => console.log(e.response.data));
 };
-const ProfileInfo: React.FC<ProfileInfoProps> = ({ setUserId }) => {
+const ProfileInfo: React.FC<ProfileInfoProps> = ({ setUserId, navigation }) => {
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
+  const [feeding, setFeeding] = useState<boolean>();
   imgUrl = require("../../image/umakase.png");
   //onload
   useEffect(() => {
@@ -80,20 +89,47 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ setUserId }) => {
         <Text style={{ flex: 1, textAlign: "center" }}>無料会員</Text>
       </View>
       <View style={styles.rowContainer}>
-        <TouchableOpacity style={styles.button_disable}>
+        <TouchableOpacity
+          style={styles.button_disable}
+          onPress={() =>
+            navigation.push("ProfileUpdateScreen", {
+              mode: profileUpdateMode.email,
+              userid: "", //userProfileContainer?.profile.id,
+            })
+          }
+        >
           <Text>プレミアムサービス登録</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.rowContainer}>
-        <TouchableOpacity style={styles.button_active}>
+        <TouchableOpacity
+          style={styles.button_active}
+          onPress={() =>
+            navigation.push("ProfileUpdateScreen", {
+              mode: profileUpdateMode.password,
+              userid: "", //userProfileContainer?.profile.id,
+            })
+          }
+        >
+          <Text>パスワード設定</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.rowContainer}>
+        <TouchableOpacity
+          style={styles.button_active}
+          onPress={() =>
+            navigation.push("ProfileUpdateScreen", {
+              mode: profileUpdateMode.email,
+              userid: "", //userProfileContainer?.profile.id,
+            })
+          }
+        >
           <Text>メールアドレス設定</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
-
-const width = windowWidth * 0.35;
 
 const styles = StyleSheet.create({
   mainContainer: {

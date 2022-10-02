@@ -8,17 +8,20 @@ import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import { CommonActions, DrawerActions } from "@react-navigation/native";
 import { backgroundColor } from "../../Constants/cssConst";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
-import { DrawerScreenProps } from "@react-navigation/drawer";
-import { HomeDrawerNavigationProps } from "../../Types/Navigations/HomeDrawer";
 import ProfileInfo from "../../Components/Home/ProfileInfo";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 
-type RandomScreenProps = DrawerScreenProps<
-  HomeDrawerNavigationProps,
+// type RandomScreenProps = DrawerScreenProps<
+//   HomeDrawerNavigationProps,
+//   "ProfileNavigation"
+// >;
+
+type ProfileScreenProps = NativeStackScreenProps<
+  ProfileStackProps,
   "ProfileScreen"
 >;
-
-const ProfileScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
-  const [id, setId] = useState<string>();
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
   const [userId, setUserId] = useState<string>();
   //logout process
   const logoutProcess = async () => {
@@ -53,7 +56,7 @@ const ProfileScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
-        <ProfileInfo setUserId={setUserId} />
+        <ProfileInfo setUserId={setUserId} navigation={navigation} />
         <TouchableOpacity
           onPress={() => logoutProcess()}
           style={styles.logoutBtn}
