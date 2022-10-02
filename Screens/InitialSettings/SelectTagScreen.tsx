@@ -101,7 +101,6 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   };
   // next step function
   const goNextStep = async () => {
-    console.log(selectedTagId);
     navigation.navigate("SelectFoodScreen", { TargetTags: selectedTagId });
   };
 
