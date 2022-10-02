@@ -31,7 +31,7 @@ const RootRouter: React.FC = () => {
         }
       })
       .catch((e) => {
-        console.log("token validation error:", e.response.data);
+        console.log("token validation error:", e.response.data.error.message);
         setAccess(false);
       });
   };
