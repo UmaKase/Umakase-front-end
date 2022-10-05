@@ -54,7 +54,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
         // await SecureStore.setItemAsync(USERID_KEY, loginResult.data.profile.id);
 
-        await SecureStore.setItemAsync(USERNAME_KEY, username);
+        // await SecureStore.setItemAsync(USERNAME_KEY, username);
 
         // await SecureStore.setItemAsync(SHOWNAME_KEY, loginResult.data.profile.showname);
         navigation.dispatch(
