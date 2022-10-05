@@ -1,6 +1,6 @@
 import { DrawerActions } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
@@ -13,6 +13,8 @@ import {
   Fontisto,
 } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import customAxiosInstance from "../../Utils/customAxiosInstance";
+import { RoomAPI } from "../../Constants/backendAPI";
 
 type RandomScreenProps = NativeStackScreenProps<
   HomeTabNavigationProps,
@@ -20,6 +22,19 @@ type RandomScreenProps = NativeStackScreenProps<
 >;
 
 const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
+  useEffect(() => {
+    customAxiosInstance({
+      method: "get",
+      url: `${RoomAPI}/info/:id`,
+    })
+      .then((res) => {
+        console.log("response status:", res.status);
+        console.log(res.data.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, []);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
