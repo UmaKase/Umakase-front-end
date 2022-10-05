@@ -9,6 +9,8 @@ import { AuthAPI } from "../Constants/backendAPI";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
 import { RootNavigationProps } from "../Types/Navigations/Root";
 import customAxiosInstance from "../Utils/customAxiosInstance";
+import { getItemAsync } from "expo-secure-store";
+import { CONFIG_KEY } from "../Constants/securestoreKey";
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
@@ -19,21 +21,26 @@ const RootRouter: React.FC = () => {
 
   // token validation request
   const tokenValidation = async () => {
-    customAxiosInstance({
-      method: "post",
-      url: `${AuthAPI}/token/access`,
-    })
-      .then((res) => {
-        if (res.data.ok) {
-          setAccess(true);
-        } else {
-          setAccess(false);
-        }
+    const config = await getItemAsync(CONFIG_KEY);
+    if (config) {
+      await customAxiosInstance({
+        method: "post",
+        url: `${AuthAPI}/token/access`,
       })
-      .catch((e) => {
-        console.log("token validation error:", e.response.data.error.message);
-        setAccess(false);
-      });
+        .then((res) => {
+          if (res.data.ok) {
+            setAccess(true);
+          } else {
+            setAccess(false);
+          }
+        })
+        .catch((e) => {
+          console.log("token validation error:", e.response.data.error.message);
+          setAccess(false);
+        });
+    } else {
+      setAccess(true);
+    }
   };
 
   // initial token validation
