@@ -24,7 +24,6 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
   const [img, setImg] = useState<string>();
 
   const fetchImg = async () => {
-    console.log(food.img);
     if (food.img) {
       axios({
         method: "get",
@@ -44,6 +43,7 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
 
   useEffect(() => {
     fetchImg();
+    console.log(food.img);
   }, [food.img]);
 
   return (
