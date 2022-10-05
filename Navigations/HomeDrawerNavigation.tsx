@@ -5,11 +5,11 @@ import RandomScreen from "../Screens/Home/RandomScreen";
 import ProfileScreen from "../Screens/Home/ProfileScreen";
 import { HomeDrawerNavigationProps } from "../Types/Navigations/HomeDrawer";
 import {
-  backgroundColor,
   darkTextColor,
   drawerColor,
   lightTextColor,
 } from "../Constants/cssConst";
+import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
@@ -28,6 +28,8 @@ const HomeDrawerNavigation: React.FC = () => {
     >
       <Drawer.Screen name="RandomScreen" component={RandomScreen} />
       <Drawer.Screen name="ProfileScreen" component={ProfileScreen} />
+
+      <Drawer.Screen name="Room" component={RoomStackNavigation} />
     </Drawer.Navigator>
   );
 };
