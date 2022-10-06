@@ -279,11 +279,12 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
               />
             </TouchableOpacity>
           </View>
-          {/* tag container */}
+          {/* food container */}
           <FlatList
             data={food}
             extraData={food}
             onEndReached={() => onEndReachedHandler()}
+            keyExtractor={(item) => item.id}
             // keyExtractor={(item, index) => index.toString()}
             style={styles.foodsContainer}
             columnWrapperStyle={{ justifyContent: "space-evenly" }}
@@ -294,7 +295,6 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
               );
               return (
                 <ToggleFood
-                  key={item.id}
                   food={item}
                   checked={isChecked}
                   onPressHandler={() => {
@@ -308,9 +308,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                       setFoods((prev) => {
                         return [
                           temptFood,
-                          ...prev.filter(
-                            (target) => target.id !== temptFood.id
-                          ),
+                          ...prev.filter((target) => target !== temptFood),
                         ];
                       });
                     }
