@@ -1,11 +1,9 @@
 import { DrawerActions } from "@react-navigation/native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
 import { windowHeight, windowWidth } from "../../Constants/cssConst";
-import { HomeTabNavigationProps } from "../../Types/Navigations/HomeTab";
 import {
   Entypo,
   FontAwesome,
@@ -15,13 +13,34 @@ import {
 import { TouchableOpacity } from "react-native-gesture-handler";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { RoomAPI } from "../../Constants/backendAPI";
+import { HomeDrawerNavigationProps } from "../../Types/Navigations/HomeDrawer";
+import { DrawerScreenProps } from "@react-navigation/drawer";
 
-type RandomScreenProps = NativeStackScreenProps<
-  HomeTabNavigationProps,
+type RandomScreenProps = DrawerScreenProps<
+  HomeDrawerNavigationProps,
   "RandomScreen"
 >;
 
 const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
+  const [mode, setMode] = useState(1);
+
+  const randomFunction = () => {
+    switch (mode) {
+      case 1: {
+        console.log(1);
+        break;
+      }
+      case 2: {
+        console.log(2);
+        break;
+      }
+      case 3: {
+        console.log(3);
+        break;
+      }
+    }
+  };
+
   useEffect(() => {
     customAxiosInstance({
       method: "get",
@@ -48,29 +67,53 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
             {/* left arrow */}
             <TouchableOpacity
               onPress={() => {
-                Alert.alert("", "LEFT!");
+                if (mode !== 1) {
+                  setMode((prev) => prev - 1);
+                }
               }}
             >
               <Fontisto name="caret-left" size={arrowSize} color="#FFF" />
             </TouchableOpacity>
             {/* mode btn */}
-            <TouchableOpacity style={styles.modeBtn}>
+            {/* start btn */}
+            <TouchableOpacity
+              style={[styles.modeBtn, mode === 1 && { borderColor: "#87A7E5" }]}
+              onPress={() => setMode(1)}
+            >
               <FontAwesome5
                 name="play"
                 size={(buttonSize * 2) / 5}
-                color="#FFF"
+                color={mode === 1 ? "#87A7E5" : "#FFF"}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modeBtn}>
-              <FontAwesome5 name="hotjar" size={buttonSize / 2} color="#FFF" />
+            {/* fire btn */}
+            <TouchableOpacity
+              style={[styles.modeBtn, mode === 2 && { borderColor: "#87A7E5" }]}
+              onPress={() => setMode(2)}
+            >
+              <FontAwesome5
+                name="hotjar"
+                size={buttonSize / 2}
+                color={mode === 2 ? "#87A7E5" : "#FFF"}
+              />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modeBtn}>
-              <Entypo name="back-in-time" size={buttonSize / 2} color="#FFF" />
+            {/* time btn */}
+            <TouchableOpacity
+              style={[styles.modeBtn, mode === 3 && { borderColor: "#87A7E5" }]}
+              onPress={() => setMode(3)}
+            >
+              <Entypo
+                name="back-in-time"
+                size={buttonSize / 2}
+                color={mode === 3 ? "#87A7E5" : "#FFF"}
+              />
             </TouchableOpacity>
             {/* right arrow */}
             <TouchableOpacity
               onPress={() => {
-                Alert.alert("", "RIGHT!");
+                if (mode !== 3) {
+                  setMode((prev) => prev + 1);
+                }
               }}
             >
               <Fontisto name="caret-right" size={arrowSize} color="#FFF" />
