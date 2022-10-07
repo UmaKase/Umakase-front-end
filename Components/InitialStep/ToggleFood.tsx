@@ -43,7 +43,10 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
 
   useEffect(() => {
     fetchImg();
-    console.log(food.img);
+    // console.log(food.img);
+    // return () => {
+    //   console.log("unmount:", food.img);
+    // };
   }, [food.img]);
 
   return (
