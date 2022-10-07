@@ -9,8 +9,14 @@ import { AuthAPI } from "../Constants/backendAPI";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
 import { RootNavigationProps } from "../Types/Navigations/Root";
 import customAxiosInstance from "../Utils/customAxiosInstance";
-import { getItemAsync } from "expo-secure-store";
-import { CONFIG_KEY } from "../Constants/securestoreKey";
+import { deleteItemAsync, getItemAsync } from "expo-secure-store";
+import {
+  ACCESS_KEY,
+  CONFIG_KEY,
+  REFRESH_KEY,
+  TEMPUSERID_KEY,
+  TEMPUSERPASS_KEY,
+} from "../Constants/securestoreKey";
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
@@ -43,8 +49,17 @@ const RootRouter: React.FC = () => {
     }
   };
 
+  const testFunction = () => {
+    deleteItemAsync(CONFIG_KEY);
+    deleteItemAsync(ACCESS_KEY);
+    deleteItemAsync(REFRESH_KEY);
+    deleteItemAsync(TEMPUSERID_KEY);
+    deleteItemAsync(TEMPUSERPASS_KEY);
+  };
+
   // initial token validation
   useEffect(() => {
+    // testFunction();
     if (access === undefined) {
       tokenValidation();
     }
