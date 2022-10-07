@@ -37,6 +37,8 @@ const HomeDrawerNavigation: React.FC = () => {
       />
 
       <Drawer.Screen name="Room" component={RoomStackNavigation} />
+
+      {/* <DrawerContent navigation={}></DrawerContent> */}
     </Drawer.Navigator>
   );
 };
