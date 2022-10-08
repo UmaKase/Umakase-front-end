@@ -4,6 +4,7 @@ import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -41,7 +42,7 @@ type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   // submiting state
   const [startSubmit, setStartSubmit] = useState(false);
-  const [loadingText, setLoadingText] = useState("setting temp user info");
+  const [loadingText, setLoadingText] = useState("Creating new account");
 
   // food var
   const [selectedFood, setSelectedFood] = useState<string[]>([]);
@@ -60,57 +61,77 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // submit function
   const submit = async () => {
-    axios({
-      method: "post",
-      url: `${AuthAPI}/register`,
-      data: {
-        isTemp: true,
-      },
-    })
-      .then((res) => {
-        console.log(res.data.data);
-        SecureStore.setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
-        SecureStore.setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
-        const tempData = {
-          id: res.data.data.tmpId,
-          pass: res.data.data.tmpPass,
-        };
-        return tempData;
-      })
-      .then((data) => {
-        axios({
-          method: "post",
-          url: `${AuthAPI}/login`,
-          data: {
-            username: data.id,
-            password: data.pass,
-          },
-        })
-          .then((res) => {
-            SecureStore.setItemAsync(ACCESS_KEY, res.data.accessToken);
-            SecureStore.setItemAsync(REFRESH_KEY, res.data.refreshToken);
-          })
-          .then(() => {
-            customAxiosInstance({
-              method: "post",
-              url: `${RoomAPI}/create`,
-              data: {
-                isDefaultRoom: true,
-                foodIds: selectedFood,
-              },
-            })
-              .then(() => {
-                SecureStore.setItemAsync(CONFIG_KEY, "Completed");
-                console.log("saved");
-                navigation.dispatch(
-                  CommonActions.reset({
-                    routes: [{ name: "HomeDrawerNavigation" }],
-                  })
-                );
-              })
-              .catch((e) => console.log("Start submit Error:", e));
-          });
+    setStartSubmit(true);
+    let tempData = undefined;
+    let loginFlag = false;
+    // reset function
+    // phase 1 register a temp user
+    try {
+      const res = await axios({
+        method: "post",
+        url: `${AuthAPI}/register`,
+        data: {
+          isTemp: true,
+        },
       });
+      SecureStore.setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
+      SecureStore.setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
+      tempData = {
+        id: res.data.data.tmpId,
+        pass: res.data.data.tmpPass,
+      };
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 1");
+    }
+
+    // phase 2 login with temp user
+    // prettier-ignore
+    if(tempData === undefined){return console.log("Submit process failed with tempUserRegisterDate === undifined.")}
+    setLoadingText("Login process");
+    try {
+      const res = await axios({
+        method: "post",
+        url: `${AuthAPI}/login`,
+        data: {
+          username: tempData.id,
+          password: tempData.pass,
+        },
+      });
+      SecureStore.setItemAsync(ACCESS_KEY, res.data.accessToken);
+      SecureStore.setItemAsync(REFRESH_KEY, res.data.refreshToken);
+      loginFlag = true;
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 2");
+    }
+
+    // phase 3
+    // prettier-ignore
+    if(!loginFlag){return console.log("Submit process failed with liginWithTempUser === undefined.")}
+    setLoadingText("Creating user setting");
+    try {
+      const res = await customAxiosInstance({
+        method: "post",
+        url: `${RoomAPI}/new`,
+        data: {
+          isDefaultRoom: true,
+          foodIds: selectedFood,
+          name: "__default",
+        },
+      });
+      console.log(res.data.data);
+      SecureStore.setItemAsync(CONFIG_KEY, "Completed");
+      console.log("saved");
+      navigation.dispatch(
+        CommonActions.reset({
+          routes: [{ name: "HomeDrawerNavigation" }],
+        })
+      );
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 3");
+    }
   };
 
   // on reach end flatlist request
@@ -147,24 +168,15 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           },
         })
           .then((res) => {
-            console.log(res.data.foods);
-            setSearchFoods(res.data.foods);
+            setSearchFoods(res.data.data.foods);
           })
-          .catch((e) => console.log(e.response));
+          .catch((e) => console.log("food request error:", e));
       }
       console.log(input);
     }, 500),
     []
   );
 
-  // setting complete function
-  const settingComplete = async () => {
-    await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
-    console.log("saved");
-    navigation.dispatch(
-      CommonActions.reset({ routes: [{ name: "HomeDrawerNavigation" }] })
-    );
-  };
   // skip setting function
   const skipSetting = async () => {
     await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
@@ -178,7 +190,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   useEffect(() => {
     // fetch foods
     if (!foodEnd) {
-      console.log(route.params.TargetTags);
+      console.log("Target Tags", route.params.TargetTags);
       axios({
         url: `${FoodAPI}/db?take=20&page=${page}`,
         method: "post",
@@ -188,8 +200,8 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         },
       })
         .then((res) => {
-          if (res.data.foods[0]) {
-            setFoods((prev) => [...prev, ...res.data.foods]);
+          if (res.data.data.foods[0]) {
+            setFoods((prev) => [...prev, ...res.data.data.foods]);
           } else {
             setFoodEnd(true);
           }
@@ -210,8 +222,8 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         },
       })
         .then((res) => {
-          if (res.data.foods[0]) {
-            setSearchFoods((prev) => [...prev, ...res.data.foods]);
+          if (res.data.data.foods[0]) {
+            setSearchFoods((prev) => [...prev, ...res.data.data.foods]);
           } else {
             setSearchEnd(true);
           }
@@ -267,12 +279,13 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
               />
             </TouchableOpacity>
           </View>
-          {/* tag container */}
+          {/* food container */}
           <FlatList
             data={food}
             extraData={food}
             onEndReached={() => onEndReachedHandler()}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item) => item.id}
+            // keyExtractor={(item, index) => index.toString()}
             style={styles.foodsContainer}
             columnWrapperStyle={{ justifyContent: "space-evenly" }}
             numColumns={2}
@@ -295,7 +308,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                       setFoods((prev) => {
                         return [
                           temptFood,
-                          ...prev.filter((target) => target.id != temptFood.id),
+                          ...prev.filter((target) => target !== temptFood),
                         ];
                       });
                     }
@@ -307,7 +320,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           {/* footer */}
           <Footer
             goBackFunc={() => navigation.pop()}
-            goNextFunc={() => settingComplete()}
+            goNextFunc={() => submit()}
             skipFunc={() => skipSetting()}
           />
           {searchMode ? (
@@ -327,7 +340,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                 <FlatList
                   data={searchFoods}
                   extraData={searchFoods}
-                  keyExtractor={(item, index) => index.toString()}
+                  // keyExtractor={(item) => item.id}
                   style={styles.foodsContainer}
                   columnWrapperStyle={{ justifyContent: "space-evenly" }}
                   numColumns={2}
@@ -338,6 +351,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                     );
                     return (
                       <ToggleFoodForSearch
+                        key={index.toString()}
                         food={item}
                         checked={isChecked}
                         onPressHandler={() => {

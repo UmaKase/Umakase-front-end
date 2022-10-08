@@ -8,7 +8,7 @@ import {
   windowWidth,
 } from "../../Constants/cssConst";
 import { ImgAPI } from "../../Constants/backendAPI";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
+import axios from "axios";
 
 interface ToggleFoodProps {
   food: Food;
@@ -24,9 +24,8 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
   const [img, setImg] = useState<string>();
 
   const fetchImg = async () => {
-    console.log(food.img);
     if (food.img) {
-      customAxiosInstance({
+      axios({
         method: "get",
         responseType: "blob",
         url: `${ImgAPI}/food/${food.img}`,
@@ -44,6 +43,10 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
 
   useEffect(() => {
     fetchImg();
+    // console.log(food.img);
+    // return () => {
+    //   console.log("unmount:", food.img);
+    // };
   }, [food.img]);
 
   return (

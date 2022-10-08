@@ -69,10 +69,10 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         setEmailErrMsgShow(false);
         setUsernameErrMsgShow(false);
         setPasswordErrMsgShow(false);
-        console.log(JSON.stringify(e.response.data));
         const errors = e.response.data.data.error as registerError[];
         let errorMsg = "";
         errors.forEach((error) => {
+          console.log("param:", error.param);
           if (errorMsg === "") {
             errorMsg = `${errorMsg}${error.param}:${error.msg}`;
           } else {
@@ -161,7 +161,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             {passwordErrMsgShow ? (
               <View style={styles.errMsgContainer}>
                 <Text style={styles.errMsg}>
-                  Password should be at least 8 letters long
+                  Password should be at least 5 letters long
                 </Text>
               </View>
             ) : (
@@ -182,7 +182,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             {passwordErrMsgShow ? (
               <View style={styles.errMsgContainer}>
                 <Text style={styles.errMsg}>
-                  Password should be at least 8 letters long
+                  Password should be at least 5 letters long
                 </Text>
               </View>
             ) : (

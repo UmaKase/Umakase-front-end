@@ -5,83 +5,69 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AuthNavigation from "../Navigations/AuthNavigation";
 import HomeStackNavigation from "../Navigations/HomeStackNavigation";
 //import secureStore
-import * as SecureStore from "expo-secure-store";
-import axios from "axios";
 import { AuthAPI } from "../Constants/backendAPI";
+import LoadingSpinner from "../Components/Auth/LoadingSpinner";
+import { RootNavigationProps } from "../Types/Navigations/Root";
+import customAxiosInstance from "../Utils/customAxiosInstance";
+import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import {
   ACCESS_KEY,
   CONFIG_KEY,
   REFRESH_KEY,
+  TEMPUSERID_KEY,
+  TEMPUSERPASS_KEY,
 } from "../Constants/securestoreKey";
-import LoadingSpinner from "../Components/Auth/LoadingSpinner";
-import { RootNavigationProps } from "../Types/Navigations/Root";
-import customAxiosInstance from "../Utils/customAxiosInstance";
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
-  //fetching data status
+  // fetching phase state
   const [fetching, setFetching] = useState<boolean>(true);
-  // ANCHOR start token validation to do conditional navigation
+  // access return from token validation
   const [access, setAccess] = useState<boolean>();
-  const [accessToken, setAccessToken] = useState<string>("");
+
+  // token validation request
   const tokenValidation = async () => {
-    //use this while the account is not logout and you reinstall the DB
-    // await SecureStore.deleteItemAsync(ACCESS_KEY);
-    // await SecureStore.deleteItemAsync(CONFIG_KEY);
-    const localAccessToken = await SecureStore.getItemAsync(ACCESS_KEY);
-    console.log("accessToken:", localAccessToken);
-    const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
-    if (!localAccessToken || !localRefreshToken) {
-      return false;
-    }
-    const accessResult = await axios({
-      method: "post",
-      url: `${AuthAPI}/token/access`,
-      headers: { Authorization: `Bearer ${localAccessToken}` },
-    });
-    if (accessResult.data.ok) {
-      setAccessToken(localAccessToken);
-      console.log("success");
-      return true;
-    }
-    const refreshResult = await axios({
-      method: "post",
-      url: `${AuthAPI}/token/refresh`,
-      headers: { Authorization: `Bearer ${REFRESH_KEY}` },
-    });
-    if (refreshResult.status != 200) {
-      console.log(refreshResult);
-      return false;
-    }
-    await SecureStore.setItemAsync(ACCESS_KEY, refreshResult.data.accessToken);
-    return true;
-  };
-
-  const authentication = async () => {
-    customAxiosInstance({
-      method: "post",
-      url: `${AuthAPI}/token/access`,
-    })
-      .then((res) => {
-        if (res.data.ok) {
-          setAccess(true);
-        } else {
-          setAccess(false);
-        }
+    const config = await getItemAsync(CONFIG_KEY);
+    if (config) {
+      await customAxiosInstance({
+        method: "post",
+        url: `${AuthAPI}/token/access`,
       })
-      .catch((e) => {
-        console.log(e.response.data);
-        setAccess(false);
-      });
+        .then((res) => {
+          if (res.data.ok) {
+            setAccess(true);
+          } else {
+            setAccess(false);
+          }
+        })
+        .catch((e) => {
+          console.log("token validation error:", e.response.data.error.message);
+          setAccess(false);
+        });
+    } else {
+      setAccess(true);
+    }
   };
 
+  const testFunction = () => {
+    deleteItemAsync(CONFIG_KEY);
+    deleteItemAsync(ACCESS_KEY);
+    deleteItemAsync(REFRESH_KEY);
+    deleteItemAsync(TEMPUSERID_KEY);
+    deleteItemAsync(TEMPUSERPASS_KEY);
+  };
+
+  // initial token validation
   useEffect(() => {
-    // SecureStore.deleteItemAsync(CONFIG_KEY);
-    authentication();
+    // testFunction();
+    if (access === undefined) {
+      tokenValidation();
+    }
   }, []);
 
+  // after setAccess state end the fetching phase
   useEffect(() => {
-    if (access) {
+    if (access !== undefined) {
       setFetching(false);
     }
   }, [access]);

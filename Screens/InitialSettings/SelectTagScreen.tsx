@@ -2,7 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   backgroundColor,
   windowHeight,
@@ -10,8 +17,14 @@ import {
 } from "../../Constants/cssConst";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { CONFIG_KEY } from "../../Constants/securestoreKey";
-import { TagAPI } from "../../Constants/backendAPI";
+import {
+  ACCESS_KEY,
+  CONFIG_KEY,
+  REFRESH_KEY,
+  TEMPUSERID_KEY,
+  TEMPUSERPASS_KEY,
+} from "../../Constants/securestoreKey";
+import { AuthAPI, RoomAPI, TagAPI } from "../../Constants/backendAPI";
 import { FlatList } from "react-native-gesture-handler";
 import Footer from "../../Components/InitialStep/Footer";
 import { CommonActions } from "@react-navigation/native";
@@ -22,6 +35,7 @@ import SearchBar from "../../Components/InitialStep/SearchBar";
 import _ from "lodash";
 import ToggleTagForSearch from "../../Components/InitialStep/ToggleTagForSearch";
 import Modal from "react-native-modal";
+import customAxiosInstance from "../../Utils/customAxiosInstance";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -47,6 +61,9 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // search mode contorller boolean
   const [searchMode, setSearchMode] = useState(false);
 
+  const [startSubmit, setStartSubmit] = useState(false);
+  const [loadingText, setLoadingText] = useState("Creating new account");
+
   // search tag http request
   const debounceSearchTags = useCallback(
     _.debounce((input: string) => {
@@ -56,7 +73,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
       } else {
         axios({
           method: "post",
-          url: `${TagAPI}/?name=${input}&take=20&page=${searchPage}`,
+          url: `${TagAPI}/search?name=${input}&take=20&page=${searchPage}`,
           data: {
             excludes: selectedTagId,
           },
@@ -92,16 +109,81 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   };
 
   // skip function
-  const skipSetting = async () => {
-    await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
-    console.log("saved");
-    navigation.dispatch(
-      CommonActions.reset({ routes: [{ name: "HomeDrawerNavigation" }] })
-    );
+  const skipSettingFunction = async () => {
+    setStartSubmit(true);
+    let tempData = undefined;
+    let loginFlag = false;
+    // reset function
+    // phase 1 register a temp user
+    try {
+      const res = await axios({
+        method: "post",
+        url: `${AuthAPI}/register`,
+        data: {
+          isTemp: true,
+        },
+      });
+      SecureStore.setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
+      SecureStore.setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
+      tempData = {
+        id: res.data.data.tmpId,
+        pass: res.data.data.tmpPass,
+      };
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 1");
+    }
+
+    // phase 2 login with temp user
+    // prettier-ignore
+    if(tempData === undefined){return console.log("Submit process failed with tempUserRegisterDate === undifined.")}
+    setLoadingText("Login process");
+    try {
+      const res = await axios({
+        method: "post",
+        url: `${AuthAPI}/login`,
+        data: {
+          username: tempData.id,
+          password: tempData.pass,
+        },
+      });
+      SecureStore.setItemAsync(ACCESS_KEY, res.data.accessToken);
+      SecureStore.setItemAsync(REFRESH_KEY, res.data.refreshToken);
+      loginFlag = true;
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 2");
+    }
+
+    // phase 3
+    // prettier-ignore
+    if(!loginFlag){return console.log("Submit process failed with liginWithTempUser === undefined.")}
+    setLoadingText("Creating user setting");
+    try {
+      const res = await customAxiosInstance({
+        method: "post",
+        url: `${RoomAPI}/new`,
+        data: {
+          isDefaultRoom: true,
+          foodIds: [],
+          name: "__default",
+        },
+      });
+      console.log(res.data.data);
+      SecureStore.setItemAsync(CONFIG_KEY, "Completed");
+      console.log("saved");
+      navigation.dispatch(
+        CommonActions.reset({
+          routes: [{ name: "HomeDrawerNavigation" }],
+        })
+      );
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 3");
+    }
   };
   // next step function
   const goNextStep = async () => {
-    console.log(selectedTagId);
     navigation.navigate("SelectFoodScreen", { TargetTags: selectedTagId });
   };
 
@@ -134,7 +216,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     if (searchPage !== 1 && !searchEnd) {
       axios({
         method: "post",
-        url: `${TagAPI}/?name=${inputText}&take=20&page=${searchPage}`,
+        url: `${TagAPI}/search?name=${inputText}&take=20&page=${searchPage}`,
         data: {
           excludes: selectedTagId,
         },
@@ -153,141 +235,162 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [searchPage]);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={[styles.safeArea, { opacity: searchMode ? 0.7 : 1 }]}
-      >
-        {/* header */}
-        <View style={styles.header}>
-          <Text style={styles.headerFont}>
-            お気入り料理の種類を{"\n"}
-            選択してください
-          </Text>
-        </View>
-        {/* search Btn */}
-        <View style={styles.searchContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              setSearchMode((prev) => !prev);
+    <SafeAreaProvider
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: startSubmit ? backgroundColor : "#FFF",
+      }}
+    >
+      {startSubmit ? (
+        <>
+          <ActivityIndicator size="large" color="#FFF"></ActivityIndicator>
+          <Text
+            style={{
+              color: "#FFF",
+              fontSize: windowWidth * 0.05,
+              marginTop: windowHeight * 0.03,
             }}
           >
-            <FontAwesome
-              name="search"
-              size={windowWidth * 0.07}
-              // color={backgroundColor}
-              color="#FFF"
-            />
-          </TouchableOpacity>
-        </View>
-        {/* card container */}
-        <FlatList
-          data={tags}
-          extraData={tags}
-          keyExtractor={(item, index) => index.toString()}
-          style={styles.tagContainer}
-          columnWrapperStyle={{ justifyContent: "space-evenly" }}
-          numColumns={2}
-          onEndReached={() => onScrollToBottom()}
-          renderItem={({ item, index }) => {
-            const tempTag = tags[index];
-            const isChecked = selectedTagId.find((tagId) => tagId === item.id)
-              ? true
-              : false;
-            return (
-              <ToggleTag
-                tag={item}
-                check={isChecked}
-                onPressHandler={() => {
-                  if (isChecked) {
-                    setSelectedTagId((prev) =>
-                      prev.filter((id) => id !== item.id)
-                    );
-                  } else {
-                    setSelectedTagId((prev) => [...prev, item.id]);
-                    setTags((prev) => {
-                      return [
-                        tempTag,
-                        ...prev.filter((target) => target.id != tempTag.id),
-                      ];
-                    });
-                  }
-                }}
-              ></ToggleTag>
-            );
-          }}
-        />
-        {/* footer */}
-        <Footer
-          goBackFunc={() => navigation.goBack()}
-          goNextFunc={() => goNextStep()}
-          skipFunc={() => skipSetting()}
-        />
-        {/* modal */}
-        <Modal
-          isVisible={searchMode}
-          onBackdropPress={() => leaveSearchMode()}
-          style={styles.modal}
+            {loadingText}
+          </Text>
+        </>
+      ) : (
+        <SafeAreaView
+          style={[styles.safeArea, { opacity: searchMode ? 0.7 : 1 }]}
         >
-          <View style={styles.modalBackground}>
-            <SearchBar
-              input={inputText}
-              setInput={setInputText}
-              placeholderText="種類を入力してください"
-              searchFunction={(input: string) => debounceSearchTags(input)}
-            ></SearchBar>
-            <FlatList
-              data={searchTags}
-              extraData={searchTags}
-              keyExtractor={(item, index) => index.toString()}
-              style={styles.tagContainer}
-              columnWrapperStyle={{ justifyContent: "space-evenly" }}
-              numColumns={2}
-              onEndReached={() => onModalScrollToBottom()}
-              renderItem={({ item, index }) => {
-                const isChecked = selectedTagId.find(
-                  (tagId) => tagId === item.id
-                )
-                  ? true
-                  : false;
-                return (
-                  <ToggleTagForSearch
-                    tag={item}
-                    check={isChecked}
-                    onPressHandler={() => {
-                      const tempSearchTag = searchTags[index];
-                      if (isChecked) {
-                        setSelectedTagId((prev) =>
-                          prev.filter((id) => id !== item.id)
-                        );
-                      } else {
-                        setSelectedTagId((prev) => [...prev, item.id]);
-                        setTags((prev) => {
-                          return [
-                            tempSearchTag,
-                            ...prev.filter(
-                              (target) => target.id != tempSearchTag.id
-                            ),
-                          ];
-                        });
-                      }
-                    }}
-                  ></ToggleTagForSearch>
-                );
-              }}
-            />
-            <View style={styles.modalFooter}>
-              <TouchableOpacity
-                onPress={() => {
-                  leaveSearchMode();
-                }}
-                style={styles.modalSubmit}
-              >
-                <Text style={styles.modalSubmitText}>確定</Text>
-              </TouchableOpacity>
-            </View>
+          {/* header */}
+          <View style={styles.header}>
+            <Text style={styles.headerFont}>
+              お気入り料理の種類を{"\n"}
+              選択してください
+            </Text>
           </View>
-        </Modal>
-      </SafeAreaView>
+          {/* search Btn */}
+          <View style={styles.searchContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                setSearchMode((prev) => !prev);
+              }}
+            >
+              <FontAwesome
+                name="search"
+                size={windowWidth * 0.07}
+                // color={backgroundColor}
+                color="#FFF"
+              />
+            </TouchableOpacity>
+          </View>
+          {/* card container */}
+          <FlatList
+            data={tags}
+            extraData={tags}
+            keyExtractor={(item, index) => index.toString()}
+            style={styles.tagContainer}
+            columnWrapperStyle={{ justifyContent: "space-evenly" }}
+            numColumns={2}
+            onEndReached={() => onScrollToBottom()}
+            renderItem={({ item, index }) => {
+              const tempTag = tags[index];
+              const isChecked = selectedTagId.find((tagId) => tagId === item.id)
+                ? true
+                : false;
+              return (
+                <ToggleTag
+                  tag={item}
+                  check={isChecked}
+                  onPressHandler={() => {
+                    if (isChecked) {
+                      setSelectedTagId((prev) =>
+                        prev.filter((id) => id !== item.id)
+                      );
+                    } else {
+                      setSelectedTagId((prev) => [...prev, item.id]);
+                      setTags((prev) => {
+                        return [
+                          tempTag,
+                          ...prev.filter((target) => target.id != tempTag.id),
+                        ];
+                      });
+                    }
+                  }}
+                ></ToggleTag>
+              );
+            }}
+          />
+          {/* footer */}
+          <Footer
+            goBackFunc={() => navigation.goBack()}
+            goNextFunc={() => goNextStep()}
+            skipFunc={() => skipSettingFunction()}
+          />
+          {/* modal */}
+          <Modal
+            isVisible={searchMode}
+            onBackdropPress={() => leaveSearchMode()}
+            style={styles.modal}
+          >
+            <View style={styles.modalBackground}>
+              <SearchBar
+                input={inputText}
+                setInput={setInputText}
+                placeholderText="種類を入力してください"
+                searchFunction={(input: string) => debounceSearchTags(input)}
+              ></SearchBar>
+              <FlatList
+                data={searchTags}
+                extraData={searchTags}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.tagContainer}
+                columnWrapperStyle={{ justifyContent: "space-evenly" }}
+                numColumns={2}
+                onEndReached={() => onModalScrollToBottom()}
+                renderItem={({ item, index }) => {
+                  const isChecked = selectedTagId.find(
+                    (tagId) => tagId === item.id
+                  )
+                    ? true
+                    : false;
+                  return (
+                    <ToggleTagForSearch
+                      tag={item}
+                      check={isChecked}
+                      onPressHandler={() => {
+                        const tempSearchTag = searchTags[index];
+                        if (isChecked) {
+                          setSelectedTagId((prev) =>
+                            prev.filter((id) => id !== item.id)
+                          );
+                        } else {
+                          setSelectedTagId((prev) => [...prev, item.id]);
+                          setTags((prev) => {
+                            return [
+                              tempSearchTag,
+                              ...prev.filter(
+                                (target) => target.id != tempSearchTag.id
+                              ),
+                            ];
+                          });
+                        }
+                      }}
+                    ></ToggleTagForSearch>
+                  );
+                }}
+              />
+              <View style={styles.modalFooter}>
+                <TouchableOpacity
+                  onPress={() => {
+                    leaveSearchMode();
+                  }}
+                  style={styles.modalSubmit}
+                >
+                  <Text style={styles.modalSubmitText}>確定</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        </SafeAreaView>
+      )}
     </SafeAreaProvider>
   );
 };

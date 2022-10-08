@@ -1,5 +1,12 @@
-import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import React, { useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import {
@@ -11,73 +18,185 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
+import { setItemAsync } from "expo-secure-store";
+import axios from "axios";
+import { AuthAPI, RoomAPI } from "../../Constants/backendAPI";
+import {
+  ACCESS_KEY,
+  CONFIG_KEY,
+  REFRESH_KEY,
+  TEMPUSERID_KEY,
+  TEMPUSERPASS_KEY,
+} from "../../Constants/securestoreKey";
+import customAxiosInstance from "../../Utils/customAxiosInstance";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "IntroScreen">;
 
 const IntroScreen: React.FC<Props> = ({ navigation }) => {
+  const [startSubmit, setStartSubmit] = useState(false);
+  const [loadingText, setLoadingText] = useState("Creating new account");
+  const accountLoginHandler = () => {
+    setItemAsync(CONFIG_KEY, "Completed");
+    navigation.dispatch(
+      CommonActions.reset({
+        routes: [{ name: "AuthNavigation" }],
+      })
+    );
+  };
+  const skipSettingFunction = async () => {
+    setStartSubmit(true);
+    let tempData = undefined;
+    let loginFlag = false;
+    // reset function
+    // phase 1 register a temp user
+    try {
+      const res = await axios({
+        method: "post",
+        url: `${AuthAPI}/register`,
+        data: {
+          isTemp: true,
+        },
+      });
+      setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
+      setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
+      tempData = {
+        id: res.data.data.tmpId,
+        pass: res.data.data.tmpPass,
+      };
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 1");
+    }
+
+    // phase 2 login with temp user
+    // prettier-ignore
+    if(tempData === undefined){return console.log("Submit process failed with tempUserRegisterDate === undifined.")}
+    setLoadingText("Login process");
+    try {
+      const res = await axios({
+        method: "post",
+        url: `${AuthAPI}/login`,
+        data: {
+          username: tempData.id,
+          password: tempData.pass,
+        },
+      });
+      setItemAsync(ACCESS_KEY, res.data.accessToken);
+      setItemAsync(REFRESH_KEY, res.data.refreshToken);
+      loginFlag = true;
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 2");
+    }
+
+    // phase 3
+    // prettier-ignore
+    if(!loginFlag){return console.log("Submit process failed with liginWithTempUser === undefined.")}
+    setLoadingText("Creating user setting");
+    try {
+      const res = await customAxiosInstance({
+        method: "post",
+        url: `${RoomAPI}/new`,
+        data: {
+          isDefaultRoom: true,
+          foodIds: [],
+          name: "__default",
+        },
+      });
+      console.log(res.data.data);
+      setItemAsync(CONFIG_KEY, "Completed");
+      console.log("saved");
+      navigation.dispatch(
+        CommonActions.reset({
+          routes: [{ name: "HomeDrawerNavigation" }],
+        })
+      );
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 3");
+    }
+  };
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.background}>
-        {/* header */}
-        <View style={styles.header}>
-          <View style={styles.iconConatiner}>
-            <Image
-              source={require("../../image/umakase.png")}
-              style={styles.icon}
-            ></Image>
-          </View>
-          <View style={styles.headLine}>
-            <Text style={styles.headLineText}>ようこそ！</Text>
-          </View>
-        </View>
-        {/* body */}
-        <View style={styles.directionsContainer}>
-          <Text style={styles.directionsFont}>
-            Umakaseをご使用いただき、{"\n"}
-            ありがとうございます。{"\n"}
-            これからお気入り料理の設定を{"\n"}
-            行います。{"\n"}
-            右ボタンをクリックして設定を{"\n"}
-            始めます。{"\n"}
-            スキップボタンをクリックして{"\n"}
-            設定をあと回します。
+    <SafeAreaProvider
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: startSubmit ? backgroundColor : "#FFF",
+      }}
+    >
+      {startSubmit ? (
+        <>
+          <ActivityIndicator size="large" color="#FFF"></ActivityIndicator>
+          <Text
+            style={{
+              color: "#FFF",
+              fontSize: windowWidth * 0.05,
+              marginTop: windowHeight * 0.03,
+            }}
+          >
+            {loadingText}
           </Text>
-        </View>
-        <View style={styles.linkContainer}>
-          <TouchableOpacity style={styles.loginLink} onPress={() => {}}>
-            <Text style={styles.loginLinkFont}>アカウントをログイン</Text>
-          </TouchableOpacity>
-        </View>
-        {/* footer */}
-        <View style={styles.footer}>
-          <View style={styles.sideContainer}></View>
-          <View style={styles.btnContainer}>
+        </>
+      ) : (
+        <SafeAreaView style={styles.background}>
+          {/* header */}
+          <View style={styles.header}>
+            <View style={styles.iconConatiner}>
+              <Image
+                source={require("../../image/umakase.png")}
+                style={styles.icon}
+              ></Image>
+            </View>
+            <View style={styles.headLine}>
+              <Text style={styles.headLineText}>ようこそ！</Text>
+            </View>
+          </View>
+          {/* body */}
+          <View style={styles.directionsContainer}>
+            <Text style={styles.directionsFont}>
+              Umakaseをご使用いただき、{"\n"}
+              ありがとうございます。{"\n"}
+              これからお気入り料理の設定を{"\n"}
+              行います。{"\n"}
+              右ボタンをクリックして設定を{"\n"}
+              始めます。{"\n"}
+              スキップボタンをクリックして{"\n"}
+              設定をあと回します。
+            </Text>
+          </View>
+          <View style={styles.linkContainer}>
             <TouchableOpacity
-              style={styles.skipBtn}
-              onPress={() =>
-                navigation.dispatch(
-                  CommonActions.reset({
-                    routes: [{ name: "HomeDrawerNavigation" }],
-                  })
-                )
-              }
+              style={styles.loginLink}
+              onPress={() => accountLoginHandler()}
             >
-              <Text style={styles.skipBtnText}>スキップ</Text>
+              <Text style={styles.loginLinkFont}>アカウントをログイン</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.sideContainer}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("SelectTagScreen")}
-            >
-              <FontAwesome
-                name="arrow-circle-right"
-                size={windowWidth * 0.145}
-                color="#FFF"
-              />
-            </TouchableOpacity>
+          {/* footer */}
+          <View style={styles.footer}>
+            <View style={styles.sideContainer}></View>
+            <View style={styles.btnContainer}>
+              <TouchableOpacity
+                style={styles.skipBtn}
+                onPress={() => skipSettingFunction()}
+              >
+                <Text style={styles.skipBtnText}>スキップ</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.sideContainer}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("SelectTagScreen")}
+              >
+                <FontAwesome
+                  name="arrow-circle-right"
+                  size={windowWidth * 0.145}
+                  color="#FFF"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      )}
     </SafeAreaProvider>
   );
 };

@@ -1,15 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import { createDrawerNavigator, DrawerContent } from "@react-navigation/drawer";
 import RandomScreen from "../Screens/Home/RandomScreen";
 import { HomeDrawerNavigationProps } from "../Types/Navigations/HomeDrawer";
 import {
-  backgroundColor,
   darkTextColor,
   drawerColor,
   lightTextColor,
 } from "../Constants/cssConst";
+
 import { ProfileStackScreen } from "./ProfileStackNavigation";
+import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
@@ -26,11 +27,24 @@ const HomeDrawerNavigation: React.FC = () => {
         drawerInactiveTintColor: lightTextColor,
       }}
     >
-      <Drawer.Screen name="RandomScreen" component={RandomScreen} />
       <Drawer.Screen
         name="ProfileNavigation"
         component={ProfileStackScreen}
       ></Drawer.Screen>
+      <Drawer.Screen
+        name="RandomScreen"
+        component={RandomScreen}
+        options={{
+          drawerContentContainerStyle: {
+            borderBottomWidth: 1,
+            borderBottomColor: "#FFF",
+          },
+        }}
+      />
+
+      <Drawer.Screen name="Room" component={RoomStackNavigation} />
+
+      {/* <DrawerContent navigation={}></DrawerContent> */}
     </Drawer.Navigator>
   );
 };

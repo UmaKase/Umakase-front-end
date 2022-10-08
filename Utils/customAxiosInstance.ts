@@ -12,7 +12,7 @@ customAxiosInstance.interceptors.request.use(
     try {
       accessToken = await getItemAsync(ACCESS_KEY);
     } catch (e) {
-      console.log(e);
+      console.log("Interceptors request handler setting accessToken: " + e);
     }
 
     if (!!accessToken) {
@@ -34,30 +34,33 @@ customAxiosInstance.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    // the flag of refreshToken validate result
+    let refreshTokenValidationResult: boolean = false;
     if (error.response.status >= 400 && error.response.status < 500) {
       let newAccessToken;
       // refresh access token
       const localRefreshToken = await getItemAsync(REFRESH_KEY);
-      axios({
-        method: "post",
-        url: `${AuthAPI}/token/refresh`,
-        headers: { Authorization: `Bearer ${localRefreshToken}` },
-      })
-        .then((res) => {
-          try {
-            newAccessToken = res.data.data.newAccessToken;
-            setItemAsync(ACCESS_KEY, newAccessToken);
-            // prettier-ignore
-            customAxiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
-          } catch (error) {
-            console.log(error);
-          }
-        })
-        .catch((e) => console.log(e));
 
-      return customAxiosInstance(originalRequest);
+      try {
+        const res = await axios({
+          method: "post",
+          url: `${AuthAPI}/token/refresh`,
+          headers: { Authorization: `Bearer ${localRefreshToken}` },
+        });
+        newAccessToken = res.data.data.newAccessToken;
+        await setItemAsync(ACCESS_KEY, newAccessToken);
+        refreshTokenValidationResult = true;
+      } catch (error) {
+        console.log("Interceptor Catch Error:" + error);
+        refreshTokenValidationResult = false;
+      }
     }
-    return Promise.reject(error);
+    console.log(
+      "Refresh Token Validation Result:",
+      refreshTokenValidationResult
+    );
+    // prettier-ignore
+    return refreshTokenValidationResult? customAxiosInstance(originalRequest) : Promise.reject(error);
   }
 );
 

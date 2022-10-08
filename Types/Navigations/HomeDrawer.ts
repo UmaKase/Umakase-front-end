@@ -6,5 +6,6 @@ export type HomeDrawerNavigationProps = {
   ProfileNavigation:{
     ProfileScreen: undefined;
     ProfileUpdateScreen:ProfileStackProps;
-  }
+  };
+  Room: undefined;
 };
