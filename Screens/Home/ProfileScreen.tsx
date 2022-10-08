@@ -11,6 +11,7 @@ import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
 import ProfileInfo from "../../Components/Home/ProfileInfo";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
+import UserList from "../../Components/Home/UserList";
 
 // type RandomScreenProps = DrawerScreenProps<
 //   HomeDrawerNavigationProps,
@@ -57,6 +58,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
         <ProfileInfo setUserId={setUserId} navigation={navigation} />
+        <UserList />
         <TouchableOpacity
           onPress={() => logoutProcess()}
           style={styles.logoutBtn}
