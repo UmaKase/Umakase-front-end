@@ -4,6 +4,6 @@ export type ProfileStackProps = {
   ProfileScreen: undefined;
   ProfileUpdateScreen: {
     mode:number;
-    userid:string;
+    userId:string;
   };
 };

@@ -6,7 +6,7 @@ import {
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
@@ -23,6 +23,7 @@ import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { UserAPI } from "../../Constants/backendAPI";
 import { REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 type ProfileUpdateScreenProps = NativeStackScreenProps<
   ProfileStackProps,
@@ -39,15 +40,22 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
   const [errMsg, setErrMsg] = useState<string>("");
   //predefined function/processes
   //request api to update personal info
-  const updateProcess = async (successCallBack: any) => {
+  const updateProcess = async (
+    userId: string,
+    successCallBack: (res: AxiosResponse) => void,
+    failCallback: (res: Error | AxiosError) => void
+  ) => {
     const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
     let requestMethod = "";
     let requestUrl = "";
     let requestData = undefined;
+    //refresh token error handler
     if (!localRefreshToken) {
       console.log("No local refresh token");
       return Alert.alert("Error", "No local refresh token");
     }
+    console.log("userid:" + route.params.userId);
+    //update email property
     if (route.params.mode === profileUpdateMode.email) {
       requestMethod = "put";
       requestUrl = `${UserAPI}/profile/email`;
@@ -57,16 +65,20 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
     } else {
       return;
     }
-    console.log("update start");
-    // customAxiosInstance({
-    //   method: requestMethod,
-    //   url: requestUrl,
-    //   data: requestData,
-    // })
-    //   .then((res) => {
-    //     successCallBack(res);
-    //   })
-    //   .catch((e) => console.log(e.response.data));
+    console.log(requestData);
+    //call update property api
+    customAxiosInstance({
+      method: requestMethod,
+      url: requestUrl,
+      data: requestData,
+    })
+      .then((res) => {
+        successCallBack(res);
+      })
+      .catch((e) => {
+        console.log(e.response.data);
+        failCallback(e);
+      });
   };
   //verify input function
   const verifyInput = (): boolean => {
@@ -81,6 +93,17 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
     }
     return true;
   };
+  let onLoadBool = true;
+  useEffect(() => {
+    console.log(route.params.userId);
+    const focus = navigation.addListener("focus", () => {
+      if (!onLoadBool) {
+        navigation.goBack();
+      } else {
+        onLoadBool = false;
+      }
+    });
+  }, []);
   //get name of update value
   updateValueName = profileUpdateValueName[route.params.mode];
   let confirmInput;
@@ -164,10 +187,13 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
                   return;
                 }
                 console.info(verifyInput());
-                updateProcess(() => {
-                  console.info("OK");
-                  navigation.goBack();
-                });
+                updateProcess(
+                  route.params.userId,
+                  () => {
+                    navigation.goBack();
+                  },
+                  () => {}
+                );
               }}
             >
               <Text style={styles.button_text}>設定</Text>
