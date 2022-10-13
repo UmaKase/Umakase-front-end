@@ -22,6 +22,7 @@ import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import { profileUpdateMode } from "../../Constants/ProfileConst";
 
 interface ProfileInfoProps {
+  userId: string | undefined;
   setUserId: React.Dispatch<React.SetStateAction<string | undefined>>;
   navigation: NativeStackNavigationProp<
     ProfileStackProps,
@@ -46,7 +47,11 @@ const profileProcess = async (successCallBack: any) => {
     })
     .catch((e) => console.log(e.response.data));
 };
-const ProfileInfo: React.FC<ProfileInfoProps> = ({ setUserId, navigation }) => {
+const ProfileInfo: React.FC<ProfileInfoProps> = ({
+  userId,
+  setUserId,
+  navigation,
+}) => {
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
   const [feeding, setFeeding] = useState<boolean>();
@@ -94,7 +99,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ setUserId, navigation }) => {
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.email,
-              userid: "", //userProfileContainer?.profile.id,
+              userId: userId ? userId : "",
             })
           }
         >
@@ -107,7 +112,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ setUserId, navigation }) => {
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.password,
-              userid: "", //userProfileContainer?.profile.id,
+              userId: userId ? userId : "",
             })
           }
         >
@@ -120,7 +125,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ setUserId, navigation }) => {
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.email,
-              userid: "", //userProfileContainer?.profile.id,
+              userId: userId ? userId : "",
             })
           }
         >

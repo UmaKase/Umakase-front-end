@@ -57,7 +57,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
-        <ProfileInfo setUserId={setUserId} navigation={navigation} />
+        <ProfileInfo
+          userId={userId}
+          setUserId={setUserId}
+          navigation={navigation}
+        />
         <UserList />
         <TouchableOpacity
           onPress={() => logoutProcess()}
