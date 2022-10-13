@@ -44,7 +44,7 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
   }, []);
 
   const createRoom = () => {
-    console.log("create Room!");
+    navigation.navigate("RoomConfigSettingScreen");
   };
   const getRoomInfo = () => {
     console.log("get room info");
