@@ -12,7 +12,7 @@ import { RoomStackNavigationProps } from "../../../Types/Navigations/RoomStack";
 import { DrawerActions } from "@react-navigation/native";
 import customAxiosInstance from "../../../Utils/customAxiosInstance";
 import { RoomAPI } from "../../../Constants/backendAPI";
-import { Entypo, FontAwesome, Ionicons } from "@expo/vector-icons";
+import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Props = NativeStackScreenProps<RoomStackNavigationProps, "RoomListScreen">;
