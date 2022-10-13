@@ -48,9 +48,9 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       .then(async (loginResult) => {
         //ANCHOR saving basic info
         // prettier-ignore
-        await SecureStore.setItemAsync(ACCESS_KEY, loginResult.data.accessToken);
+        await SecureStore.setItemAsync(ACCESS_KEY, loginResult.data.data.accessToken);
         // prettier-ignore
-        await SecureStore.setItemAsync(REFRESH_KEY, loginResult.data.refreshToken);
+        await SecureStore.setItemAsync(REFRESH_KEY, loginResult.data.data.refreshToken);
 
         // await SecureStore.setItemAsync(USERID_KEY, loginResult.data.profile.id);
 
@@ -62,11 +62,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         );
       })
       .catch((e) => {
-        console.log(e);
         if (e.response.status == 400) {
-          Alert.alert("Login failed", e.response.data.error.message);
+          Alert.alert("Login failed", e.response.data.message);
         } else {
-          console.log(e.response.data.error.message);
+          console.log("login catch else error:", e.response.data.message);
         }
       });
   };

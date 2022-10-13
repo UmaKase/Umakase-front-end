@@ -98,8 +98,8 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           password: tempData.pass,
         },
       });
-      SecureStore.setItemAsync(ACCESS_KEY, res.data.accessToken);
-      SecureStore.setItemAsync(REFRESH_KEY, res.data.refreshToken);
+      SecureStore.setItemAsync(ACCESS_KEY, res.data.data.accessToken);
+      SecureStore.setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
       loginFlag = true;
     } catch (error) {
       setStartSubmit(false);

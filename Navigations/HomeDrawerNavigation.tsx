@@ -8,6 +8,8 @@ import {
   drawerColor,
   lightTextColor,
 } from "../Constants/cssConst";
+
+import { ProfileStackScreen } from "./ProfileStackNavigation";
 import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
@@ -25,6 +27,10 @@ const HomeDrawerNavigation: React.FC = () => {
         drawerInactiveTintColor: lightTextColor,
       }}
     >
+      <Drawer.Screen
+        name="ProfileNavigation"
+        component={ProfileStackScreen}
+      ></Drawer.Screen>
       <Drawer.Screen
         name="RandomScreen"
         component={RandomScreen}

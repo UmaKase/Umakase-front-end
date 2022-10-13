@@ -51,7 +51,7 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
         console.log(res.data.data);
       })
       .catch((e) => {
-        console.log(e);
+        console.log(e.response.data.message);
       });
   }, []);
   return (
