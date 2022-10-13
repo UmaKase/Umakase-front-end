@@ -36,7 +36,7 @@ customAxiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     // the flag of refreshToken validate result
     let refreshTokenValidationResult: boolean = false;
-    if (error.response.status >= 400 && error.response.status < 500) {
+    if (error.response.status === 401 || error.response.status === 400) {
       let newAccessToken;
       // refresh access token
       const localRefreshToken = await getItemAsync(REFRESH_KEY);
@@ -60,7 +60,7 @@ customAxiosInstance.interceptors.response.use(
       refreshTokenValidationResult
     );
     // prettier-ignore
-    return refreshTokenValidationResult? customAxiosInstance(originalRequest) : Promise.reject(error);
+    return refreshTokenValidationResult? axios(originalRequest) : Promise.reject(error);
   }
 );
 
