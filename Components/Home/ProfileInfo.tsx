@@ -55,7 +55,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
   const [feeding, setFeeding] = useState<boolean>();
-  imgUrl = require("../../image/umakase.png");
+  imgUrl = require("../../Image/Umakase.png");
   //onload
   useEffect(() => {
     profileProcess((res: any) => {
@@ -75,7 +75,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     <View style={styles.mainContainer}>
       <View style={styles.rowContainer}>
         <Image
-          source={require("../../image/umakase.png")}
+          source={require("../../Image/Umakase.png")}
           style={styles.icon}
         />
         <View

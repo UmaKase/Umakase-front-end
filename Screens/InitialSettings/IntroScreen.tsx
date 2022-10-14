@@ -143,7 +143,7 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.header}>
             <View style={styles.iconConatiner}>
               <Image
-                source={require("../../image/umakase.png")}
+                source={require("../../Image/Umakase.png")}
                 style={styles.icon}
               ></Image>
             </View>

@@ -30,7 +30,7 @@ const UserItem: FunctionComponent<UserItemProps> = (item: any) => {
       >
         <View style={styles.userItemInfoContainer}>
           <Image
-            source={require("../../image/umakase.png")}
+            source={require("../../Image/Umakase.png")}
             style={styles.userItemIcon}
           />
           <Text style={[selected ? styles.selected : styles.deselected]}>
