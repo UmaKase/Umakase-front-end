@@ -81,8 +81,8 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
           password: tempData.pass,
         },
       });
-      setItemAsync(ACCESS_KEY, res.data.accessToken);
-      setItemAsync(REFRESH_KEY, res.data.refreshToken);
+      setItemAsync(ACCESS_KEY, res.data.data.accessToken);
+      setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
       loginFlag = true;
     } catch (error) {
       setStartSubmit(false);
