@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     width: windowWidth,
     height: 35,
     flexDirection: "row",
-    paddingHorizontal: 10,
+    paddingHorizontal: windowWidth * 0.03,
   },
   iconContainer: {
     flex: 1,
