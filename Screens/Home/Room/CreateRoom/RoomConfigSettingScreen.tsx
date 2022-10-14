@@ -24,20 +24,20 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
   const [descriptionInput, setDescriptionInput] = useState("");
   const [friends, setFriedns] = useState([1, 1, 1, 1, 1, 1, 1, 1, 1]);
 
-  useFocusEffect(() => {
+  // useFocusEffect(() => {
+  //   console.log("hi this is set room config screen.");
+
+  //   return () => {
+  //     navigation.goBack();
+  //   };
+  // });
+  useEffect(() => {
     console.log("hi this is set room config screen.");
 
     return () => {
       console.log("see u next time :D");
     };
-  });
-  // useEffect(() => {
-  //   console.log("hi this is set room config screen.");
-
-  //   return () => {
-  //     console.log("see u next time :D");
-  //   };
-  // }, []);
+  }, []);
 
   return (
     <SafeAreaProvider>
