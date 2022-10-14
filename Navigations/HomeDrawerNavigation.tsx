@@ -77,24 +77,7 @@ const HomeDrawerNavigation: React.FC = () => {
         component={ProfileStackScreen}
       ></Drawer.Screen>
       <Drawer.Screen name="RandomScreen" component={RandomScreen} />
-
-      <Drawer.Screen
-        name="Room"
-        component={RoomStackNavigation}
-        options={{
-          drawerItemStyle: {
-            borderBottomWidth: 1,
-            borderBottomColor: "#FFF",
-          },
-        }}
-      />
-      {/* <DrawerItem
-        label="logout"
-        onPress={() => logoutFunction()}
-        icon={() => (
-          <MaterialIcons name="logout" size={windowWidth * 0.05} color="#FFF" />
-        )}
-      /> */}
+      <Drawer.Screen name="Room" component={RoomStackNavigation} />
 
       {/* <DrawerContent navigation={}></DrawerContent> */}
     </Drawer.Navigator>
