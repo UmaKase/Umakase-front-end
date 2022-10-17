@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 import React from "react";
 import {
   createDrawerNavigator,
@@ -19,12 +19,28 @@ import {
 import { ProfileStackScreen } from "./ProfileStackNavigation";
 import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
 import { Entypo } from "@expo/vector-icons";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
 const HomeDrawerNavigation: React.FC = () => {
+  const navigation = useNavigation();
   const logoutFunction = () => {
-    console.log("Logout button!");
+    return Alert.alert("Logout", "Do you want to logout?", [
+      {
+        text: "Cancel",
+        onPress: () => navigation.dispatch(DrawerActions.closeDrawer),
+        style: "default",
+      },
+      {
+        text: "Confirm",
+        onPress: () => {
+          console.log("loging out!");
+          navigation.dispatch(DrawerActions.closeDrawer);
+        },
+        style: "destructive",
+      },
+    ]);
   };
   const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     return (
@@ -37,7 +53,7 @@ const HomeDrawerNavigation: React.FC = () => {
           style={{
             height: 0,
             width: windowWidth * 0.63,
-            borderWidth: 1,
+            borderWidth: 0.5,
             borderColor: "#FFF",
             marginVertical: windowHeight * 0.02,
           }}
@@ -78,8 +94,6 @@ const HomeDrawerNavigation: React.FC = () => {
       ></Drawer.Screen>
       <Drawer.Screen name="RandomScreen" component={RandomScreen} />
       <Drawer.Screen name="Room" component={RoomStackNavigation} />
-
-      {/* <DrawerContent navigation={}></DrawerContent> */}
     </Drawer.Navigator>
   );
 };
