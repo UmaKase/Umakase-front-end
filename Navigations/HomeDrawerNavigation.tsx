@@ -48,7 +48,7 @@ const HomeDrawerNavigation: React.FC = () => {
         <DrawerItemList {...props} />
         {/* devide line */}
         <DrawerItem
-          label="_______________________________"
+          label=""
           onPress={() => {}}
           style={{
             height: 0,
