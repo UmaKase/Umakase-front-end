@@ -3,6 +3,9 @@ import {
   drawerColor,
   errTextColor,
   lightTextColor,
+  paddingLarge,
+  textLarge,
+  textMedium,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
@@ -10,13 +13,14 @@ import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
-import { DrawerActions } from "@react-navigation/native";
+import { DrawerActions, useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import {
   profileUpdateMode,
   profileUpdateValueName,
-} from "../../Constants/ProfileConst";
+  profileUpdScreenStr,
+} from "../../Constants/profileConst";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { TextInput } from "react-native-gesture-handler";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
@@ -24,6 +28,7 @@ import { UserAPI } from "../../Constants/backendAPI";
 import { REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { FontAwesome } from "@expo/vector-icons";
 
 type ProfileUpdateScreenProps = NativeStackScreenProps<
   ProfileStackProps,
@@ -84,26 +89,22 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
   const verifyInput = (): boolean => {
     if (route.params.mode == profileUpdateMode.password) {
       if (confirmValue == newValue) {
-        setErrMsg("");
+        setErrMsg(profileUpdScreenStr.errMsgEmpty);
         return true;
       } else {
-        setErrMsg("入力パスワードは一致しない。");
+        setErrMsg(profileUpdScreenStr.errMsgUnequip);
         return false;
       }
     }
     return true;
   };
-  let onLoadBool = true;
-  useEffect(() => {
-    console.log(route.params.userId);
-    const focus = navigation.addListener("focus", () => {
-      if (!onLoadBool) {
-        navigation.goBack();
-      } else {
-        onLoadBool = false;
-      }
-    });
-  }, []);
+  let firstLoadBool = true;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => navigation.goBack();
+    }, [])
+  );
   //get name of update value
   updateValueName = profileUpdateValueName[route.params.mode];
   let confirmInput;
@@ -118,7 +119,9 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
             { justifyContent: "flex-start" },
           ]}
         >
-          <Text style={styles.subtitleText}>パスワード確認</Text>
+          <Text style={styles.subtitleText}>
+            {profileUpdScreenStr.pwdConfirmHint}
+          </Text>
         </View>
         <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
           <TextInput
@@ -139,6 +142,10 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
         ></CustomHeader>
         <View style={styles.mainContainer}>
           <View style={styles.rowContainer}>
+            <Text style={[styles.textContainer, styles.titleText]}>
+              {updateValueName}
+              {profileUpdScreenStr.titlePostfix}
+            </Text>
             <Text style={[styles.textContainer, styles.errText]}>{errMsg}</Text>
           </View>
           <View
@@ -148,7 +155,10 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
               { justifyContent: "flex-start" },
             ]}
           >
-            <Text style={styles.subtitleText}>新しい{updateValueName}</Text>
+            <Text style={styles.subtitleText}>
+              {profileUpdScreenStr.newValHint}
+              {updateValueName}
+            </Text>
           </View>
           <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
             <TextInput
@@ -168,7 +178,9 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
               { justifyContent: "flex-start" },
             ]}
           >
-            <Text style={styles.subtitleText}>古いパスワード</Text>
+            <Text style={styles.subtitleText}>
+              {profileUpdScreenStr.oldPwdHint}
+            </Text>
           </View>
           <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
             <TextInput
@@ -178,9 +190,25 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
               secureTextEntry={true}
             ></TextInput>
           </View>
-          <View style={[styles.rowContainer, styles.formRowContainer]}>
+        </View>
+        <View style={[styles.footer]}>
+          <View style={styles.sideContainer}>
             <TouchableOpacity
-              style={styles.button_active}
+              style={[styles.modeBtn]}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <FontAwesome
+                name="arrow-left"
+                size={windowWidth * 0.09}
+                color={lightTextColor}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.sideContainer}>
+            <TouchableOpacity
+              style={[styles.modeBtn]}
               onPress={() => {
                 if (!verifyInput()) {
                   console.log("Incorrect password");
@@ -196,7 +224,11 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
                 );
               }}
             >
-              <Text style={styles.button_text}>設定</Text>
+              <FontAwesome
+                name="check"
+                size={windowWidth * 0.09}
+                color={lightTextColor}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -206,8 +238,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
 };
 
 export default ProfileUpdateScreen;
-const subtitleFontSize = windowWidth * 0.05;
-const bigFontSize = windowWidth * 0.07;
+const buttonSize = windowWidth * 0.17;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -218,28 +249,40 @@ const styles = StyleSheet.create({
     backgroundColor: "#888",
   },
   mainContainer: {
-    paddingTop: 20,
-    paddingBottom: 20,
+    flex: 1,
+    paddingTop: paddingLarge,
+    paddingBottom: paddingLarge,
     justifyContent: "flex-start",
   },
   rowContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    margin: 5,
+    margin: windowHeight * 0.01,
+  },
+  footer: {
+    height: windowHeight * 0.08,
+    width: windowWidth,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: windowHeight * 0.04,
+  },
+  sideContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
   formRowContainer: {
-    marginTop: 15,
+    marginTop: paddingLarge,
   },
   textContainer: {
-    flex: 1,
     textAlign: "center",
     color: lightTextColor,
   },
   titleText: {
-    fontSize: bigFontSize,
+    fontSize: textLarge,
   },
   subtitleText: {
-    fontSize: subtitleFontSize,
+    fontSize: textMedium,
     textAlign: "left",
     color: lightTextColor,
   },
@@ -256,21 +299,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     backgroundColor: drawerColor,
   },
-  button_active: {
-    alignItems: "center",
-    backgroundColor: drawerColor,
-    width: windowWidth * 0.8,
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
-  button_disable: {
-    alignItems: "center",
-    backgroundColor: "#b8b8b8",
-    width: windowWidth * 0.8,
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
   button_text: {
     color: lightTextColor,
+  },
+  modeBtn: {
+    width: buttonSize,
+    height: buttonSize,
+    borderRadius: buttonSize / 2,
+    marginHorizontal: windowWidth * 0.02,
+    borderWidth: 5,
+    borderColor: "#FFF",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

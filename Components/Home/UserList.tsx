@@ -1,10 +1,18 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import { FlatList } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
 import {
   backgroundColor,
   lightTextColor,
+  paddingMedium,
+  paddingSmall,
+  textMedium,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
@@ -12,35 +20,13 @@ import UserItem from "./UserItem";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { RoomAPI } from "../../Constants/backendAPI";
+import { UserContext } from "../../Context/UserContext";
+import { Room } from "../../Types/types";
 
 interface UserListProps {}
-const items = [
-  {
-    id: 1,
-    title: "Item 1",
-  },
-  {
-    id: 2,
-    title: "Item 2",
-  },
-  {
-    id: 3,
-    title: "Item 3",
-  },
-  {
-    id: 4,
-    title: "Item 4",
-  },
-  {
-    id: 5,
-    title: "Item 5",
-  },
-  {
-    id: 6,
-    title: "Item 6",
-  },
-];
 const UserList: FunctionComponent<UserListProps> = () => {
+  const [roomId, setRoomId] = useState("");
+  //get default room id from api
   useEffect(() => {
     customAxiosInstance({
       method: "get",
@@ -49,47 +35,47 @@ const UserList: FunctionComponent<UserListProps> = () => {
       .then((res) => {
         console.log("response status:", res.status);
         console.log(res.data.data);
+        const room = res.data.data as Room;
+        setRoomId(room.id);
       })
       .catch((e) => {
         console.log(e);
       });
   }, []);
-  //   const userItem = (props: any) => {
-  //     return (
-  //       <View>
-  //         <Text>{item.title}</Text>
-  //       </View>
-  //     );
-  //   };
-  const userItemDetail = (item: any) => {
-    <View>
-      <Text>item.title</Text>
-    </View>;
-  };
+  const { users, headerTitle, handleAdd } = useContext(UserContext);
+  //user list`s header JSX element
+  const userListHeader = () => (
+    <View style={styles.userListView}>
+      <View style={styles.headerLeftView}>
+        <Text style={styles.headerTitle}>{headerTitle}</Text>
+      </View>
+      <View
+        style={[styles.headerRightView, handleAdd ? {} : { display: "none" }]}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            handleAdd ? handleAdd(roomId) : {};
+          }}
+        >
+          <FontAwesome
+            name="plus"
+            size={windowWidth * 0.05}
+            color={lightTextColor}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
   return (
     <View>
-      <View style={[styles.userListView]}>
-        <View style={{ alignItems: "flex-start", flex: 1 }}>
-          <Text style={{ color: lightTextColor }}>ルームメイト</Text>
-        </View>
-        <View style={{ alignItems: "flex-end", flex: 1 }}>
-          <TouchableOpacity>
-            <FontAwesome
-              name="plus"
-              size={windowWidth * 0.05}
-              color={lightTextColor}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <ScrollView style={styles.userListScrollView} nestedScrollEnabled={true}>
-        <FlatList
-          data={items}
-          renderItem={({ item, index }) => {
-            return <UserItem item={{ item }} />;
-          }}
-        ></FlatList>
-      </ScrollView>
+      <FlatList
+        data={users}
+        renderItem={({ item, index }) => {
+          return <UserItem item={{ item }} />;
+        }}
+        ListHeaderComponent={userListHeader}
+        stickyHeaderIndices={[0]}
+      />
     </View>
   );
 };
@@ -99,8 +85,17 @@ export default UserList;
 const styles = StyleSheet.create({
   userListView: {
     flexDirection: "row",
+    padding: paddingSmall,
+    paddingLeft: paddingMedium,
+    paddingRight: paddingMedium,
   },
-  userListScrollView: {
-    height: windowHeight * 0.35,
+  headerTitle: {
+    color: lightTextColor,
+    fontSize: textMedium,
+  },
+  headerLeftView: { alignItems: "flex-start", flex: 1 },
+  headerRightView: { alignItems: "flex-end", flex: 1 },
+  userList: {
+    height: windowHeight * 0.5,
   },
 });

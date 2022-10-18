@@ -28,10 +28,6 @@ const HomeDrawerNavigation: React.FC = () => {
       }}
     >
       <Drawer.Screen
-        name="ProfileNavigation"
-        component={ProfileStackScreen}
-      ></Drawer.Screen>
-      <Drawer.Screen
         name="RandomScreen"
         component={RandomScreen}
         options={{
@@ -44,6 +40,7 @@ const HomeDrawerNavigation: React.FC = () => {
 
       <Drawer.Screen name="Room" component={RoomStackNavigation} />
 
+      <Drawer.Screen name="ProfileNavigation" component={ProfileStackScreen} />
       {/* <DrawerContent navigation={}></DrawerContent> */}
     </Drawer.Navigator>
   );

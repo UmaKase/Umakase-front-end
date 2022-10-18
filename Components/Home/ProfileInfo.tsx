@@ -1,5 +1,8 @@
 import {
   drawerColor,
+  paddingLarge,
+  paddingMedium,
+  textMedium,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
@@ -14,12 +17,19 @@ import {
   Alert,
 } from "react-native";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
-import { UserAPI } from "../../Constants/backendAPI";
-import { REFRESH_KEY } from "../../Constants/securestoreKey";
+import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
+import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
-import { profileUpdateMode } from "../../Constants/ProfileConst";
+import {
+  profileInfoStr,
+  profileUpdateMode,
+} from "../../Constants/profileConst";
+import { CommonActions } from "@react-navigation/native";
+import axios, { AxiosResponse } from "axios";
+import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
+import { FontAwesome } from "@expo/vector-icons";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -52,13 +62,36 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   setUserId,
   navigation,
 }) => {
+  //logout process
+  const logoutProcess = async () => {
+    const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
+    if (!localRefreshToken) {
+      console.log("No local refresh token");
+      return Alert.alert("Error", "No local refresh token");
+    }
+    axios({
+      method: "post",
+      url: `${AuthAPI}/token/logout`,
+      headers: { Authorization: `Bearer ${localRefreshToken}` },
+    }).then(async (response) => {
+      if (response.status) {
+        await SecureStore.deleteItemAsync(ACCESS_KEY);
+        await SecureStore.deleteItemAsync(REFRESH_KEY);
+        navigation.dispatch(
+          CommonActions.reset({ routes: [{ name: "AuthNavigation" }] })
+        );
+      } else {
+        return Alert.alert("Error", "logout process failed.");
+      }
+    });
+  };
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
   const [feeding, setFeeding] = useState<boolean>();
   imgUrl = require("../../image/umakase.png");
   //onload
   useEffect(() => {
-    profileProcess((res: any) => {
+    profileProcess((res: AxiosResponse<any, any>) => {
       try {
         //convert response to user profile type
         const resData = res.data.data.user as UserProfileContainer;
@@ -74,24 +107,25 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   return (
     <View style={styles.mainContainer}>
       <View style={styles.rowContainer}>
-        <Image
-          source={require("../../image/umakase.png")}
-          style={styles.icon}
-        />
-        <View
-          style={{
-            flexDirection: "column",
-            flex: 1,
-            justifyContent: "center",
-          }}
-        >
-          <Text>{userProfileContainer?.profile.username}</Text>
-          <Text>ID:******</Text>
+        <View style={styles.infoLeftView}>
+          <FontAwesome
+            name="user-circle"
+            size={windowWidth * 0.18}
+            color="black"
+          />
+        </View>
+        <View style={styles.infoRightView}>
+          <Text style={{ fontSize: textMedium }}>
+            {userProfileContainer?.profile.username}
+          </Text>
+          <Text
+            style={{ fontSize: textMedium }}
+          >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
         </View>
       </View>
       <View style={styles.rowContainer}>
-        <Text style={{ flex: 1, textAlign: "center" }}>メンバーシップ:</Text>
-        <Text style={{ flex: 1, textAlign: "center" }}>無料会員</Text>
+        <Text style={styles.membership}>{profileInfoStr.membershipHint}</Text>
+        <Text style={styles.membership}>{profileInfoStr.membershipFree}</Text>
       </View>
       <View style={styles.rowContainer}>
         <TouchableOpacity
@@ -103,7 +137,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text>プレミアムサービス登録</Text>
+          <Text style={{ fontSize: textMedium }}>
+            {profileInfoStr.premiumBut}
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.rowContainer}>
@@ -116,7 +152,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text>パスワード設定</Text>
+          <Text style={{ fontSize: textMedium }}>
+            {profileInfoStr.passwordBut}
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.rowContainer}>
@@ -129,7 +167,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text>メールアドレス設定</Text>
+          <Text style={{ fontSize: textMedium }}>{profileInfoStr.mailBut}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -138,34 +176,41 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
 
 const styles = StyleSheet.create({
   mainContainer: {
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: paddingLarge,
+    paddingBottom: paddingLarge,
     justifyContent: "flex-start",
   },
   rowContainer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    padding: 5,
+    padding: paddingMedium,
+    paddingLeft: paddingLarge,
+    paddingRight: paddingLarge,
   },
-  icon: {
-    height: windowHeight * 0.11,
-    width: windowWidth * 0.11,
-    resizeMode: "contain",
+  infoLeftView: {
+    alignItems: "center",
     flex: 1,
+  },
+  infoRightView: {
+    flexDirection: "column",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   button_active: {
     alignItems: "center",
     backgroundColor: drawerColor,
-    width: windowWidth * 0.8,
-    paddingTop: 5,
-    paddingBottom: 5,
+    flex: 1,
+    paddingTop: paddingMedium,
+    paddingBottom: paddingMedium,
   },
   button_disable: {
     alignItems: "center",
     backgroundColor: "#b8b8b8",
-    width: windowWidth * 0.8,
-    paddingTop: 5,
-    paddingBottom: 5,
+    flex: 1,
+    paddingTop: paddingMedium,
+    paddingBottom: paddingMedium,
   },
+  membership: { flex: 1, textAlign: "center", fontSize: textMedium },
 });
 export default ProfileInfo;

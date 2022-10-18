@@ -20,3 +20,14 @@ export const errTextColor = "red";
 export const inputIconSize = windowWidth * 0.07;
 export const bottomIconSize = windowWidth * 0.07;
 export const inputFontSize = windowWidth * 0.04;
+
+//fontSize
+export const textExtraLarge = windowWidth * 0.11;
+export const textLarge =windowWidth * 0.07;
+export const textMedium = windowWidth * 0.045;
+export const textSmall = windowWidth * 0.02;
+
+//padding
+export const paddingLarge = windowWidth * 0.05;
+export const paddingMedium = windowWidth * 0.02;
+export const paddingSmall = windowWidth * 0.005;
