@@ -1,10 +1,10 @@
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RoomStackNavigationProps } from "../../../../Types/Navigations/RoomStack";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../../../Components/HomeDrawer/CustomHeader";
-import { DrawerActions, useFocusEffect } from "@react-navigation/native";
+import { DrawerActions } from "@react-navigation/native";
 import {
   backgroundColor,
   windowHeight,
@@ -12,6 +12,9 @@ import {
 } from "../../../../Constants/cssConst";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import Modal from "react-native-modal";
+import SearchBar from "../../../../Components/InitialStep/SearchBar";
+import _ from "lodash";
 
 type RoomConfigSettingScreeProps = NativeStackScreenProps<
   RoomStackNavigationProps,
@@ -23,6 +26,21 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
   const [friends, setFriedns] = useState([1, 1, 1, 1, 1, 1, 1, 1, 1]);
+
+  const [searchMode, setSearchMode] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const searchOn = () => {
+    setSearchMode(true);
+  };
+  const leaveSearchMode = () => {
+    setSearchMode(false);
+  };
+  const searchFriend = useCallback(
+    _.debounce((input: string) => {
+      console.log(input);
+    }, 500),
+    []
+  );
 
   // useFocusEffect(() => {
   //   console.log("hi this is set room config screen.");
@@ -49,7 +67,11 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
         <View style={styles.title}>
           {/* prettier-ignore */}
           <Text style={{fontSize:windowWidth*0.08, color:"#FFF", fontWeight:"500"}}>タイトル</Text>
-          <TouchableOpacity onPress={() => console.log("this is setting btn")}>
+          <TouchableOpacity
+            onPress={() => {
+              console.log("this is setting btn");
+            }}
+          >
             {/* prettier-ignore */}
             <FontAwesome5 name="phabricator" size={windowWidth * 0.15} color="#FFF" />
           </TouchableOpacity>
@@ -80,7 +102,12 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
         <View style={styles.title}>
           {/* prettier-ignore */}
           <Text style={{ fontSize: windowWidth * 0.08, color: "#FFF", fontWeight: "500"}}>参加者を選択</Text>
-          <TouchableOpacity onPress={() => console.log("this is plus button!")}>
+          <TouchableOpacity
+            onPress={() => {
+              searchOn();
+              console.log("this is plus button!");
+            }}
+          >
             {/* prettier-ignore */}
             <FontAwesome5 name="plus-circle" size={windowWidth * 0.12} color="#FFF" />
           </TouchableOpacity>
@@ -112,6 +139,21 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
             />
           </TouchableOpacity>
         </View>
+        {/* search modal =================================================== */}
+        <Modal
+          isVisible={searchMode}
+          onBackdropPress={() => leaveSearchMode()}
+          style={{ margin: 0, justifyContent: "flex-end" }}
+        >
+          <View style={styles.modal}>
+            <SearchBar
+              input={searchInput}
+              setInput={setSearchInput}
+              placeholderText="Enter user name"
+              searchFunction={(input: string) => searchFriend(input)}
+            />
+          </View>
+        </Modal>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -165,5 +207,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: windowWidth * 0.03,
     marginTop: windowWidth * 0.01,
+  },
+  // modal
+  modal: {
+    flex: 0.75,
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: windowWidth * 0.05,
+    borderTopRightRadius: windowWidth * 0.05,
   },
 });
