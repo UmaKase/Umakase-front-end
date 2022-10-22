@@ -15,6 +15,7 @@ import UserList from "../../Components/Home/UserList";
 import { UserContext } from "../../Context/UserContext";
 import { User } from "../../Types/types";
 import { profileScreenStr } from "../../Constants/profileConst";
+import { commonStyle } from "../../Style/CommonStyle";
 type ProfileScreenProps = NativeStackScreenProps<
   ProfileStackProps,
   "ProfileScreen"
@@ -56,7 +57,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={commonStyle.safeArea}>
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
@@ -86,10 +87,3 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
   );
 };
 export default ProfileScreen;
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: backgroundColor,
-  },
-});

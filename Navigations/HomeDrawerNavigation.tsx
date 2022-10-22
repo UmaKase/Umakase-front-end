@@ -11,6 +11,7 @@ import {
 
 import { ProfileStackScreen } from "./ProfileStackNavigation";
 import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
+import { SettingStackNavigation } from "./SettingStackNavigation";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
@@ -41,6 +42,10 @@ const HomeDrawerNavigation: React.FC = () => {
       <Drawer.Screen name="Room" component={RoomStackNavigation} />
 
       <Drawer.Screen name="ProfileNavigation" component={ProfileStackScreen} />
+      <Drawer.Screen
+        name="SettingNavigation"
+        component={SettingStackNavigation}
+      />
       {/* <DrawerContent navigation={}></DrawerContent> */}
     </Drawer.Navigator>
   );

@@ -10,6 +10,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import {
   backgroundColor,
   lightTextColor,
+  paddingLarge,
   paddingMedium,
   paddingSmall,
   textMedium,
@@ -86,8 +87,8 @@ const styles = StyleSheet.create({
   userListView: {
     flexDirection: "row",
     padding: paddingSmall,
-    paddingLeft: paddingMedium,
-    paddingRight: paddingMedium,
+    paddingLeft: paddingLarge,
+    paddingRight: paddingLarge,
   },
   headerTitle: {
     color: lightTextColor,

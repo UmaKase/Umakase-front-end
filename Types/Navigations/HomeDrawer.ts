@@ -7,5 +7,8 @@ export type HomeDrawerNavigationProps = {
     ProfileScreen: undefined;
     ProfileUpdateScreen:ProfileStackProps;
   };
+  SettingNavigation:{
+    SettingScreen: undefined;
+  };
   Room: undefined;
 };

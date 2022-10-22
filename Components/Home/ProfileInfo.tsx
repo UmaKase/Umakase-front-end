@@ -2,6 +2,7 @@ import {
   drawerColor,
   paddingLarge,
   paddingMedium,
+  textLarge,
   textMedium,
   windowHeight,
   windowWidth,
@@ -30,6 +31,7 @@ import { CommonActions } from "@react-navigation/native";
 import axios, { AxiosResponse } from "axios";
 import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
 import { FontAwesome } from "@expo/vector-icons";
+import { commonStyle } from "../../Style/CommonStyle";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -105,8 +107,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     });
   }, []);
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.rowContainer}>
+    <View style={[commonStyle.mainContainer, { flex: 0 }]}>
+      <View style={commonStyle.rowContainer}>
         <View style={styles.infoLeftView}>
           <FontAwesome
             name="user-circle"
@@ -115,21 +117,25 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           />
         </View>
         <View style={styles.infoRightView}>
-          <Text style={{ fontSize: textMedium }}>
+          <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
             {userProfileContainer?.profile.username}
           </Text>
           <Text
-            style={{ fontSize: textMedium }}
+            style={[commonStyle.textContainer, { fontSize: textLarge }]}
           >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
         </View>
       </View>
-      <View style={styles.rowContainer}>
-        <Text style={styles.membership}>{profileInfoStr.membershipHint}</Text>
-        <Text style={styles.membership}>{profileInfoStr.membershipFree}</Text>
+      <View style={commonStyle.rowContainer}>
+        <Text style={[commonStyle.textContainer, styles.membership]}>
+          {profileInfoStr.membershipHint}
+        </Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>
+          {profileInfoStr.membershipFree}
+        </Text>
       </View>
-      <View style={styles.rowContainer}>
+      <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={styles.button_disable}
+          style={commonStyle.button_disable}
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.email,
@@ -137,14 +143,14 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text style={{ fontSize: textMedium }}>
+          <Text style={commonStyle.textContainer}>
             {profileInfoStr.premiumBut}
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.rowContainer}>
+      <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={styles.button_active}
+          style={commonStyle.button_active}
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.password,
@@ -152,14 +158,14 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text style={{ fontSize: textMedium }}>
+          <Text style={commonStyle.textContainer}>
             {profileInfoStr.passwordBut}
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.rowContainer}>
+      <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={styles.button_active}
+          style={commonStyle.button_active}
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.email,
@@ -167,7 +173,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text style={{ fontSize: textMedium }}>{profileInfoStr.mailBut}</Text>
+          <Text style={commonStyle.textContainer}>
+            {profileInfoStr.mailBut}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -175,18 +183,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    paddingTop: paddingLarge,
-    paddingBottom: paddingLarge,
-    justifyContent: "flex-start",
-  },
-  rowContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    padding: paddingMedium,
-    paddingLeft: paddingLarge,
-    paddingRight: paddingLarge,
-  },
   infoLeftView: {
     alignItems: "center",
     flex: 1,
@@ -196,20 +192,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  button_active: {
-    alignItems: "center",
-    backgroundColor: drawerColor,
-    flex: 1,
-    paddingTop: paddingMedium,
-    paddingBottom: paddingMedium,
-  },
-  button_disable: {
-    alignItems: "center",
-    backgroundColor: "#b8b8b8",
-    flex: 1,
-    paddingTop: paddingMedium,
-    paddingBottom: paddingMedium,
   },
   membership: { flex: 1, textAlign: "center", fontSize: textMedium },
 });

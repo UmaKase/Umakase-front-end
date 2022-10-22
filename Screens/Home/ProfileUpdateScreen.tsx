@@ -29,6 +29,7 @@ import { REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { FontAwesome } from "@expo/vector-icons";
+import { commonStyle } from "../../Style/CommonStyle";
 
 type ProfileUpdateScreenProps = NativeStackScreenProps<
   ProfileStackProps,
@@ -114,16 +115,18 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
       <View>
         <View
           style={[
-            styles.rowContainer,
+            commonStyle.rowContainer,
             styles.formRowContainer,
             { justifyContent: "flex-start" },
           ]}
         >
-          <Text style={styles.subtitleText}>
+          <Text style={commonStyle.subtitleText}>
             {profileUpdScreenStr.pwdConfirmHint}
           </Text>
         </View>
-        <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
+        <View
+          style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+        >
           <TextInput
             style={styles.textbox}
             value={confirmValue}
@@ -136,31 +139,35 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
   }
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={commonStyle.safeArea}>
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
-        <View style={styles.mainContainer}>
-          <View style={styles.rowContainer}>
-            <Text style={[styles.textContainer, styles.titleText]}>
+        <View style={commonStyle.mainContainer}>
+          <View style={commonStyle.rowContainer}>
+            <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
               {updateValueName}
               {profileUpdScreenStr.titlePostfix}
             </Text>
-            <Text style={[styles.textContainer, styles.errText]}>{errMsg}</Text>
+            <Text style={[commonStyle.textContainer, commonStyle.errText]}>
+              {errMsg}
+            </Text>
           </View>
           <View
             style={[
-              styles.rowContainer,
+              commonStyle.rowContainer,
               styles.formRowContainer,
               { justifyContent: "flex-start" },
             ]}
           >
-            <Text style={styles.subtitleText}>
+            <Text style={commonStyle.subtitleText}>
               {profileUpdScreenStr.newValHint}
               {updateValueName}
             </Text>
           </View>
-          <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
+          <View
+            style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+          >
             <TextInput
               style={styles.textbox}
               value={newValue}
@@ -173,16 +180,18 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
           {confirmInput}
           <View
             style={[
-              styles.rowContainer,
+              commonStyle.rowContainer,
               styles.formRowContainer,
               { justifyContent: "flex-start" },
             ]}
           >
-            <Text style={styles.subtitleText}>
+            <Text style={commonStyle.subtitleText}>
               {profileUpdScreenStr.oldPwdHint}
             </Text>
           </View>
-          <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
+          <View
+            style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+          >
             <TextInput
               style={styles.textbox}
               value={oldPassword}
@@ -191,7 +200,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
             ></TextInput>
           </View>
         </View>
-        <View style={[styles.footer]}>
+        <View style={[commonStyle.footer]}>
           <View style={styles.sideContainer}>
             <TouchableOpacity
               style={[styles.modeBtn]}
@@ -241,31 +250,6 @@ export default ProfileUpdateScreen;
 const buttonSize = windowWidth * 0.17;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: backgroundColor,
-  },
-  logoutBtn: {
-    backgroundColor: "#888",
-  },
-  mainContainer: {
-    flex: 1,
-    paddingTop: paddingLarge,
-    paddingBottom: paddingLarge,
-    justifyContent: "flex-start",
-  },
-  rowContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    margin: windowHeight * 0.01,
-  },
-  footer: {
-    height: windowHeight * 0.08,
-    width: windowWidth,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: windowHeight * 0.04,
-  },
   sideContainer: {
     flex: 1,
     alignItems: "center",
@@ -273,21 +257,6 @@ const styles = StyleSheet.create({
   },
   formRowContainer: {
     marginTop: paddingLarge,
-  },
-  textContainer: {
-    textAlign: "center",
-    color: lightTextColor,
-  },
-  titleText: {
-    fontSize: textLarge,
-  },
-  subtitleText: {
-    fontSize: textMedium,
-    textAlign: "left",
-    color: lightTextColor,
-  },
-  errText: {
-    color: errTextColor,
   },
   textbox: {
     justifyContent: "center",
@@ -298,9 +267,6 @@ const styles = StyleSheet.create({
     color: lightTextColor,
     borderBottomWidth: 1,
     backgroundColor: drawerColor,
-  },
-  button_text: {
-    color: lightTextColor,
   },
   modeBtn: {
     width: buttonSize,
