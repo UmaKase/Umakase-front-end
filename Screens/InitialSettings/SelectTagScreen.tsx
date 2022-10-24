@@ -115,6 +115,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     let loginFlag = false;
     // reset function
     // phase 1 register a temp user
+    // todo: send food data
     try {
       const res = await axios({
         method: "post",
