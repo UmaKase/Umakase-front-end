@@ -9,6 +9,7 @@ import {
 } from "../../Constants/cssConst";
 import { ImgAPI } from "../../Constants/backendAPI";
 import axios from "axios";
+import CacheImage from "../Universal/CacheImage";
 
 interface ToggleFoodProps {
   food: Food;
@@ -61,11 +62,8 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
     >
       <View style={styles.imgContainer}>
         {img ? (
-          <Image
-            source={{ uri: img }}
-            style={styles.img}
-            resizeMode="cover"
-          ></Image>
+          // <Image source={{ uri: img }} style={styles.img} />
+          <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
         ) : (
           <View
             style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
@@ -104,12 +102,14 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: borderRadius,
     borderTopRightRadius: borderRadius,
     backgroundColor: drawerColor,
+    // alignItems: "center",
+    // justifyContent: "center",
   },
   img: {
     flex: 1,
     borderTopLeftRadius: borderRadius,
     borderTopRightRadius: borderRadius,
-    resizeMode: "contain",
+    resizeMode: "cover",
   },
   nameContainer: {
     flex: 1,
