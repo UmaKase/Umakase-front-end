@@ -9,7 +9,6 @@ import {
 import React, { useEffect, useState } from "react";
 import * as FileSystem from "expo-file-system";
 import shortHash from "shorthash2";
-import axios from "axios";
 type Props = {
   url: string;
   style?: StyleProp<ImageStyle>;
@@ -21,54 +20,25 @@ const CacheImage: React.FC<Props> = ({ url, style }) => {
   // image source state
   const [source, setSource] = useState<string>();
   // when component did mount
-  const componentDidMount = async () => {
+  const cacheImage = async () => {
     const fileName = shortHash(url);
     const path = `${FileSystem.cacheDirectory}${fileName}`;
-    console.log(path);
     const image = await FileSystem.getInfoAsync(path);
     // ANCHOR find image in cache ============================================
-    if (image.exists) {
-      console.log("read image from cache...");
-      setSource(image.uri);
-      return;
+    if (!image.exists) {
+      // ANCHOR doesn't find image in cache ====================================
+      const newImage = await FileSystem.downloadAsync(url, path); // setSource(image.uri);
+      return newImage.uri;
     }
-    // ANCHOR doesn't find image in cache ====================================
-    console.log("downloading image to cache...");
-    console.log("URL:", url);
-    const newImage = await FileSystem.downloadAsync(url, path);
-    console.log("result: ", newImage.status);
-    setSource(newImage.uri);
-    // prepared axios function for if needed ==================
-    // axios({
-    //   method: "get",
-    //   responseType: "blob",
-    //   url: url,
-    // })
-    //   .then(async (res) => {
-    //     console.log("URL:" + URL.createObjectURL(res.data));
-    //     const newImage = await FileSystem.downloadAsync(
-    //       URL.createObjectURL(res.data),
-    //       path
-    //     );
-    //     setSource(newImage.uri);
-    //   })
-    //   .catch((e) => {
-    //     console.log("this is error :" + e);
-    //   });
+    return image.uri;
   };
-  // ANCHOR fetching data ====================================
+
   useEffect(() => {
-    componentDidMount();
-    return () => {
-      setFetching(true);
-    };
-  }, [url]);
-  // ANCHOR end fetching  ====================================
-  useEffect(() => {
-    if (source) {
+    cacheImage().then((uri) => {
       setFetching(false);
-    }
-  }, [source]);
+      setSource(uri);
+    });
+  }, []);
 
   return fetching ? (
     <ActivityIndicator size="large" color="#FFF" style={styles.centerObject} />
