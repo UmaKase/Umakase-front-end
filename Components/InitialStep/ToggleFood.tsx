@@ -1,5 +1,5 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
 import { Food } from "../../Types/InitialSteps";
 import {
   backgroundColor,
@@ -8,7 +8,6 @@ import {
   windowWidth,
 } from "../../Constants/cssConst";
 import { ImgAPI } from "../../Constants/backendAPI";
-import axios from "axios";
 import CacheImage from "../Universal/CacheImage";
 
 interface ToggleFoodProps {
@@ -22,34 +21,6 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
   checked,
   onPressHandler,
 }) => {
-  const [img, setImg] = useState<string>();
-
-  const fetchImg = async () => {
-    if (food.img) {
-      axios({
-        method: "get",
-        responseType: "blob",
-        url: `${ImgAPI}/food/${food.img}`,
-      })
-        .then((res) => {
-          setImg(URL.createObjectURL(res.data));
-        })
-        .catch((e) => {
-          console.log("this is error :" + e);
-        });
-    } else {
-      setImg(undefined);
-    }
-  };
-
-  useEffect(() => {
-    fetchImg();
-    // console.log(food.img);
-    // return () => {
-    //   console.log("unmount:", food.img);
-    // };
-  }, [food.img]);
-
   return (
     <TouchableOpacity
       onPress={() => {
@@ -61,16 +32,10 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
       ]}
     >
       <View style={styles.imgContainer}>
-        {img ? (
-          // <Image source={{ uri: img }} style={styles.img} />
-          <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
-        ) : (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <Text style={{ color: "#777" }}>No Image</Text>
-          </View>
-        )}
+        <CacheImage
+          url={`https://content.investhack.tech/api/v1/img/food/${food.img}`}
+          style={styles.img}
+        />
       </View>
       <View style={styles.nameContainer}>
         <Text
