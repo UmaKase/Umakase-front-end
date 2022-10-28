@@ -21,9 +21,7 @@ const SettingScreen: React.FC<SettingScreenProps> = ({ navigation, route }) => {
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
         <View style={commonStyle.mainContainer}>
-          <View
-            style={[commonStyle.rowContainer, { justifyContent: "flex-start" }]}
-          >
+          <View style={[commonStyle.rowContainer]}>
             <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
               {settingScreenConst.settingTitle}
             </Text>
@@ -52,9 +50,7 @@ const SettingScreen: React.FC<SettingScreenProps> = ({ navigation, route }) => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View
-            style={[commonStyle.rowContainer, { justifyContent: "flex-start" }]}
-          >
+          <View style={[commonStyle.rowContainer]}>
             <Text style={[commonStyle.textContainer, commonStyle.titleText, ,]}>
               {settingScreenConst.supportTitle}
             </Text>
@@ -83,9 +79,7 @@ const SettingScreen: React.FC<SettingScreenProps> = ({ navigation, route }) => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View
-            style={[commonStyle.rowContainer, { justifyContent: "flex-start" }]}
-          >
+          <View style={[commonStyle.rowContainer]}>
             <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
               {settingScreenConst.otherTitle}
             </Text>
