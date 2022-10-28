@@ -32,7 +32,10 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
       ]}
     >
       <View style={styles.imgContainer}>
-        <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
+        <CacheImage
+          url={`https://content.investhack.tech/api/v1/img/food/${food.img}`}
+          style={styles.img}
+        />
       </View>
       <View style={styles.nameContainer}>
         <Text
