@@ -124,7 +124,6 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
       });
       setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
       setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
-      console.log(res.data.data);
       tempData = {
         id: res.data.data.tmpId,
         pass: res.data.data.tmpPass,
