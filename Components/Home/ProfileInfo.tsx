@@ -90,7 +90,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
   const [feeding, setFeeding] = useState<boolean>();
-  imgUrl = require("../../image/umakase.png");
+  imgUrl = require("../../Image/Umakase.png");
   //onload
   useEffect(() => {
     profileProcess((res: AxiosResponse<any, any>) => {

@@ -3,9 +3,9 @@ import { ProfileStackProps } from "Types/Home/Profile/ProfileStackProps";
 export type HomeDrawerNavigationProps = {
   //screens
   RandomScreen: undefined;
-  ProfileNavigation:{
+  ProfileNavigation: {
     ProfileScreen: undefined;
-    ProfileUpdateScreen:ProfileStackProps;
+    ProfileUpdateScreen: ProfileStackProps;
   };
   SettingNavigation:{
     SettingScreen: undefined;

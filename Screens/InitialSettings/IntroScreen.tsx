@@ -20,7 +20,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
 import { setItemAsync } from "expo-secure-store";
 import axios from "axios";
-import { AuthAPI, RoomAPI } from "../../Constants/backendAPI";
+import { AuthAPI } from "../../Constants/backendAPI";
 import {
   ACCESS_KEY,
   CONFIG_KEY,
@@ -28,7 +28,6 @@ import {
   TEMPUSERID_KEY,
   TEMPUSERPASS_KEY,
 } from "../../Constants/securestoreKey";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "IntroScreen">;
 
@@ -43,11 +42,10 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
       })
     );
   };
+  // skip function
   const skipSettingFunction = async () => {
     setStartSubmit(true);
     let tempData = undefined;
-    let loginFlag = false;
-    // reset function
     // phase 1 register a temp user
     try {
       const res = await axios({
@@ -55,10 +53,13 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
         url: `${AuthAPI}/register`,
         data: {
           isTemp: true,
+          foodIds: [],
+          name: "__default",
         },
       });
       setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
       setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
+      console.log(res.data.data);
       tempData = {
         id: res.data.data.tmpId,
         pass: res.data.data.tmpPass,
@@ -81,29 +82,8 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
           password: tempData.pass,
         },
       });
-      setItemAsync(ACCESS_KEY, res.data.accessToken);
-      setItemAsync(REFRESH_KEY, res.data.refreshToken);
-      loginFlag = true;
-    } catch (error) {
-      setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 2");
-    }
-
-    // phase 3
-    // prettier-ignore
-    if(!loginFlag){return console.log("Submit process failed with liginWithTempUser === undefined.")}
-    setLoadingText("Creating user setting");
-    try {
-      const res = await customAxiosInstance({
-        method: "post",
-        url: `${RoomAPI}/new`,
-        data: {
-          isDefaultRoom: true,
-          foodIds: [],
-          name: "__default",
-        },
-      });
-      console.log(res.data.data);
+      setItemAsync(ACCESS_KEY, res.data.data.accessToken);
+      setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
       setItemAsync(CONFIG_KEY, "Completed");
       console.log("saved");
       navigation.dispatch(
@@ -113,7 +93,7 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
       );
     } catch (error) {
       setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 3");
+      return Alert.alert("Submit Error", "Submit failed in phase 2");
     }
   };
   return (
@@ -143,7 +123,7 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.header}>
             <View style={styles.iconConatiner}>
               <Image
-                source={require("../../image/umakase.png")}
+                source={require("../../Image/Umakase.png")}
                 style={styles.icon}
               ></Image>
             </View>
