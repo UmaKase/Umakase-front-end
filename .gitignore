@@ -6,3 +6,4 @@ dist/
 # lock files
 package-lock.json
 yarn.lock
+Constants/backendAPI.ts
