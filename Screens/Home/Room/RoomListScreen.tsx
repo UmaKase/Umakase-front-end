@@ -21,7 +21,7 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
   useEffect(() => {
     customAxiosInstance({
       method: "get",
-      url: `${RoomAPI}/info/:id`,
+      url: `${RoomAPI}/`,
     })
       .then((res) => {
         console.log("response status:", res.status);
@@ -36,7 +36,7 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
       url: `${RoomAPI}/`,
     })
       .then((res) => {
-        console.log(res.data.data);
+        console.log(res.data.data.rooms);
       })
       .catch((e) => {
         console.log(e.response.data);
