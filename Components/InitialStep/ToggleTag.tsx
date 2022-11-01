@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import React from "react";
 
 import {
@@ -6,7 +6,6 @@ import {
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { Tag } from "../../Types/InitialSteps";
 
 type Props = {

@@ -12,7 +12,6 @@ import {
   View,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
-import * as SecureStore from "expo-secure-store";
 import {
   ACCESS_KEY,
   CONFIG_KEY,
@@ -30,12 +29,12 @@ import ToggleFood from "../../Components/InitialStep/ToggleFood";
 import Footer from "../../Components/InitialStep/Footer";
 import { Food } from "../../Types/InitialSteps";
 import axios from "axios";
-import { AuthAPI, FoodAPI, RoomAPI } from "../../Constants/backendAPI";
+import { AuthAPI, FoodAPI } from "../../Constants/backendAPI";
 import _ from "lodash";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import Modal from "react-native-modal";
 import ToggleFoodForSearch from "../../Components/InitialStep/ToggleFoodForSearch";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
+import { setItemAsync } from "expo-secure-store";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -59,11 +58,10 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const [searchPage, setSearchPage] = useState(1);
   const [searchEnd, setSearchEnd] = useState(false);
 
-  // submit function
+  // ANCHOR submit function
   const submit = async () => {
     setStartSubmit(true);
     let tempData = undefined;
-    let loginFlag = false;
     // reset function
     // phase 1 register a temp user
     try {
@@ -72,10 +70,12 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         url: `${AuthAPI}/register`,
         data: {
           isTemp: true,
+          foodIds: selectedFood,
+          name: "__default",
         },
       });
-      SecureStore.setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
-      SecureStore.setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
+      await setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
+      await setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
       tempData = {
         id: res.data.data.tmpId,
         pass: res.data.data.tmpPass,
@@ -98,30 +98,9 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           password: tempData.pass,
         },
       });
-      SecureStore.setItemAsync(ACCESS_KEY, res.data.data.accessToken);
-      SecureStore.setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
-      loginFlag = true;
-    } catch (error) {
-      setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 2");
-    }
-
-    // phase 3
-    // prettier-ignore
-    if(!loginFlag){return console.log("Submit process failed with liginWithTempUser === undefined.")}
-    setLoadingText("Creating user setting");
-    try {
-      const res = await customAxiosInstance({
-        method: "post",
-        url: `${RoomAPI}/new`,
-        data: {
-          isDefaultRoom: true,
-          foodIds: selectedFood,
-          name: "__default",
-        },
-      });
-      console.log(res.data.data);
-      SecureStore.setItemAsync(CONFIG_KEY, "Completed");
+      await setItemAsync(ACCESS_KEY, res.data.data.accessToken);
+      await setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
+      await setItemAsync(CONFIG_KEY, "Completed");
       console.log("saved");
       navigation.dispatch(
         CommonActions.reset({
@@ -130,7 +109,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       );
     } catch (error) {
       setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 3");
+      return Alert.alert("Submit Error", "Submit failed in phase 2");
     }
   };
 
@@ -177,13 +156,59 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     []
   );
 
-  // skip setting function
+  // ANCHOR skip setting function
   const skipSetting = async () => {
-    await SecureStore.setItemAsync(CONFIG_KEY, "Completed");
-    console.log("saved");
-    navigation.dispatch(
-      CommonActions.reset({ routes: [{ name: "HomeDrawerNavigation" }] })
-    );
+    setStartSubmit(true);
+    let tempData = undefined;
+    // phase 1 register a temp user
+    try {
+      const res = await axios({
+        method: "post",
+        url: `${AuthAPI}/register`,
+        data: {
+          isTemp: true,
+          foodIds: [],
+          name: "__default",
+        },
+      });
+      await setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
+      await setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
+      console.log(res.data.data);
+      tempData = {
+        id: res.data.data.tmpId,
+        pass: res.data.data.tmpPass,
+      };
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 1");
+    }
+
+    // phase 2 login with temp user
+    // prettier-ignore
+    if(tempData === undefined){return console.log("Submit process failed with tempUserRegisterDate === undifined.")}
+    setLoadingText("Login process");
+    try {
+      const res = await axios({
+        method: "post",
+        url: `${AuthAPI}/login`,
+        data: {
+          username: tempData.id,
+          password: tempData.pass,
+        },
+      });
+      await setItemAsync(ACCESS_KEY, res.data.data.accessToken);
+      await setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
+      await setItemAsync(CONFIG_KEY, "Completed");
+      console.log("saved");
+      navigation.dispatch(
+        CommonActions.reset({
+          routes: [{ name: "HomeDrawerNavigation" }],
+        })
+      );
+    } catch (error) {
+      setStartSubmit(false);
+      return Alert.alert("Submit Error", "Submit failed in phase 2");
+    }
   };
 
   // get foods

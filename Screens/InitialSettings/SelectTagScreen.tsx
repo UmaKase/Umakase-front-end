@@ -16,7 +16,6 @@ import {
   windowWidth,
 } from "../../Constants/cssConst";
 import axios from "axios";
-import * as SecureStore from "expo-secure-store";
 import {
   ACCESS_KEY,
   CONFIG_KEY,
@@ -24,7 +23,7 @@ import {
   TEMPUSERID_KEY,
   TEMPUSERPASS_KEY,
 } from "../../Constants/securestoreKey";
-import { AuthAPI, RoomAPI, TagAPI } from "../../Constants/backendAPI";
+import { AuthAPI, TagAPI } from "../../Constants/backendAPI";
 import { FlatList } from "react-native-gesture-handler";
 import Footer from "../../Components/InitialStep/Footer";
 import { CommonActions } from "@react-navigation/native";
@@ -35,7 +34,7 @@ import SearchBar from "../../Components/InitialStep/SearchBar";
 import _ from "lodash";
 import ToggleTagForSearch from "../../Components/InitialStep/ToggleTagForSearch";
 import Modal from "react-native-modal";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
+import { setItemAsync } from "expo-secure-store";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -112,20 +111,19 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   const skipSettingFunction = async () => {
     setStartSubmit(true);
     let tempData = undefined;
-    let loginFlag = false;
-    // reset function
     // phase 1 register a temp user
-    // todo: send food data
     try {
       const res = await axios({
         method: "post",
         url: `${AuthAPI}/register`,
         data: {
           isTemp: true,
+          foodIds: [],
+          name: "__default",
         },
       });
-      SecureStore.setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
-      SecureStore.setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
+      setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
+      setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
       tempData = {
         id: res.data.data.tmpId,
         pass: res.data.data.tmpPass,
@@ -148,30 +146,9 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           password: tempData.pass,
         },
       });
-      SecureStore.setItemAsync(ACCESS_KEY, res.data.data.accessToken);
-      SecureStore.setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
-      loginFlag = true;
-    } catch (error) {
-      setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 2");
-    }
-
-    // phase 3
-    // prettier-ignore
-    if(!loginFlag){return console.log("Submit process failed with liginWithTempUser === undefined.")}
-    setLoadingText("Creating user setting");
-    try {
-      const res = await customAxiosInstance({
-        method: "post",
-        url: `${RoomAPI}/new`,
-        data: {
-          isDefaultRoom: true,
-          foodIds: [],
-          name: "__default",
-        },
-      });
-      console.log(res.data.data);
-      SecureStore.setItemAsync(CONFIG_KEY, "Completed");
+      setItemAsync(ACCESS_KEY, res.data.data.accessToken);
+      setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
+      setItemAsync(CONFIG_KEY, "Completed");
       console.log("saved");
       navigation.dispatch(
         CommonActions.reset({
@@ -180,7 +157,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
       );
     } catch (error) {
       setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 3");
+      return Alert.alert("Submit Error", "Submit failed in phase 2");
     }
   };
   // next step function
