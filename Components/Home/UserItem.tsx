@@ -66,7 +66,8 @@ const UserItem: FunctionComponent<UserItemProps> = (item: any) => {
               handleSelect && selected ? styles.selected : styles.deselected,
             ]}
           >
-            {itemUser.profile?.lastname + " " + itemUser.profile?.firstname}
+            {itemUser.profile?.id}
+            {/* {itemUser.profile?.lastname + " " + itemUser.profile?.firstname} */}
           </Text>
         </View>
         <View
@@ -78,7 +79,7 @@ const UserItem: FunctionComponent<UserItemProps> = (item: any) => {
         >
           <TouchableOpacity
             onPress={() => {
-              handleRemove ? handleRemove(itemUser.id) : {};
+              handleRemove ? handleRemove(itemUser) : {};
             }}
           >
             <FontAwesome

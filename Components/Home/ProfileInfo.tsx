@@ -98,6 +98,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         //convert response to user profile type
         const resData = res.data.data.user as UserProfileContainer;
         //set user id in the parent screen
+        console.log(resData);
         setUserId(resData.profile.userId);
         //set user profile to state
         setUseProfileContainer(resData);
