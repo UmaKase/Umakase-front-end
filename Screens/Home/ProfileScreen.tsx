@@ -14,7 +14,7 @@ import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import UserList from "../../Components/Home/UserList";
 import { UserContext } from "../../Context/UserContext";
 import { User } from "../../Types/types";
-import { profileScreenStr } from "../../Constants/profileConst";
+import { profileScreenStr } from "../../Constants/ProfileConst";
 import { commonStyle } from "../../Style/CommonStyle";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { postRoomEvent } from "../../Constants/paramConst";

@@ -26,7 +26,7 @@ import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import {
   profileInfoStr,
   profileUpdateMode,
-} from "../../Constants/profileConst";
+} from "../../Constants/ProfileConst";
 import { CommonActions } from "@react-navigation/native";
 import axios, { AxiosResponse } from "axios";
 import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
