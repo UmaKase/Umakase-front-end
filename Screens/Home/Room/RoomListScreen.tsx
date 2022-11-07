@@ -22,6 +22,19 @@ type Props = NativeStackScreenProps<RoomStackNavigationProps, "RoomListScreen">;
 const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
   const [fetching, setFetching] = useState(true);
   const [rooms, setRooms] = useState<RoomListRoomInfo[]>();
+  const roomsLayout = (length: number) => {
+    switch (length) {
+      case 1: {
+        return windowHeight * 0.2;
+      }
+      case 2: {
+        return windowHeight * 0.4;
+      }
+      default: {
+        return windowHeight * 0.6;
+      }
+    }
+  };
   useEffect(() => {
     // get room list
     customAxiosInstance({
@@ -54,20 +67,22 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
           <CenterActivityIndicator size={"large"} color="#FFF" />
         ) : (
           <>
-            <FlatList
-              data={rooms}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => {
-                return (
-                  <RoomBox
-                    key={item.room.id}
-                    onPressHandler={() => goRoom(item.room.id)}
-                    roomName={item.room.name}
-                  />
-                );
-              }}
-            />
-            <View style={{ flex: 1 }}>
+            <View style={{ height: roomsLayout(rooms!.length) }}>
+              <FlatList
+                data={rooms}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => {
+                  return (
+                    <RoomBox
+                      key={item.room.id}
+                      onPressHandler={() => goRoom(item.room.id)}
+                      roomName={item.room.name}
+                    />
+                  );
+                }}
+              />
+            </View>
+            <View style={{ borderColor: "#000" }}>
               <CreateRoomBlock createRoomFunc={createRoom} />
             </View>
           </>
