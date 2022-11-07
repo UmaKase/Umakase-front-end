@@ -20,7 +20,7 @@ import {
   profileUpdateMode,
   profileUpdateValueName,
   profileUpdScreenStr,
-} from "../../Constants/profileConst";
+} from "../../Constants/ProfileConst";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { TextInput } from "react-native-gesture-handler";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
