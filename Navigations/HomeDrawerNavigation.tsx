@@ -18,22 +18,24 @@ import {
 
 import { ProfileStackScreen } from "./ProfileStackNavigation";
 import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
+import { SettingStackNavigation } from "./SettingStackNavigation";
 import { Entypo } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { DrawerLabel, logoutPopout } from "../Constants/homeConst";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
 const HomeDrawerNavigation: React.FC = () => {
   const navigation = useNavigation();
   const logoutFunction = () => {
-    return Alert.alert("Logout", "Do you want to logout?", [
+    return Alert.alert(logoutPopout.title, logoutPopout.description, [
       {
-        text: "Cancel",
+        text: logoutPopout.cancel,
         onPress: () => navigation.dispatch(DrawerActions.closeDrawer),
         style: "default",
       },
       {
-        text: "Confirm",
+        text: logoutPopout.confirm,
         onPress: () => {
           console.log("loging out!");
           navigation.dispatch(DrawerActions.closeDrawer);
@@ -60,7 +62,7 @@ const HomeDrawerNavigation: React.FC = () => {
         />
         {/* Logout Button */}
         <DrawerItem
-          label="Logout"
+          label={DrawerLabel.logout}
           onPress={() => logoutFunction()}
           icon={() => (
             <Entypo name="log-out" size={windowWidth * 0.06} color="#FFF" />
@@ -71,6 +73,11 @@ const HomeDrawerNavigation: React.FC = () => {
             fontWeight: "500",
           }}
         />
+        <Drawer.Screen
+          name="ProfileNavigation"
+          options={{ drawerLabel: DrawerLabel.profile }}
+          component={ProfileStackScreen}
+        ></Drawer.Screen>
       </DrawerContentScrollView>
     );
   };
@@ -92,8 +99,21 @@ const HomeDrawerNavigation: React.FC = () => {
         name="ProfileNavigation"
         component={ProfileStackScreen}
       ></Drawer.Screen>
-      <Drawer.Screen name="RandomScreen" component={RandomScreen} />
-      <Drawer.Screen name="Room" component={RoomStackNavigation} />
+      <Drawer.Screen
+        name="RandomScreen"
+        options={{ drawerLabel: DrawerLabel.random }}
+        component={RandomScreen}
+      />
+      <Drawer.Screen
+        name="Room"
+        options={{ drawerLabel: DrawerLabel.room }}
+        component={RoomStackNavigation}
+      />
+      <Drawer.Screen
+        name="SettingNavigation"
+        options={{ drawerLabel: DrawerLabel.setting }}
+        component={SettingStackNavigation}
+      />
     </Drawer.Navigator>
   );
 };

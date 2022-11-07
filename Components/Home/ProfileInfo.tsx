@@ -1,5 +1,9 @@
 import {
   drawerColor,
+  paddingLarge,
+  paddingMedium,
+  textLarge,
+  textMedium,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
@@ -14,12 +18,20 @@ import {
   Alert,
 } from "react-native";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
-import { UserAPI } from "../../Constants/backendAPI";
-import { REFRESH_KEY } from "../../Constants/securestoreKey";
+import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
+import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
-import { profileUpdateMode } from "../../Constants/ProfileConst";
+import {
+  profileInfoStr,
+  profileUpdateMode,
+} from "../../Constants/profileConst";
+import { CommonActions } from "@react-navigation/native";
+import axios, { AxiosResponse } from "axios";
+import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
+import { FontAwesome } from "@expo/vector-icons";
+import { commonStyle } from "../../Style/CommonStyle";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -52,17 +64,41 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   setUserId,
   navigation,
 }) => {
+  //logout process
+  const logoutProcess = async () => {
+    const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
+    if (!localRefreshToken) {
+      console.log("No local refresh token");
+      return Alert.alert("Error", "No local refresh token");
+    }
+    axios({
+      method: "post",
+      url: `${AuthAPI}/token/logout`,
+      headers: { Authorization: `Bearer ${localRefreshToken}` },
+    }).then(async (response) => {
+      if (response.status) {
+        await SecureStore.deleteItemAsync(ACCESS_KEY);
+        await SecureStore.deleteItemAsync(REFRESH_KEY);
+        navigation.dispatch(
+          CommonActions.reset({ routes: [{ name: "AuthNavigation" }] })
+        );
+      } else {
+        return Alert.alert("Error", "logout process failed.");
+      }
+    });
+  };
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
   const [feeding, setFeeding] = useState<boolean>();
   imgUrl = require("../../Image/Umakase.png");
   //onload
   useEffect(() => {
-    profileProcess((res: any) => {
+    profileProcess((res: AxiosResponse<any, any>) => {
       try {
         //convert response to user profile type
         const resData = res.data.data.user as UserProfileContainer;
         //set user id in the parent screen
+        console.log(resData);
         setUserId(resData.profile.userId);
         //set user profile to state
         setUseProfileContainer(resData);
@@ -72,30 +108,35 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     });
   }, []);
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.rowContainer}>
-        <Image
-          source={require("../../Image/Umakase.png")}
-          style={styles.icon}
-        />
-        <View
-          style={{
-            flexDirection: "column",
-            flex: 1,
-            justifyContent: "center",
-          }}
-        >
-          <Text>{userProfileContainer?.profile.username}</Text>
-          <Text>ID:******</Text>
+    <View style={[commonStyle.mainContainer, { flex: 0 }]}>
+      <View style={commonStyle.rowContainer}>
+        <View style={styles.infoLeftView}>
+          <FontAwesome
+            name="user-circle"
+            size={windowWidth * 0.18}
+            color="black"
+          />
+        </View>
+        <View style={styles.infoRightView}>
+          <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
+            {userProfileContainer?.profile.username}
+          </Text>
+          <Text
+            style={[commonStyle.textContainer, { fontSize: textLarge }]}
+          >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
         </View>
       </View>
-      <View style={styles.rowContainer}>
-        <Text style={{ flex: 1, textAlign: "center" }}>メンバーシップ:</Text>
-        <Text style={{ flex: 1, textAlign: "center" }}>無料会員</Text>
+      <View style={commonStyle.rowContainer}>
+        <Text style={[commonStyle.textContainer, styles.membership]}>
+          {profileInfoStr.membershipHint}
+        </Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>
+          {profileInfoStr.membershipFree}
+        </Text>
       </View>
-      <View style={styles.rowContainer}>
+      <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={styles.button_disable}
+          style={commonStyle.button_disable}
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.email,
@@ -103,12 +144,14 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text>プレミアムサービス登録</Text>
+          <Text style={commonStyle.textContainer}>
+            {profileInfoStr.premiumBut}
+          </Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.rowContainer}>
+      <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={styles.button_active}
+          style={commonStyle.button_active}
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.password,
@@ -116,12 +159,14 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text>パスワード設定</Text>
+          <Text style={commonStyle.textContainer}>
+            {profileInfoStr.passwordBut}
+          </Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.rowContainer}>
+      <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={styles.button_active}
+          style={commonStyle.button_active}
           onPress={() =>
             navigation.push("ProfileUpdateScreen", {
               mode: profileUpdateMode.email,
@@ -129,7 +174,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text>メールアドレス設定</Text>
+          <Text style={commonStyle.textContainer}>
+            {profileInfoStr.mailBut}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -137,35 +184,16 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    paddingTop: 20,
-    paddingBottom: 20,
-    justifyContent: "flex-start",
-  },
-  rowContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    padding: 5,
-  },
-  icon: {
-    height: windowHeight * 0.11,
-    width: windowWidth * 0.11,
-    resizeMode: "contain",
+  infoLeftView: {
+    alignItems: "center",
     flex: 1,
   },
-  button_active: {
+  infoRightView: {
+    flexDirection: "column",
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: drawerColor,
-    width: windowWidth * 0.8,
-    paddingTop: 5,
-    paddingBottom: 5,
   },
-  button_disable: {
-    alignItems: "center",
-    backgroundColor: "#b8b8b8",
-    width: windowWidth * 0.8,
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
+  membership: { flex: 1, textAlign: "center", fontSize: textMedium },
 });
 export default ProfileInfo;

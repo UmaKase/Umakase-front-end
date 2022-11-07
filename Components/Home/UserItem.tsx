@@ -2,12 +2,29 @@ import { FontAwesome } from "@expo/vector-icons";
 import {
   backgroundColor,
   lightTextColor,
+  paddingMedium,
+  paddingSmall,
+  textMedium,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
-import React, { FunctionComponent, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import React, {
+  FunctionComponent,
+  useContext,
+  useState,
+  MouseEvent,
+} from "react";
+import {
+  GestureResponderEvent,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { UserContext } from "../../Context/UserContext";
+import { User } from "../../Types/types";
+import { enableLayoutAnimations } from "react-native-reanimated";
 
 interface UserItemProps {
   item: any;
@@ -15,35 +32,56 @@ interface UserItemProps {
 
 const UserItem: FunctionComponent<UserItemProps> = (item: any) => {
   const [selected, setSelected] = useState<Boolean>(false);
+  //handleRemove: display remove button and trigger remove event
+  //handleSelect: highlight selected user and trigger select event
+  const { handleRemove, handleSelect } = useContext(UserContext);
+  const itemUser = item.item.item as User;
+  //define feature of user list
   return (
     <TouchableOpacity
-      style={styles.userItemTouchableOpacity}
+      style={[styles.userItemTouchableOpacity]}
       onPress={() => {
-        setSelected(!selected);
+        if (handleSelect) {
+          handleSelect(itemUser.id);
+          setSelected(!selected);
+        }
       }}
+      disabled={!handleSelect}
     >
       <View
         style={[
           styles.userItemView,
-          selected ? styles.selected : styles.deselected,
+          handleSelect && selected ? styles.selected : styles.deselected,
         ]}
       >
         <View style={styles.userItemInfoContainer}>
-          <Image
-            source={require("../../Image/Umakase.png")}
+          <FontAwesome
+            name="user-circle"
+            size={windowWidth * 0.1}
+            color="black"
             style={styles.userItemIcon}
           />
-          <Text style={[selected ? styles.selected : styles.deselected]}>
-            {item.item.item.title}
+          <Text
+            style={[
+              handleSelect && selected ? styles.selected : styles.deselected,
+            ]}
+          >
+            {itemUser.profile?.id}
+            {/* {itemUser.profile?.lastname + " " + itemUser.profile?.firstname} */}
           </Text>
         </View>
         <View
           style={[
+            handleRemove ? {} : { display: "none" },
             styles.userItemButtonContainer,
-            selected ? styles.selected : styles.deselected,
+            handleSelect && selected ? styles.selected : styles.deselected,
           ]}
         >
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() => {
+              handleRemove ? handleRemove(itemUser) : {};
+            }}
+          >
             <FontAwesome
               name="user-times"
               size={windowWidth * 0.05}
@@ -65,9 +103,7 @@ const styles = StyleSheet.create({
     padding: windowWidth * 0.025,
     margin: windowWidth * 0.015,
   },
-  userItemTouchableOpacity: {
-    width: windowWidth - 10,
-  },
+  userItemTouchableOpacity: {},
   userItemDeselected: {
     backgroundColor: backgroundColor,
   },
@@ -82,16 +118,16 @@ const styles = StyleSheet.create({
   },
   userItemButton: {},
   userItemIcon: {
-    height: windowHeight * 0.07,
-    width: windowHeight * 0.07,
-    paddingRight: windowHeight * 0.005,
+    marginRight: paddingMedium,
   },
   selected: {
     color: backgroundColor,
     backgroundColor: lightTextColor,
+    fontSize: textMedium,
   },
   deselected: {
     color: lightTextColor,
     backgroundColor: backgroundColor,
+    fontSize: textMedium,
   },
 });

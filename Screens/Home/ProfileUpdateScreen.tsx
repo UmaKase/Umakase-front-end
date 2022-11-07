@@ -3,6 +3,9 @@ import {
   drawerColor,
   errTextColor,
   lightTextColor,
+  paddingLarge,
+  textLarge,
+  textMedium,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
@@ -10,13 +13,14 @@ import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
-import { DrawerActions } from "@react-navigation/native";
+import { DrawerActions, useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import {
   profileUpdateMode,
   profileUpdateValueName,
-} from "../../Constants/ProfileConst";
+  profileUpdScreenStr,
+} from "../../Constants/profileConst";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { TextInput } from "react-native-gesture-handler";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
@@ -24,6 +28,8 @@ import { UserAPI } from "../../Constants/backendAPI";
 import { REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { FontAwesome } from "@expo/vector-icons";
+import { commonStyle } from "../../Style/CommonStyle";
 
 type ProfileUpdateScreenProps = NativeStackScreenProps<
   ProfileStackProps,
@@ -84,26 +90,22 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
   const verifyInput = (): boolean => {
     if (route.params.mode == profileUpdateMode.password) {
       if (confirmValue == newValue) {
-        setErrMsg("");
+        setErrMsg(profileUpdScreenStr.errMsgEmpty);
         return true;
       } else {
-        setErrMsg("入力パスワードは一致しない。");
+        setErrMsg(profileUpdScreenStr.errMsgUnequip);
         return false;
       }
     }
     return true;
   };
-  let onLoadBool = true;
-  useEffect(() => {
-    console.log(route.params.userId);
-    const focus = navigation.addListener("focus", () => {
-      if (!onLoadBool) {
-        navigation.goBack();
-      } else {
-        onLoadBool = false;
-      }
-    });
-  }, []);
+  let firstLoadBool = true;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => navigation.goBack();
+    }, [])
+  );
   //get name of update value
   updateValueName = profileUpdateValueName[route.params.mode];
   let confirmInput;
@@ -113,14 +115,18 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
       <View>
         <View
           style={[
-            styles.rowContainer,
+            commonStyle.rowContainer,
             styles.formRowContainer,
             { justifyContent: "flex-start" },
           ]}
         >
-          <Text style={styles.subtitleText}>パスワード確認</Text>
+          <Text style={commonStyle.subtitleText}>
+            {profileUpdScreenStr.pwdConfirmHint}
+          </Text>
         </View>
-        <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
+        <View
+          style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+        >
           <TextInput
             style={styles.textbox}
             value={confirmValue}
@@ -133,24 +139,35 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
   }
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={commonStyle.safeArea}>
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
-        <View style={styles.mainContainer}>
-          <View style={styles.rowContainer}>
-            <Text style={[styles.textContainer, styles.errText]}>{errMsg}</Text>
+        <View style={commonStyle.mainContainer}>
+          <View style={commonStyle.rowContainer}>
+            <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
+              {updateValueName}
+              {profileUpdScreenStr.titlePostfix}
+            </Text>
+            <Text style={[commonStyle.textContainer, commonStyle.errText]}>
+              {errMsg}
+            </Text>
           </View>
           <View
             style={[
-              styles.rowContainer,
+              commonStyle.rowContainer,
               styles.formRowContainer,
               { justifyContent: "flex-start" },
             ]}
           >
-            <Text style={styles.subtitleText}>新しい{updateValueName}</Text>
+            <Text style={commonStyle.subtitleText}>
+              {profileUpdScreenStr.newValHint}
+              {updateValueName}
+            </Text>
           </View>
-          <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
+          <View
+            style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+          >
             <TextInput
               style={styles.textbox}
               value={newValue}
@@ -163,14 +180,18 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
           {confirmInput}
           <View
             style={[
-              styles.rowContainer,
+              commonStyle.rowContainer,
               styles.formRowContainer,
               { justifyContent: "flex-start" },
             ]}
           >
-            <Text style={styles.subtitleText}>古いパスワード</Text>
+            <Text style={commonStyle.subtitleText}>
+              {profileUpdScreenStr.oldPwdHint}
+            </Text>
           </View>
-          <View style={[styles.rowContainer, { height: windowHeight * 0.06 }]}>
+          <View
+            style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+          >
             <TextInput
               style={styles.textbox}
               value={oldPassword}
@@ -178,9 +199,25 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
               secureTextEntry={true}
             ></TextInput>
           </View>
-          <View style={[styles.rowContainer, styles.formRowContainer]}>
+        </View>
+        <View style={[commonStyle.footer]}>
+          <View style={styles.sideContainer}>
             <TouchableOpacity
-              style={styles.button_active}
+              style={[styles.modeBtn]}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <FontAwesome
+                name="arrow-left"
+                size={windowWidth * 0.09}
+                color={lightTextColor}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.sideContainer}>
+            <TouchableOpacity
+              style={[styles.modeBtn]}
               onPress={() => {
                 if (!verifyInput()) {
                   console.log("Incorrect password");
@@ -196,7 +233,11 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
                 );
               }}
             >
-              <Text style={styles.button_text}>設定</Text>
+              <FontAwesome
+                name="check"
+                size={windowWidth * 0.09}
+                color={lightTextColor}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -206,45 +247,16 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
 };
 
 export default ProfileUpdateScreen;
-const subtitleFontSize = windowWidth * 0.05;
-const bigFontSize = windowWidth * 0.07;
+const buttonSize = windowWidth * 0.17;
 
 const styles = StyleSheet.create({
-  safeArea: {
+  sideContainer: {
     flex: 1,
-    backgroundColor: backgroundColor,
-  },
-  logoutBtn: {
-    backgroundColor: "#888",
-  },
-  mainContainer: {
-    paddingTop: 20,
-    paddingBottom: 20,
-    justifyContent: "flex-start",
-  },
-  rowContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    margin: 5,
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
   formRowContainer: {
-    marginTop: 15,
-  },
-  textContainer: {
-    flex: 1,
-    textAlign: "center",
-    color: lightTextColor,
-  },
-  titleText: {
-    fontSize: bigFontSize,
-  },
-  subtitleText: {
-    fontSize: subtitleFontSize,
-    textAlign: "left",
-    color: lightTextColor,
-  },
-  errText: {
-    color: errTextColor,
+    marginTop: paddingLarge,
   },
   textbox: {
     justifyContent: "center",
@@ -256,21 +268,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     backgroundColor: drawerColor,
   },
-  button_active: {
+  modeBtn: {
+    width: buttonSize,
+    height: buttonSize,
+    borderRadius: buttonSize / 2,
+    marginHorizontal: windowWidth * 0.02,
+    borderWidth: 5,
+    borderColor: "#FFF",
     alignItems: "center",
-    backgroundColor: drawerColor,
-    width: windowWidth * 0.8,
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
-  button_disable: {
-    alignItems: "center",
-    backgroundColor: "#b8b8b8",
-    width: windowWidth * 0.8,
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
-  button_text: {
-    color: lightTextColor,
+    justifyContent: "center",
   },
 });
