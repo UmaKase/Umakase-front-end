@@ -1,4 +1,11 @@
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RoomStackNavigationProps } from "../../../../Types/Navigations/RoomStack";
@@ -15,6 +22,9 @@ import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import SearchBar from "../../../../Components/InitialStep/SearchBar";
 import _ from "lodash";
+import customAxiosInstance from "../../../../Utils/customAxiosInstance";
+import { RoomAPI } from "../../../../Constants/backendAPI";
+import UserList from "../../../../Components/Home/UserList";
 
 type RoomConfigSettingScreeProps = NativeStackScreenProps<
   RoomStackNavigationProps,
@@ -25,8 +35,46 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
 }) => {
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
-  const [friends, setFriedns] = useState([1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  const [roomieNames, setRoomieNames] = useState<string[]>([]);
+  const [friends, setFriedns] = useState<UserInfo[]>([
+    {
+      id: "String",
+      username: "String",
+      firstname: "String",
+      lastname: "String",
+      userId: "String",
+    },
+    {
+      id: "String",
+      username: "String",
+      firstname: "String",
+      lastname: "String",
+      userId: "String",
+    },
+  ]);
 
+  // create room function
+  const createRoom = async () => {
+    await customAxiosInstance({
+      method: "post",
+      url: `${RoomAPI}/new`,
+      data: {
+        name: titleInput,
+        roomieNames: [],
+      },
+    })
+      .then((res) => {
+        if (res.data) {
+          navigation.pop();
+        }
+      })
+      .catch((e) => {
+        console.log(JSON.stringify(e.response));
+        return Alert.alert("Create room failed.", `${e.response.error}`);
+      });
+  };
+
+  // search mode
   const [searchMode, setSearchMode] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const searchOn = () => {
@@ -112,26 +160,14 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
             <FontAwesome5 name="plus-circle" size={windowWidth * 0.12} color="#FFF" />
           </TouchableOpacity>
         </View>
-        {/* member list */}
-        <FlatList
-          data={friends}
-          keyExtractor={(item, index) => index.toString()}
-          style={{ flex: 1, backgroundColor: "#ECAC72" }}
-          renderItem={() => {
-            return (
-              // prettier-ignore
-              <View style={{height:windowHeight*0.05, width:windowWidth*0.9, borderRadius:windowWidth*0.03, backgroundColor:"#FFF", alignItems:"flex-start", justifyContent:"center", marginTop:windowHeight*0.02,}}>
-                <Text>this is the sample</Text>
-              </View>
-            );
-          }}
-        />
+        {/* member list =================*/}
+        <UserList />
         {/* footer ================================================================ */}
         <View style={styles.footer}>
           <TouchableOpacity onPress={() => navigation.pop()}>
             <FontAwesome name="home" size={windowWidth * 0.12} color="#FFF" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("next step!")}>
+          <TouchableOpacity onPress={() => createRoom()}>
             <FontAwesome
               name="arrow-circle-right"
               size={windowWidth * 0.12}
