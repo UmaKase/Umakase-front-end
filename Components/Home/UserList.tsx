@@ -89,6 +89,8 @@ const styles = StyleSheet.create({
     padding: paddingSmall,
     paddingLeft: paddingLarge,
     paddingRight: paddingLarge,
+    width: windowWidth,
+    backgroundColor: backgroundColor,
   },
   headerTitle: {
     color: lightTextColor,
