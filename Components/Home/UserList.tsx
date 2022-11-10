@@ -86,7 +86,8 @@ export default UserList;
 const styles = StyleSheet.create({
   userListView: {
     flexDirection: "row",
-    padding: paddingSmall,
+    paddingBottom: paddingSmall,
+    paddingTop: paddingSmall + paddingSmall,
     paddingLeft: paddingLarge,
     paddingRight: paddingLarge,
     width: windowWidth,

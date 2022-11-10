@@ -2,6 +2,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import {
   backgroundColor,
   lightTextColor,
+  paddingLarge,
   paddingMedium,
   paddingSmall,
   textMedium,
@@ -100,8 +101,10 @@ const styles = StyleSheet.create({
   userItemView: {
     flexDirection: "row",
     borderRadius: windowWidth * 0.025,
-    padding: windowWidth * 0.025,
-    margin: windowWidth * 0.015,
+    padding: paddingMedium,
+    margin: paddingMedium,
+    marginLeft: paddingLarge,
+    marginRight: paddingLarge,
   },
   userItemTouchableOpacity: {},
   userItemDeselected: {
