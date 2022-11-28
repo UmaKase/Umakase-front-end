@@ -7,6 +7,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { commonStyle } from "../../Style/CommonStyle";
 import { SettingStackProps } from "../../Types/Home/Setting/SettingStackProps";
 import { settingScreenConst } from "../../Constants/settingConst";
+import { TipsContext } from "../../Context/TipsContext";
+import { functionCategory } from "../../Constants/homeConst";
 
 type SettingScreenProps = NativeStackScreenProps<
   SettingStackProps,
@@ -17,9 +19,13 @@ const SettingScreen: React.FC<SettingScreenProps> = ({ navigation, route }) => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={commonStyle.safeArea}>
-        <CustomHeader
-          toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-        ></CustomHeader>
+        <TipsContext.Provider
+          value={{ currentCategory: functionCategory.setting }}
+        >
+          <CustomHeader
+            toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+          ></CustomHeader>
+        </TipsContext.Provider>
         <View style={commonStyle.mainContainer}>
           <View style={[commonStyle.rowContainer]}>
             <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
