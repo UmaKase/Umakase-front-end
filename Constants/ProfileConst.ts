@@ -15,7 +15,8 @@ export const profileInfoStr={
 //data updated in profile update screen
 export const profileUpdScreenStr={
     errMsgEmpty:"",
-    errMsgUnequip:"同じパスワードを入力してください。",
+    errMsgUnequip:"同じパスワードを入力してください",
+    errMsgNotNull:"下記の資料を入力してください",
     errMsgLogin:"ログインができません。\nもう一回試してください",
     errMsgUpdate:"資料更新できません。\nもう一回試してください",
     pwdConfirmHint:"パスワード確認",
@@ -29,6 +30,5 @@ export const profileUpdScreenStr={
 export const profileUpdateMode ={
     personalInfo:0,
     password:1,
-    personalInfoWithEmail:100
 }
 export const profileUpdateTitle =["プロフィール編集","パスワード変更"];

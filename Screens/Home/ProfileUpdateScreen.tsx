@@ -13,19 +13,23 @@ import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
-import { DrawerActions, useFocusEffect } from "@react-navigation/native";
+import {
+  DrawerActions,
+  StackActions,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import {
   profileUpdateMode,
-  profileUpdateValueName,
+  profileUpdateTitle,
   profileUpdScreenStr,
 } from "../../Constants/ProfileConst";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { TextInput } from "react-native-gesture-handler";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
-import { UserAPI } from "../../Constants/backendAPI";
-import { REFRESH_KEY } from "../../Constants/securestoreKey";
+import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
+import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { FontAwesome } from "@expo/vector-icons";
@@ -35,19 +39,21 @@ type ProfileUpdateScreenProps = NativeStackScreenProps<
   ProfileStackProps,
   "ProfileUpdateScreen"
 >;
-let updateValueName = "";
 const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
   navigation,
   route,
 }) => {
-  const [newValue, setNewValue] = useState<string>();
-  const [confirmValue, setConfirmValue] = useState<string>();
+  const [newLastName, setLastName] = useState<string>("");
+  const [newSurName, setSurName] = useState<string>("");
+  const [newValue, setNewValue] = useState<string>("");
+  const [confirmValue, setConfirmValue] = useState<string>("");
   const [oldPassword, setOldPassword] = useState<string>();
   const [errMsg, setErrMsg] = useState<string>("");
   //predefined function/processes
   //request api to update personal info
   const updateProcess = async (
     userId: string,
+    mode: number,
     successCallBack: (res: AxiosResponse) => void,
     failCallback: (res: Error | AxiosError) => void
   ) => {
@@ -55,20 +61,26 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
     let requestMethod = "";
     let requestUrl = "";
     let requestData = undefined;
+
     //refresh token error handler
     if (!localRefreshToken) {
       console.log("No local refresh token");
       return Alert.alert("Error", "No local refresh token");
     }
-    console.log("userid:" + route.params.userId);
-    //update email property
-    if (route.params.mode === profileUpdateMode.email) {
+    console.log(`userid: ${route.params.userId}, mode: ${mode}`);
+
+    //update personal property
+    if (mode == profileUpdateMode.personalInfo) {
       requestMethod = "put";
-      requestUrl = `${UserAPI}/profile/email`;
+      requestUrl = `${UserAPI}/profile`;
       requestData = {
-        email: newValue,
+        firstname: newSurName,
+        lastname: newLastName,
       };
-    } else {
+    }
+    //update password
+    else if (mode === profileUpdateMode.password) {
+      //incomplete
       return;
     }
     console.log(requestData);
@@ -86,33 +98,93 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
         failCallback(e);
       });
   };
+  //request api to login
+  const LoginProcess = async (
+    username: string,
+    password: string,
+    successCallBack: (res: AxiosResponse) => void,
+    failCallback: (res: Error | AxiosError) => void
+  ) => {
+    console.log(`username:${username};password:${password}`);
+    axios({
+      method: "post",
+      url: `${AuthAPI}/login`,
+      data: {
+        username: username,
+        password: password,
+      },
+    })
+      .then(async (loginResult) => {
+        console.log("success:" + loginResult);
+        //ANCHOR saving basic info
+        // prettier-ignore
+        await SecureStore.setItemAsync(ACCESS_KEY, loginResult.data.data.accessToken);
+        // prettier-ignore
+        await SecureStore.setItemAsync(REFRESH_KEY, loginResult.data.data.refreshToken);
+        successCallBack(loginResult);
+      })
+      .catch((e) => {
+        console.log("fail:" + e);
+        failCallback(e);
+      });
+  };
   //verify input function
   const verifyInput = (): boolean => {
+    console.log("verifyinput");
     if (route.params.mode == profileUpdateMode.password) {
-      if (confirmValue == newValue) {
-        setErrMsg(profileUpdScreenStr.errMsgEmpty);
-        return true;
-      } else {
+      if (confirmValue == "" || newValue == "") {
+        setErrMsg(profileUpdScreenStr.errMsgNotNull);
+        return false;
+      } else if (confirmValue != newValue) {
         setErrMsg(profileUpdScreenStr.errMsgUnequip);
         return false;
+      } else {
+        setErrMsg(profileUpdScreenStr.errMsgEmpty);
+        return true;
+      }
+    } else if (route.params.mode == profileUpdateMode.personalInfo) {
+      if (newLastName == "" && newSurName == "") {
+        setErrMsg(profileUpdScreenStr.errMsgNotNull);
+        return false;
+      } else {
+        setErrMsg(profileUpdScreenStr.errMsgEmpty);
+        return true;
       }
     }
     return true;
   };
-  let firstLoadBool = true;
-
+  //if user go back to this page, it will redirect to profile page
   useFocusEffect(
     React.useCallback(() => {
-      return () => navigation.goBack();
+      return () => navigation.navigate("ProfileScreen");
     }, [])
   );
-  //get name of update value
-  updateValueName = profileUpdateValueName[route.params.mode];
-  let confirmInput;
+  let inputForm;
   //if update value is password, add text input for confirming the new password
   if (route.params.mode === profileUpdateMode.password) {
-    confirmInput = (
+    inputForm = (
       <View>
+        <View
+          style={[
+            commonStyle.rowContainer,
+            styles.formRowContainer,
+            { justifyContent: "flex-start", paddingTop: 0 },
+          ]}
+        >
+          <Text style={commonStyle.subtitleText}>
+            {profileUpdScreenStr.newPwdHint}
+          </Text>
+        </View>
+        <View
+          style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+        >
+          <TextInput
+            style={styles.textbox}
+            value={newValue}
+            onChangeText={setNewValue}
+            secureTextEntry={true}
+          ></TextInput>
+        </View>
         <View
           style={[
             commonStyle.rowContainer,
@@ -134,6 +206,72 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
             secureTextEntry={true}
           ></TextInput>
         </View>
+        <View
+          style={[
+            commonStyle.rowContainer,
+            styles.formRowContainer,
+            { justifyContent: "flex-start" },
+          ]}
+        >
+          <Text style={commonStyle.subtitleText}>
+            {profileUpdScreenStr.oldPwdHint}
+          </Text>
+        </View>
+        <View
+          style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+        >
+          <TextInput
+            style={styles.textbox}
+            value={oldPassword}
+            onChangeText={setOldPassword}
+            secureTextEntry={true}
+          ></TextInput>
+        </View>
+      </View>
+    );
+  } else if (route.params.mode === profileUpdateMode.personalInfo) {
+    inputForm = (
+      <View>
+        <View
+          style={[
+            commonStyle.rowContainer,
+            styles.formRowContainer,
+            { justifyContent: "flex-start", marginTop: 0 },
+          ]}
+        >
+          <Text style={commonStyle.subtitleText}>
+            {profileUpdScreenStr.lastnameHint}
+          </Text>
+        </View>
+        <View
+          style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+        >
+          <TextInput
+            style={styles.textbox}
+            value={newLastName}
+            onChangeText={setLastName}
+          ></TextInput>
+        </View>
+        <View
+          style={[
+            commonStyle.rowContainer,
+            styles.formRowContainer,
+            { justifyContent: "flex-start" },
+          ]}
+        >
+          <Text style={commonStyle.subtitleText}>
+            {profileUpdScreenStr.surnameHint}
+          </Text>
+        </View>
+        <View
+          style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+        >
+          <TextInput
+            style={styles.textbox}
+            value={newSurName}
+            onChangeText={setSurName}
+          ></TextInput>
+        </View>
       </View>
     );
   }
@@ -143,69 +281,25 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
-        <View style={commonStyle.mainContainer}>
+        <View style={[commonStyle.mainContainer]}>
           <View style={commonStyle.rowContainer}>
             <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
-              {updateValueName}
-              {profileUpdScreenStr.titlePostfix}
+              {profileUpdateTitle[route.params.mode]}
             </Text>
+          </View>
+          <View style={commonStyle.rowContainer}>
             <Text style={[commonStyle.textContainer, commonStyle.errText]}>
               {errMsg}
             </Text>
           </View>
-          <View
-            style={[
-              commonStyle.rowContainer,
-              styles.formRowContainer,
-              { justifyContent: "flex-start" },
-            ]}
-          >
-            <Text style={commonStyle.subtitleText}>
-              {profileUpdScreenStr.newValHint}
-              {updateValueName}
-            </Text>
-          </View>
-          <View
-            style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
-          >
-            <TextInput
-              style={styles.textbox}
-              value={newValue}
-              onChangeText={setNewValue}
-              secureTextEntry={
-                route.params.mode === profileUpdateMode.password ? true : false
-              }
-            ></TextInput>
-          </View>
-          {confirmInput}
-          <View
-            style={[
-              commonStyle.rowContainer,
-              styles.formRowContainer,
-              { justifyContent: "flex-start" },
-            ]}
-          >
-            <Text style={commonStyle.subtitleText}>
-              {profileUpdScreenStr.oldPwdHint}
-            </Text>
-          </View>
-          <View
-            style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
-          >
-            <TextInput
-              style={styles.textbox}
-              value={oldPassword}
-              onChangeText={setOldPassword}
-              secureTextEntry={true}
-            ></TextInput>
-          </View>
+          {inputForm}
         </View>
         <View style={[commonStyle.footer]}>
           <View style={styles.sideContainer}>
             <TouchableOpacity
               style={[styles.modeBtn]}
               onPress={() => {
-                navigation.goBack();
+                navigation.navigate("ProfileScreen");
               }}
             >
               <FontAwesome
@@ -219,18 +313,40 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
             <TouchableOpacity
               style={[styles.modeBtn]}
               onPress={() => {
+                //input verify
                 if (!verifyInput()) {
-                  console.log("Incorrect password");
                   return;
                 }
-                console.info(verifyInput());
-                updateProcess(
-                  route.params.userId,
-                  () => {
-                    navigation.goBack();
-                  },
-                  () => {}
-                );
+                const successCallback = () => {
+                  //update info
+                  updateProcess(
+                    route.params.userId,
+                    route.params.mode,
+                    () => {
+                      setErrMsg(profileUpdScreenStr.errMsgEmpty);
+                      navigation.navigate("ProfileScreen");
+                    },
+                    () => {
+                      setErrMsg(profileUpdScreenStr.errMsgLogin);
+                    }
+                  );
+                };
+                const failCallback = () => {
+                  setErrMsg(profileUpdScreenStr.errMsgLogin);
+                  setOldPassword("");
+                  return false;
+                };
+                //authentication
+                if (route.params.mode == profileUpdateMode.password) {
+                  LoginProcess(
+                    route.params.userName,
+                    oldPassword ? oldPassword : "",
+                    successCallback,
+                    failCallback
+                  );
+                } else {
+                  successCallback();
+                }
               }}
             >
               <FontAwesome
@@ -256,6 +372,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   formRowContainer: {
+    paddingLeft: paddingLarge,
     marginTop: paddingLarge,
   },
   textbox: {
