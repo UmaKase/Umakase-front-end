@@ -21,6 +21,7 @@ import { AxiosResponse } from "axios";
 import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
 import { FontAwesome } from "@expo/vector-icons";
 import { commonStyle } from "../../Style/CommonStyle";
+import LoadingSpinner from "../../Components/Auth/LoadingSpinner";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -68,6 +69,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const [currentRoomName, setCurrentRoomName] = useState<string>(
     profileInfoStr.notSet
   );
+  const [fetching, setFetching] = useState<boolean>(true);
   getCurrentRoomName(setCurrentRoomName);
   //onload
   useEffect(() => {
@@ -81,12 +83,26 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         setUserName(resData.profile.username);
         //set user profile to state
         setUseProfileContainer(resData);
+        setFetching(false);
       } catch (e) {
         console.log(e);
+        const resData = {
+          profile: {
+            id: "",
+            username: "",
+            firstname: "",
+            lastname: "",
+            userId: "",
+          },
+        } as UserProfileContainer;
+        setUseProfileContainer(resData);
+        setFetching(false);
       }
     });
   }, []);
-  return (
+  return fetching ? (
+    <LoadingSpinner />
+  ) : (
     <View style={[commonStyle.mainContainer, { paddingTop: paddingLarge }]}>
       <View style={commonStyle.rowContainer}>
         <View style={styles.infoLeftView}>
@@ -98,7 +114,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         </View>
         <View style={styles.infoRightView}>
           <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-            {userProfileContainer?.profile.username}
+            {`${userProfileContainer?.profile.lastname} ${userProfileContainer?.profile.firstname}`}
           </Text>
           <Text
             style={[commonStyle.textContainer, { fontSize: textLarge }]}
