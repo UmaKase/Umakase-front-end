@@ -1,7 +1,7 @@
-import { functionTipsMessage } from "../../Constants/homeConst";
+import { functionTipsMessage } from "../Constants/homeConst";
 import React, { useContext, useState } from "react";
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import { TipsContext } from "../../Context/TipsContext";
+import { TipsContext } from "../Context/TipsContext";
 
 interface ModalProps {
   modalVisible: boolean;
