@@ -1,6 +1,6 @@
 export const DrawerLabel ={
     random:"献立を決める",
-    room:"料理を投票する",
+    room:"ルーム管理",
     report:"みんなのレポート",
     bookmarked:"お気入り",
     receipe:"マイレシピ",

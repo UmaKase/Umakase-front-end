@@ -16,12 +16,20 @@ import {
   windowWidth,
 } from "../Constants/cssConst";
 
-import { ProfileStackScreen } from "./ProfileStackNavigation";
+import { ProfileStackNavigation } from "./ProfileStackNavigation";
 import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
 import { SettingStackNavigation } from "./SettingStackNavigation";
 import { Entypo } from "@expo/vector-icons";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import {
+  CommonActions,
+  DrawerActions,
+  useNavigation,
+} from "@react-navigation/native";
 import { DrawerLabel, logoutPopout } from "../Constants/homeConst";
+import { ACCESS_KEY, REFRESH_KEY } from "../Constants/securestoreKey";
+import axios from "axios";
+import { AuthAPI } from "../Constants/backendAPI";
+import * as SecureStore from "expo-secure-store";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
@@ -37,12 +45,35 @@ const HomeDrawerNavigation: React.FC = () => {
       {
         text: logoutPopout.confirm,
         onPress: () => {
+          logoutProcess();
           console.log("loging out!");
           navigation.dispatch(DrawerActions.closeDrawer);
         },
         style: "destructive",
       },
     ]);
+  };
+  const logoutProcess = async () => {
+    const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
+    if (!localRefreshToken) {
+      console.log("No local refresh token");
+      return Alert.alert("Error", "No local refresh token");
+    }
+    axios({
+      method: "post",
+      url: `${AuthAPI}/token/logout`,
+      headers: { Authorization: `Bearer ${localRefreshToken}` },
+    }).then(async (response) => {
+      if (response.status) {
+        await SecureStore.deleteItemAsync(ACCESS_KEY);
+        await SecureStore.deleteItemAsync(REFRESH_KEY);
+        navigation.dispatch(
+          CommonActions.reset({ routes: [{ name: "AuthNavigation" }] })
+        );
+      } else {
+        return Alert.alert("Error", "logout process failed.");
+      }
+    });
   };
   const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     return (
@@ -58,6 +89,21 @@ const HomeDrawerNavigation: React.FC = () => {
             borderWidth: 0.5,
             borderColor: "#FFF",
             marginVertical: windowHeight * 0.02,
+          }}
+        />
+        {/* Profile Button */}
+        <DrawerItem
+          label={DrawerLabel.profile}
+          onPress={() => {
+            navigation.dispatch(DrawerActions.jumpTo("ProfileStackNavigation"));
+          }}
+          icon={() => (
+            <Entypo name="user" size={windowWidth * 0.06} color="#FFF" />
+          )}
+          labelStyle={{
+            color: "#FFF",
+            fontSize: windowWidth * 0.04,
+            fontWeight: "500",
           }}
         />
         {/* Logout Button */}
@@ -76,7 +122,7 @@ const HomeDrawerNavigation: React.FC = () => {
         <Drawer.Screen
           name="ProfileNavigation"
           options={{ drawerLabel: DrawerLabel.profile }}
-          component={ProfileStackScreen}
+          component={ProfileStackNavigation}
         ></Drawer.Screen>
       </DrawerContentScrollView>
     );
@@ -97,8 +143,9 @@ const HomeDrawerNavigation: React.FC = () => {
     >
       <Drawer.Screen
         name="ProfileNavigation"
-        component={ProfileStackScreen}
-      ></Drawer.Screen>
+        options={{ drawerLabel: DrawerLabel.profile }}
+        component={ProfileStackNavigation}
+      />
       <Drawer.Screen
         name="RandomScreen"
         options={{ drawerLabel: DrawerLabel.random }}
