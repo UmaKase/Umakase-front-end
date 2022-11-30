@@ -4,7 +4,7 @@ import {
   textMedium,
   windowWidth,
 } from "../../Constants/cssConst";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
@@ -21,6 +21,8 @@ import { AxiosResponse } from "axios";
 import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
 import { FontAwesome } from "@expo/vector-icons";
 import { commonStyle } from "../../Style/CommonStyle";
+import LoadingSpinner from "../../Components/Auth/LoadingSpinner";
+import { ProfileContext } from "../../Context/ProfileContext";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -58,17 +60,21 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   setUserId,
   navigation,
 }) => {
-  //test use, remove later
-  // SecureStore.setItemAsync(CURRENTROOM_ID, "1234");
-  // SecureStore.setItemAsync(CURRENTROOM_NAME, "ルームA");
-
+  //state variable defined
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
   const [userName, setUserName] = useState<string>("");
   const [currentRoomName, setCurrentRoomName] = useState<string>(
     profileInfoStr.notSet
   );
+  const [fetching, setFetching] = useState<boolean>(true);
+
+  //current
+  const { lastName, firstName, setLastName, setFirstName } =
+    useContext(ProfileContext);
+
   getCurrentRoomName(setCurrentRoomName);
+
   //onload
   useEffect(() => {
     profileProcess((res: AxiosResponse<any, any>) => {
@@ -81,12 +87,36 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         setUserName(resData.profile.username);
         //set user profile to state
         setUseProfileContainer(resData);
+        if (setLastName != undefined && resData.profile.lastname != undefined) {
+          console.log("setLastName:" + resData.profile.lastname);
+          setLastName(resData.profile.lastname);
+        }
+        if (
+          setFirstName != undefined &&
+          resData.profile.firstname != undefined
+        ) {
+          setFirstName(resData.profile.firstname);
+        }
+        setFetching(false);
       } catch (e) {
         console.log(e);
+        const resData = {
+          profile: {
+            id: "",
+            username: "",
+            firstname: "",
+            lastname: "",
+            userId: "",
+          },
+        } as UserProfileContainer;
+        setUseProfileContainer(resData);
+        setFetching(false);
       }
     });
   }, []);
-  return (
+  return fetching ? (
+    <LoadingSpinner />
+  ) : (
     <View style={[commonStyle.mainContainer, { paddingTop: paddingLarge }]}>
       <View style={commonStyle.rowContainer}>
         <View style={styles.infoLeftView}>
@@ -98,7 +128,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         </View>
         <View style={styles.infoRightView}>
           <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-            {userProfileContainer?.profile.username}
+            {`${lastName} ${firstName}`}
           </Text>
           <Text
             style={[commonStyle.textContainer, { fontSize: textLarge }]}
@@ -126,13 +156,16 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
         <TouchableOpacity
           style={commonStyle.button_disable}
-          onPress={() =>
+          onPress={() => {
+            console.log("setLastName::" + setLastName);
             navigation.navigate("ProfileUpdateScreen", {
               mode: profileUpdateMode.personalInfo,
               userId: userId ? userId : "",
               userName: userName,
-            })
-          }
+              setLastName: setLastName,
+              setFirstName: setFirstName,
+            });
+          }}
         >
           <Text style={commonStyle.textContainer}>
             {profileInfoStr.premiumBut}
@@ -147,6 +180,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
               mode: profileUpdateMode.personalInfo,
               userId: userId ? userId : "",
               userName: userName,
+              setLastName: setLastName,
+              setFirstName: setFirstName,
             })
           }
         >
@@ -161,8 +196,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           onPress={() =>
             navigation.navigate("ProfileUpdateScreen", {
               mode: profileUpdateMode.password,
-              userId: userId ? userId : "",
               userName: userName,
+              userId: userId ? userId : "",
             })
           }
         >

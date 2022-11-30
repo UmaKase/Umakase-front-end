@@ -9,6 +9,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import { commonStyle } from "../../Style/CommonStyle";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
+import { ProfileContext } from "../../Context/ProfileContext";
+import { USERNAME_KEY } from "../../Constants/securestoreKey";
 type ProfileScreenProps = NativeStackScreenProps<
   ProfileStackProps,
   "ProfileScreen"
@@ -32,6 +34,8 @@ const getRoomIdCall = async (successCallBack: any, failCallback: any) => {
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
   const [userId, setUserId] = useState<string>();
   const [defaultRoomId, setDefaultRoomId] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [surName, setSurName] = useState<string>("");
   //get user id
   useEffect(() => {
     getRoomIdCall(
@@ -49,11 +53,20 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
         <CustomHeader
           toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         ></CustomHeader>
-        <ProfileInfo
-          userId={userId}
-          setUserId={setUserId}
-          navigation={navigation}
-        />
+        <ProfileContext.Provider
+          value={{
+            lastName: lastName,
+            firstName: surName,
+            setLastName: setLastName,
+            setFirstName: setSurName,
+          }}
+        >
+          <ProfileInfo
+            userId={userId}
+            setUserId={setUserId}
+            navigation={navigation}
+          />
+        </ProfileContext.Provider>
       </SafeAreaView>
     </SafeAreaProvider>
   );

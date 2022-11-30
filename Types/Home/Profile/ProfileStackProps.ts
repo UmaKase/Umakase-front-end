@@ -5,5 +5,8 @@ export type ProfileStackProps = {
   ProfileUpdateScreen: {
     mode:number;
     userId:string;
+    userName:string;
+    setFirstName?:React.Dispatch<React.SetStateAction<string>>;
+    setLastName?:React.Dispatch<React.SetStateAction<string>>;
   };
 };

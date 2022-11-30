@@ -43,8 +43,8 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
   navigation,
   route,
 }) => {
-  const [newLastName, setLastName] = useState<string>("");
-  const [newSurName, setSurName] = useState<string>("");
+  const [newLastName, setNewLastName] = useState<string>("");
+  const [newSurName, setNewSurName] = useState<string>("");
   const [newValue, setNewValue] = useState<string>("");
   const [confirmValue, setConfirmValue] = useState<string>("");
   const [oldPassword, setOldPassword] = useState<string>();
@@ -249,7 +249,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
           <TextInput
             style={styles.textbox}
             value={newLastName}
-            onChangeText={setLastName}
+            onChangeText={setNewLastName}
           ></TextInput>
         </View>
         <View
@@ -269,7 +269,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
           <TextInput
             style={styles.textbox}
             value={newSurName}
-            onChangeText={setSurName}
+            onChangeText={setNewSurName}
           ></TextInput>
         </View>
       </View>
@@ -323,6 +323,20 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
                     route.params.userId,
                     route.params.mode,
                     () => {
+                      if (
+                        route.params.mode === profileUpdateMode.personalInfo
+                      ) {
+                        console.log("updateProcess");
+                        if (route.params.setLastName) {
+                          console.log("setLastName");
+                          route.params.setLastName(newLastName);
+                        }
+                        if (route.params.setFirstName) {
+                          console.log(newSurName);
+                          route.params.setFirstName(newSurName);
+                        }
+                      }
+
                       setErrMsg(profileUpdScreenStr.errMsgEmpty);
                       navigation.navigate("ProfileScreen");
                     },
