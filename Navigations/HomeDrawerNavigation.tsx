@@ -22,6 +22,7 @@ import { SettingStackNavigation } from "./SettingStackNavigation";
 import { Entypo } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { DrawerLabel, logoutPopout } from "../Constants/homeConst";
+import BookmarkedStackNavigation from "./DrawerNavigation/BookmarkedStackNavigation";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
@@ -103,6 +104,11 @@ const HomeDrawerNavigation: React.FC = () => {
         name="RandomScreen"
         options={{ drawerLabel: DrawerLabel.random }}
         component={RandomScreen}
+      />
+      <Drawer.Screen
+        name="BookmarkedStackNavigation"
+        options={{ drawerLabel: DrawerLabel.bookmarked }}
+        component={BookmarkedStackNavigation}
       />
       <Drawer.Screen
         name="Room"

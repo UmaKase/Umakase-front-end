@@ -10,6 +10,7 @@ export const cornerRadius = windowWidth * 0.23;
 
 //background color
 export const backgroundColor = "#FAC595";
+export const darkerBackgroundColor = "#ECAC72";
 export const drawerColor = "#F4A58D";
 
 //text color
@@ -23,7 +24,7 @@ export const inputFontSize = windowWidth * 0.04;
 
 //fontSize
 export const textExtraLarge = windowWidth * 0.11;
-export const textLarge =windowWidth * 0.07;
+export const textLarge = windowWidth * 0.07;
 export const textMedium = windowWidth * 0.045;
 export const textSmall = windowWidth * 0.02;
 

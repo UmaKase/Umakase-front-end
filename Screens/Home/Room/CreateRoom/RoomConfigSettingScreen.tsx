@@ -1,7 +1,7 @@
 import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RoomStackNavigationProps } from "../../../../Types/Navigations/RoomStack";
+import { RoomStackNavigationProps } from "../../../../Types/Navigations/HomeDrawer/RoomStack";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../../../Components/HomeDrawer/CustomHeader";
 import { DrawerActions } from "@react-navigation/native";
@@ -105,7 +105,11 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
             }}
           >
             {/* prettier-ignore */}
-            <FontAwesome5 name="phabricator" size={windowWidth * 0.15} color="#FFF" />
+            <FontAwesome5
+            name="trash"
+            size={windowWidth * 0.1}
+            color="#FFF"
+          />
           </TouchableOpacity>
         </View>
         {/* title input  ================================================================  */}

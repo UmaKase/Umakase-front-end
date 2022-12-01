@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
   backgroundColor,
+  darkerBackgroundColor,
   windowHeight,
   windowWidth,
 } from "../../../Constants/cssConst";
 import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RoomStackNavigationProps } from "../../../Types/Navigations/RoomStack";
+import { RoomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RoomStack";
 import { DrawerActions } from "@react-navigation/native";
 import customAxiosInstance from "../../../Utils/customAxiosInstance";
 import { RoomAPI } from "../../../Constants/backendAPI";
@@ -55,7 +56,7 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
     navigation.navigate("RoomConfigSettingScreen");
   };
   const goRoom = (roomId: string) => {
-    console.log("room id is :", roomId);
+    navigation.navigate("RoomScreen", { roomId: roomId });
   };
   return (
     <SafeAreaProvider>
@@ -108,7 +109,7 @@ const CreateRoomBlock: React.FC<CreateRoomBlockProps> = ({
         width: windowWidth * 0.85,
         height: windowHeight * 0.18,
         borderRadius: borderRadius,
-        backgroundColor: "#ECAC72",
+        backgroundColor: darkerBackgroundColor,
         alignItems: "center",
         justifyContent: "center",
         marginTop: windowHeight * 0.02,
@@ -117,7 +118,7 @@ const CreateRoomBlock: React.FC<CreateRoomBlockProps> = ({
       <Entypo
         name="circle-with-plus"
         size={windowWidth * 0.13}
-        color="#FAC595"
+        color={backgroundColor}
       />
       <Text
         style={{
