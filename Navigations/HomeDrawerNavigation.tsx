@@ -20,9 +20,15 @@ import { ProfileStackScreen } from "./ProfileStackNavigation";
 import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
 import { SettingStackNavigation } from "./SettingStackNavigation";
 import { Entypo } from "@expo/vector-icons";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import {
+  CommonActions,
+  DrawerActions,
+  useNavigation,
+} from "@react-navigation/native";
 import { DrawerLabel, logoutPopout } from "../Constants/homeConst";
 import BookmarkedStackNavigation from "./DrawerNavigation/BookmarkedStackNavigation";
+import { deleteItemAsync } from "expo-secure-store";
+import { ACCESS_KEY, REFRESH_KEY } from "../Constants/securestoreKey";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
@@ -32,14 +38,22 @@ const HomeDrawerNavigation: React.FC = () => {
     return Alert.alert(logoutPopout.title, logoutPopout.description, [
       {
         text: logoutPopout.cancel,
-        onPress: () => navigation.dispatch(DrawerActions.closeDrawer),
+        onPress: () => {
+          console.log("loging out!");
+          navigation.dispatch(DrawerActions.closeDrawer);
+        },
         style: "default",
       },
       {
         text: logoutPopout.confirm,
-        onPress: () => {
-          console.log("loging out!");
-          navigation.dispatch(DrawerActions.closeDrawer);
+        onPress: async () => {
+          await deleteItemAsync(ACCESS_KEY);
+          await deleteItemAsync(REFRESH_KEY);
+          navigation.dispatch(
+            CommonActions.reset({
+              routes: [{ name: "AuthNavigation" }],
+            })
+          );
         },
         style: "destructive",
       },
