@@ -32,7 +32,15 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({
       ]}
     >
       <View style={styles.imgContainer}>
-        <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
+        {food.img ? (
+          <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
+        ) : (
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <Text style={{ color: "#777" }}>No Image</Text>
+          </View>
+        )}
       </View>
       <View style={styles.nameContainer}>
         <Text
