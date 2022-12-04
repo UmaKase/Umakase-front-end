@@ -10,7 +10,8 @@ import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import { commonStyle } from "../../Style/CommonStyle";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { ProfileContext } from "../../Context/ProfileContext";
-import { USERNAME_KEY } from "../../Constants/securestoreKey";
+import { TipsContext } from "../../Context/TipsContext";
+import { functionCategory } from "../../Constants/homeConst";
 type ProfileScreenProps = NativeStackScreenProps<
   ProfileStackProps,
   "ProfileScreen"
@@ -50,9 +51,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={commonStyle.safeArea}>
-        <CustomHeader
-          toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-        ></CustomHeader>
+        <TipsContext.Provider
+          value={{ currentCategory: functionCategory.profile }}
+        >
+          <CustomHeader
+            toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+          ></CustomHeader>
+        </TipsContext.Provider>
         <ProfileContext.Provider
           value={{
             lastName: lastName,

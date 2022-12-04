@@ -72,7 +72,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   //current
   const { lastName, firstName, setLastName, setFirstName } =
     useContext(ProfileContext);
-
   getCurrentRoomName(setCurrentRoomName);
 
   //onload
