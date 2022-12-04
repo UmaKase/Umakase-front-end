@@ -1,7 +1,7 @@
 import { createContext } from "react";
 type TagContextProps = {
   contextTags: string[];
-  setContextTags: (selectedTagsArray?: string[]) => void;
+  setContextTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 export const TagContext = createContext<TagContextProps>({
