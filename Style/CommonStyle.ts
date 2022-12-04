@@ -1,4 +1,4 @@
-import { backgroundColor, drawerColor, errTextColor, lightTextColor, paddingLarge, paddingMedium, textLarge, textMedium, windowHeight, windowWidth } from "../Constants/cssConst";
+import { backgroundColor, drawerColor, errTextColor, lightTextColor, paddingLarge, paddingMedium, paddingSmall, textLarge, textMedium, windowHeight, windowWidth } from "../Constants/cssConst";
 import { StyleSheet } from "react-native";
 
 export const commonStyle = StyleSheet.create({
@@ -8,7 +8,7 @@ export const commonStyle = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
-    paddingTop: paddingLarge,
+    paddingTop: paddingSmall,
     paddingBottom: paddingLarge,
     justifyContent: "flex-start",
   },
