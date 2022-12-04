@@ -253,7 +253,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
         />
       )}
       {/* footer ===================== */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => optionHandler()}
         style={{
           marginTop: "auto",
@@ -280,7 +280,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
           size={windowWidth * 0.12}
           color={lightTextColor}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       {searchMode ? (
         <Modal
           isVisible={searchMode}
