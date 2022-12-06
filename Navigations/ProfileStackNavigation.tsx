@@ -3,7 +3,7 @@ import ProfileScreen from "../Screens/Home/ProfileScreen";
 import ProfileUpdateScreen from "../Screens/Home/ProfileUpdateScreen";
 //Stack Navigation for profile screens
 const ProfileStack = createNativeStackNavigator();
-export const ProfileStackScreen = () => (
+export const ProfileStackNavigation = () => (
   <ProfileStack.Navigator
     screenOptions={{
       headerShown: false,

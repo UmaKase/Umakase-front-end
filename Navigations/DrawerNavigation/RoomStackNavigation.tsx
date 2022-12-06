@@ -1,8 +1,9 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { RoomStackNavigationProps } from "../../Types/Navigations/RoomStack";
+import { RoomStackNavigationProps } from "../../Types/Navigations/HomeDrawer/RoomStack";
 import RoomListScreen from "../../Screens/Home/Room/RoomListScreen";
 import RoomConfigSettingScreen from "../../Screens/Home/Room/CreateRoom/RoomConfigSettingScreen";
+import RoomScreen from "../../Screens/Home/Room/CreateRoom/RoomScreen";
 
 const RoomStack = createNativeStackNavigator<RoomStackNavigationProps>();
 
@@ -15,6 +16,7 @@ const RoomStackNavigation: React.FC = () => {
       <RoomStack.Screen name="RoomListScreen" component={RoomListScreen} />
       {/* prettier-ignore */}
       <RoomStack.Screen name="RoomConfigSettingScreen" component={RoomConfigSettingScreen} />
+      <RoomStack.Screen name="RoomScreen" component={RoomScreen} />
     </RoomStack.Navigator>
   );
 };

@@ -1,5 +1,5 @@
 import { ProfileStackProps } from "Types/Home/Profile/ProfileStackProps";
-
+import { DrawerLabel } from "../../Constants/homeConst";
 export type HomeDrawerNavigationProps = {
   //screens
   RandomScreen: undefined;
@@ -7,8 +7,9 @@ export type HomeDrawerNavigationProps = {
     ProfileScreen: undefined;
     ProfileUpdateScreen: ProfileStackProps;
   };
-  SettingNavigation:{
+  SettingNavigation: {
     SettingScreen: undefined;
   };
   Room: undefined;
+  BookmarkedStackNavigation: undefined;
 };

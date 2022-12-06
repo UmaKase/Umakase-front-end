@@ -1,37 +1,28 @@
 import {
-  drawerColor,
   paddingLarge,
-  paddingMedium,
   textLarge,
   textMedium,
-  windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
-import React, { useEffect, useState } from "react";
-import {
-  ImageSourcePropType,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
-import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
+import { REFRESH_KEY, CURRENTROOM_NAME } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import {
   profileInfoStr,
   profileUpdateMode,
+  profileUpdateTitle,
 } from "../../Constants/ProfileConst";
-import { CommonActions } from "@react-navigation/native";
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
 import { FontAwesome } from "@expo/vector-icons";
 import { commonStyle } from "../../Style/CommonStyle";
+import LoadingSpinner from "../../Components/Auth/LoadingSpinner";
+import { ProfileContext } from "../../Context/ProfileContext";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -42,8 +33,6 @@ interface ProfileInfoProps {
     undefined
   >;
 }
-let imgUrl: string = "";
-let imgSrc: ImageSourcePropType; //profile process
 const profileProcess = async (successCallBack: any) => {
   const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
   if (!localRefreshToken) {
@@ -59,38 +48,32 @@ const profileProcess = async (successCallBack: any) => {
     })
     .catch((e) => console.log(e.response.data));
 };
+// get current room name and set it to state
+const getCurrentRoomName = async (
+  setter: React.Dispatch<React.SetStateAction<string>>
+) => {
+  const tempRoomName = await SecureStore.getItemAsync(CURRENTROOM_NAME);
+  setter(tempRoomName != null ? tempRoomName : profileInfoStr.notSet);
+};
 const ProfileInfo: React.FC<ProfileInfoProps> = ({
   userId,
   setUserId,
   navigation,
 }) => {
-  //logout process
-  const logoutProcess = async () => {
-    const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
-    if (!localRefreshToken) {
-      console.log("No local refresh token");
-      return Alert.alert("Error", "No local refresh token");
-    }
-    axios({
-      method: "post",
-      url: `${AuthAPI}/token/logout`,
-      headers: { Authorization: `Bearer ${localRefreshToken}` },
-    }).then(async (response) => {
-      if (response.status) {
-        await SecureStore.deleteItemAsync(ACCESS_KEY);
-        await SecureStore.deleteItemAsync(REFRESH_KEY);
-        navigation.dispatch(
-          CommonActions.reset({ routes: [{ name: "AuthNavigation" }] })
-        );
-      } else {
-        return Alert.alert("Error", "logout process failed.");
-      }
-    });
-  };
+  //state variable defined
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
-  const [feeding, setFeeding] = useState<boolean>();
-  imgUrl = require("../../Image/Umakase.png");
+  const [userName, setUserName] = useState<string>("");
+  const [currentRoomName, setCurrentRoomName] = useState<string>(
+    profileInfoStr.notSet
+  );
+  const [fetching, setFetching] = useState<boolean>(true);
+
+  //current
+  const { lastName, firstName, setLastName, setFirstName } =
+    useContext(ProfileContext);
+  getCurrentRoomName(setCurrentRoomName);
+
   //onload
   useEffect(() => {
     profileProcess((res: AxiosResponse<any, any>) => {
@@ -100,15 +83,40 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         //set user id in the parent screen
         console.log(resData);
         setUserId(resData.profile.userId);
+        setUserName(resData.profile.username);
         //set user profile to state
         setUseProfileContainer(resData);
+        if (setLastName != undefined && resData.profile.lastname != undefined) {
+          console.log("setLastName:" + resData.profile.lastname);
+          setLastName(resData.profile.lastname);
+        }
+        if (
+          setFirstName != undefined &&
+          resData.profile.firstname != undefined
+        ) {
+          setFirstName(resData.profile.firstname);
+        }
+        setFetching(false);
       } catch (e) {
         console.log(e);
+        const resData = {
+          profile: {
+            id: "",
+            username: "",
+            firstname: "",
+            lastname: "",
+            userId: "",
+          },
+        } as UserProfileContainer;
+        setUseProfileContainer(resData);
+        setFetching(false);
       }
     });
   }, []);
-  return (
-    <View style={[commonStyle.mainContainer, { flex: 0 }]}>
+  return fetching ? (
+    <LoadingSpinner />
+  ) : (
+    <View style={[commonStyle.mainContainer, { paddingTop: paddingLarge }]}>
       <View style={commonStyle.rowContainer}>
         <View style={styles.infoLeftView}>
           <FontAwesome
@@ -119,14 +127,15 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         </View>
         <View style={styles.infoRightView}>
           <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-            {userProfileContainer?.profile.username}
+            {`${lastName} ${firstName}`}
           </Text>
           <Text
             style={[commonStyle.textContainer, { fontSize: textLarge }]}
           >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
         </View>
       </View>
-      <View style={commonStyle.rowContainer}>
+      {/* membership display*/}
+      <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
         <Text style={[commonStyle.textContainer, styles.membership]}>
           {profileInfoStr.membershipHint}
         </Text>
@@ -134,15 +143,28 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           {profileInfoStr.membershipFree}
         </Text>
       </View>
+      {/* */}
       <View style={commonStyle.rowContainer}>
+        <Text style={[commonStyle.textContainer, styles.membership]}>
+          {profileInfoStr.roomHint}
+        </Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>
+          {currentRoomName}
+        </Text>
+      </View>
+      <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
         <TouchableOpacity
           style={commonStyle.button_disable}
-          onPress={() =>
-            navigation.push("ProfileUpdateScreen", {
-              mode: profileUpdateMode.email,
+          onPress={() => {
+            console.log("setLastName::" + setLastName);
+            navigation.navigate("ProfileUpdateScreen", {
+              mode: profileUpdateMode.personalInfo,
               userId: userId ? userId : "",
-            })
-          }
+              userName: userName,
+              setLastName: setLastName,
+              setFirstName: setFirstName,
+            });
+          }}
         >
           <Text style={commonStyle.textContainer}>
             {profileInfoStr.premiumBut}
@@ -153,14 +175,17 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <TouchableOpacity
           style={commonStyle.button_active}
           onPress={() =>
-            navigation.push("ProfileUpdateScreen", {
-              mode: profileUpdateMode.password,
+            navigation.navigate("ProfileUpdateScreen", {
+              mode: profileUpdateMode.personalInfo,
               userId: userId ? userId : "",
+              userName: userName,
+              setLastName: setLastName,
+              setFirstName: setFirstName,
             })
           }
         >
           <Text style={commonStyle.textContainer}>
-            {profileInfoStr.passwordBut}
+            {profileUpdateTitle[profileUpdateMode.personalInfo]}
           </Text>
         </TouchableOpacity>
       </View>
@@ -168,14 +193,15 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <TouchableOpacity
           style={commonStyle.button_active}
           onPress={() =>
-            navigation.push("ProfileUpdateScreen", {
-              mode: profileUpdateMode.email,
+            navigation.navigate("ProfileUpdateScreen", {
+              mode: profileUpdateMode.password,
+              userName: userName,
               userId: userId ? userId : "",
             })
           }
         >
           <Text style={commonStyle.textContainer}>
-            {profileInfoStr.mailBut}
+            {profileUpdateTitle[profileUpdateMode.password]}
           </Text>
         </TouchableOpacity>
       </View>

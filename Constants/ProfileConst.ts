@@ -3,26 +3,32 @@ export const profileScreenStr={
     userListHeaderText:"ルームメイト",
 }
 export const profileInfoStr={
-    membershipHint:"メンバーシップ:",
     IdHint:"id:",
     IdMask:"****",
+    membershipHint:"メンバーシップ:",
     membershipFree:"無料会員",
+    roomHint:"設定ルーム:",
     membershipPremium:"プレミアム会員",
     premiumBut:"プレミアムサービス登録",
-    passwordBut:"パスワード変更",
-    mailBut:"メールアドレス変更",
+    notSet:"未設定",
 }
 //data updated in profile update screen
 export const profileUpdScreenStr={
     errMsgEmpty:"",
-    errMsgUnequip:"入力パスワードは一致しない。",
+    errMsgUnequip:"同じパスワードを入力してください",
+    errMsgNotNull:"下記の資料を入力してください",
+    errMsgLogin:"ログインができません。\nもう一回試してください",
+    errMsgUpdate:"資料更新できません。\nもう一回試してください",
     pwdConfirmHint:"パスワード確認",
     titlePostfix:"更新",
-    newValHint:"新しい",
+    newPwdHint:"新しいパスワード",
     oldPwdHint:"古いパスワード",
+    surnameHint:"氏",
+    lastnameHint:"名",
+    mailHint:"メールアドレス"
 }
 export const profileUpdateMode ={
-    email:0,
+    personalInfo:0,
     password:1,
 }
-export const profileUpdateValueName =["メールアドレス","パスワード"];
+export const profileUpdateTitle =["プロフィール編集","パスワード変更"];
