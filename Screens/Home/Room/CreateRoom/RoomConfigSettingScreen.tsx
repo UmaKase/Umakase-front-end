@@ -7,6 +7,7 @@ import CustomHeader from "../../../../Components/HomeDrawer/CustomHeader";
 import { DrawerActions } from "@react-navigation/native";
 import {
   backgroundColor,
+  paddingLarge,
   windowHeight,
   windowWidth,
 } from "../../../../Constants/cssConst";
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: windowWidth * 0.03,
+    paddingHorizontal: paddingLarge,
     marginTop: windowWidth * 0.01,
   },
   // modal
