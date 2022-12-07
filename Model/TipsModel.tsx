@@ -1,7 +1,8 @@
-import { functionTipsMessage } from "../Constants/homeConst";
+import { functionTipsMessage, tipCloseStr } from "../Constants/homeConst";
 import React, { useContext, useState } from "react";
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { TipsContext } from "../Context/TipsContext";
+import { paddingSmall, windowHeight, windowWidth } from "../Constants/cssConst";
 
 interface ModalProps {
   modalVisible: boolean;
@@ -25,14 +26,16 @@ export const TipsModel: React.FunctionComponent<ModalProps> = ({
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>
-            {functionTipsMessage[currentCategory][tipPage]}
-          </Text>
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <Text style={styles.modalText}>
+              {functionTipsMessage[currentCategory][tipPage]}
+            </Text>
+          </View>
           <Pressable
             style={[styles.button, styles.buttonClose]}
             onPress={() => setModalVisible(!modalVisible)}
           >
-            <Text style={styles.textStyle}>Hide Modal</Text>
+            <Text style={styles.textStyle}>{tipCloseStr}</Text>
           </Pressable>
         </View>
       </View>
@@ -47,9 +50,9 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-    margin: 20,
-    height: 300,
-    width: 200,
+    margin: paddingSmall,
+    height: windowHeight * 0.5,
+    width: windowWidth * 0.7,
     backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
@@ -81,6 +84,6 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 15,
-    textAlign: "center",
+    textAlign: "left",
   },
 });
