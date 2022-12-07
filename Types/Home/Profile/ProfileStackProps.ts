@@ -9,4 +9,5 @@ export type ProfileStackProps = {
     setFirstName?:React.Dispatch<React.SetStateAction<string>>;
     setLastName?:React.Dispatch<React.SetStateAction<string>>;
   };
+  RegisterScreen:undefined;
 };
