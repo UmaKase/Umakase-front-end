@@ -13,7 +13,9 @@ import * as SecureStore from "expo-secure-store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import {
+  profileInfoNum,
   profileInfoStr,
+  profileMembership,
   profileUpdateMode,
   profileUpdateTitle,
 } from "../../Constants/ProfileConst";
@@ -64,6 +66,10 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const [userProfileContainer, setUseProfileContainer] =
     useState<UserProfileContainer>();
   const [userName, setUserName] = useState<string>("");
+  const [membership, setMembership] = useState<number>(
+    profileInfoNum.membershipFree
+  );
+  const [membershipText, setMembershipText] = useState<string>("");
   const [currentRoomName, setCurrentRoomName] = useState<string>(
     profileInfoStr.notSet
   );
@@ -85,10 +91,16 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         console.log(resData);
         setUserId(resData.profile.userId);
         setUserName(resData.profile.username);
+        if (resData.email != null && resData.email != "") {
+          setMembership(profileInfoNum.membershipFree);
+          setMembershipText(profileMembership[profileInfoNum.membershipFree]);
+        } else {
+          setMembership(profileInfoNum.memberUnregister);
+          setMembershipText(profileMembership[profileInfoNum.memberUnregister]);
+        }
         //set user profile to state
         setUseProfileContainer(resData);
         if (setLastName != undefined && resData.profile.lastname != undefined) {
-          console.log("setLastName:" + resData.profile.lastname);
           setLastName(resData.profile.lastname);
         }
         if (
@@ -141,7 +153,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           {profileInfoStr.membershipHint}
         </Text>
         <Text style={[commonStyle.textContainer, styles.membership]}>
-          {profileInfoStr.membershipFree}
+          {membershipText}
         </Text>
       </View>
       {/* */}
@@ -153,25 +165,38 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           {currentRoomName}
         </Text>
       </View>
-      <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
-        <TouchableOpacity
-          style={commonStyle.button_disable}
-          onPress={() => {
-            console.log("setLastName::" + setLastName);
-            navigation.navigate("ProfileUpdateScreen", {
-              mode: profileUpdateMode.personalInfo,
-              userId: userId ? userId : "",
-              userName: userName,
-              setLastName: setLastName,
-              setFirstName: setFirstName,
-            });
-          }}
-        >
-          <Text style={commonStyle.textContainer}>
-            {profileInfoStr.premiumBut}
-          </Text>
-        </TouchableOpacity>
-      </View>
+
+      {membership == profileInfoNum.memberUnregister ? (
+        <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
+          <TouchableOpacity
+            style={commonStyle.button_active}
+            onPress={async () => navigation.navigate("RegisterScreen")}
+          >
+            <Text style={commonStyle.textContainer}>
+              {profileInfoStr.mergedUserRegisterBut}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
+          <TouchableOpacity
+            style={commonStyle.button_disable}
+            onPress={() => {
+              navigation.navigate("ProfileUpdateScreen", {
+                mode: profileUpdateMode.personalInfo,
+                userId: userId ? userId : "",
+                userName: userName,
+                setLastName: setLastName,
+                setFirstName: setFirstName,
+              });
+            }}
+          >
+            <Text style={commonStyle.textContainer}>
+              {profileInfoStr.premiumRegisterBut}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={commonStyle.rowContainer}>
         <TouchableOpacity
           style={commonStyle.button_active}
