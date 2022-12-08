@@ -7,7 +7,6 @@ import {
   DrawerItem,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import RandomScreen from "../Screens/Home/RandomScreen";
 import { HomeDrawerNavigationProps } from "../Types/Navigations/HomeDrawer";
 import {
   drawerColor,
@@ -32,6 +31,7 @@ import { ACCESS_KEY, REFRESH_KEY } from "../Constants/securestoreKey";
 import axios from "axios";
 import { AuthAPI } from "../Constants/backendAPI";
 import * as SecureStore from "expo-secure-store";
+import RandomStackNavigation from "./DrawerNavigation/RandomStackNavigation";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
@@ -73,7 +73,7 @@ const HomeDrawerNavigation: React.FC = () => {
       url: `${AuthAPI}/token/logout`,
       headers: { Authorization: `Bearer ${localRefreshToken}` },
     }).then(async (response) => {
-      if (response.status) {
+      if (response.status === 200) {
         await SecureStore.deleteItemAsync(ACCESS_KEY);
         await SecureStore.deleteItemAsync(REFRESH_KEY);
         navigation.dispatch(
@@ -138,7 +138,7 @@ const HomeDrawerNavigation: React.FC = () => {
   };
   return (
     <Drawer.Navigator
-      initialRouteName="RandomScreen"
+      initialRouteName="RandomStackNavigation"
       screenOptions={{
         headerShown: false,
         drawerStyle: {
@@ -156,9 +156,9 @@ const HomeDrawerNavigation: React.FC = () => {
         component={ProfileStackNavigation}
       />
       <Drawer.Screen
-        name="RandomScreen"
+        name="RandomStackNavigation"
         options={{ drawerLabel: DrawerLabel.random }}
-        component={RandomScreen}
+        component={RandomStackNavigation}
       />
       <Drawer.Screen
         name="BookmarkedStackNavigation"
