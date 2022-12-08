@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -49,6 +49,7 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
       })
       .catch((e) => {
         console.log(e.response.data);
+        return Alert.alert("Error", "Getting room list failed.");
       });
   }, []);
 
