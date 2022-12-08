@@ -34,8 +34,8 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
   const [fetching, setFetching] = useState(true);
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
-  const [roomieNames, setRoomieNames] = useState<string[]>([]);
   const [friends, setFriedns] = useState<User[]>([]);
+  const [roomieNames, setRoomieNames] = useState<string[]>([]);
 
   // create room function
   const createRoom = async () => {
@@ -59,28 +59,21 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
   };
 
   // search mode
-  const [searchMode, setSearchMode] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
-  const searchOn = () => {
-    setSearchMode(true);
-  };
-  const leaveSearchMode = () => {
-    setSearchMode(false);
-  };
-  const searchFriend = useCallback(
-    _.debounce((input: string) => {
-      console.log(input);
-    }, 500),
-    []
-  );
+  // const [searchMode, setSearchMode] = useState(false);
+  // const [searchInput, setSearchInput] = useState("");
+  // const searchOn = () => {
+  //   setSearchMode(true);
+  // };
+  // const leaveSearchMode = () => {
+  //   setSearchMode(false);
+  // };
+  // const searchFriend = useCallback(
+  //   _.debounce((input: string) => {
+  //     console.log(input);
+  //   }, 500),
+  //   []
+  // );
 
-  // useFocusEffect(() => {
-  //   console.log("hi this is set room config screen.");
-
-  //   return () => {
-  //     navigation.goBack();
-  //   };
-  // });
   useEffect(() => {
     console.log("hi this is set room config screen.");
     setFriedns(fakeUserData);
@@ -197,7 +190,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
           </TouchableOpacity>
         </View>
         {/* search modal =================================================== */}
-        <Modal
+        {/* <Modal
           isVisible={searchMode}
           onBackdropPress={() => leaveSearchMode()}
           style={{ margin: 0, justifyContent: "flex-end" }}
@@ -210,7 +203,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
               searchFunction={(input: string) => searchFriend(input)}
             />
           </View>
-        </Modal>
+        </Modal> */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -307,74 +300,74 @@ const fakeUserData = [
     refreshToken: "+C,|J_EO)`",
     tmpId: "Wh}R`:hqCR",
   },
-  {
-    id: "aspernatur",
-    createdAt:
-      "Debitis enim totam doloremque velit. Voluptas harum nam sit totam quam ut voluptates vitae dolor. Beatae et exercitationem dolorum. Quae iure quos autem minus debitis iusto et et alias. At sed quia est consequatur voluptatum autem sit qui. Molestiae corporis nemo perferendis et perferendis eum ut aliquam.\n \rEt mollitia eaque quasi id at. Omnis occaecati aliquam inventore ducimus vitae. Et tempore ducimus voluptatem nam in tempora sit sed et.\n \rVoluptatem beatae optio provident officia facilis hic quaerat in at. Voluptates ea ut ratione odit perspiciatis et et. Explicabo et ducimus temporibus labore repellendus. Voluptatem id sed. Ipsam numquam consequatur et culpa eaque nostrum accusamus alias possimus.",
-    updatedAt:
-      "Omnis rerum quo reprehenderit maiores provident architecto quasi commodi voluptatem.",
-    email: '}[3q1XFz"q',
-    password: "nostrum",
-    refreshToken: "3R@TUZK(Zh",
-    tmpId: "'f6|)I/@s;",
-  },
-  {
-    id: "Ad cumque sunt magni rerum. Nisi non nostrum perferendis qui. Consequuntur ut quia et a unde. Optio ea qui illo sint eius dolorem aperiam ut.\n \rNisi fugit autem consequatur corrupti blanditiis. Expedita expedita labore. Fuga nostrum id repudiandae fugit enim et ut. Omnis ratione corrupti enim nihil fugiat eius et minima reiciendis. Quis repellendus voluptate nihil enim ducimus molestias quae unde sunt. Fugit vero vel dolores sint exercitationem facere dolorem omnis modi.\n \rConsectetur atque similique odit facilis iste qui. Culpa et est. Distinctio et libero aut aliquid sit.",
-    createdAt: "Ex officiis sapiente dolor veniam est.",
-    updatedAt: "et",
-    email: "w.jZTg}C1U",
-    password:
-      "Est non dolor aut quia veniam praesentium dolorem voluptate. Accusantium omnis error facere veniam cupiditate. Numquam doloribus aut ipsam sint dolorum dolor delectus vel.",
-    refreshToken: "CPvm(GO'*|",
-    tmpId: "K2aSP6=OwD",
-  },
-  {
-    id: "Illo est quibusdam et dolor. Voluptas quis nulla ut excepturi est explicabo harum qui.",
-    createdAt: "sunt",
-    updatedAt: "est nobis odit",
-    email: "s1XgY(K<pZ",
-    password: "Maiores similique iste.",
-    refreshToken: "'M9a%cQ'BK",
-    tmpId: "S01x1DDTXU",
-  },
-  {
-    id: "Asperiores alias ut non ex vero.\nEt autem fuga natus odit et sit.\nReiciendis doloremque earum et hic facere unde quo.\nNesciunt nihil eveniet iure sint quo dolores porro hic.\nExercitationem ut molestiae repellendus nisi.",
-    createdAt:
-      "Aliquid dicta ex ullam in sit non. Et delectus commodi corporis aliquam quia qui vel praesentium.",
-    updatedAt:
-      "Inventore eum commodi molestias quo ratione ut maiores aut. Omnis ratione autem. Nobis sint commodi corporis labore dolores unde esse iure. Dolorem quo ut impedit sit nemo sapiente rerum.",
-    email: "6.<#a4kJ=H",
-    password: "Nihil nulla vitae repudiandae. Voluptatibus sapiente sed qui.",
-    refreshToken: "W]tw[iy&Jx",
-    tmpId: '"J0iMQ3JyA',
-  },
-  {
-    id: "Commodi eos sit molestias qui et voluptas cumque nihil dicta. Qui consequatur alias omnis quis officia temporibus.",
-    createdAt: "cumque",
-    updatedAt: "odio",
-    email: "AVadtT+d6P",
-    password:
-      "Voluptas explicabo error eos vel cumque atque voluptatem aut. Soluta qui excepturi id facilis maiores voluptas. At quo atque corporis minus. Odit beatae minus architecto.\n \rId eveniet dignissimos ut voluptate labore veniam in. Rem eveniet ea. Laudantium culpa in enim repudiandae beatae. Alias sit error possimus hic aut unde. Deleniti perferendis magnam doloribus sed. Dolore perferendis ducimus ut sunt et.\n \rEt et dolor. Et id veritatis quo consequatur voluptas. Eaque ea excepturi. Amet ullam voluptatem reprehenderit est facilis maxime minima. Ex et quos voluptatem ea debitis earum est nam. Id recusandae expedita cupiditate voluptatem.",
-    refreshToken: "AuH`S=#@6D",
-    tmpId: "FH8wI[,cd{",
-  },
-  {
-    id: "Impedit vitae reiciendis commodi maiores esse quo in. Numquam culpa dolores architecto sunt ut. Qui sint omnis distinctio explicabo voluptatibus accusantium ut. Ut qui doloribus sunt fugiat est voluptatem veniam. Repellendus nihil nam. Ab et inventore.",
-    createdAt: "Et velit earum distinctio et.",
-    updatedAt:
-      "Beatae earum iusto nihil aspernatur debitis dolorum eaque. Quia rerum est voluptatem saepe corporis rerum et facilis aut. Voluptas et deserunt et deserunt dolores rerum. Aut magnam placeat est unde voluptatem tempore qui odit eum.",
-    email: "_P|-vuv<mm",
-    password: "placeat delectus explicabo",
-    refreshToken: "ZQ_iW\\]xk0",
-    tmpId: "))K7']yh4/",
-  },
-  {
-    id: "Voluptas quos doloribus facilis quae nihil distinctio sint dolor nesciunt.",
-    createdAt: "libero",
-    updatedAt: "Est suscipit consequatur.\nRatione natus animi iure et qui ab.",
-    email: "&nFqyzHwOT",
-    password: "Consequatur est dolore velit sed.",
-    refreshToken: "a:3/ePbC5<",
-    tmpId: "mlm6i(D$)Z",
-  },
+  // {
+  //   id: "aspernatur",
+  //   createdAt:
+  //     "Debitis enim totam doloremque velit. Voluptas harum nam sit totam quam ut voluptates vitae dolor. Beatae et exercitationem dolorum. Quae iure quos autem minus debitis iusto et et alias. At sed quia est consequatur voluptatum autem sit qui. Molestiae corporis nemo perferendis et perferendis eum ut aliquam.\n \rEt mollitia eaque quasi id at. Omnis occaecati aliquam inventore ducimus vitae. Et tempore ducimus voluptatem nam in tempora sit sed et.\n \rVoluptatem beatae optio provident officia facilis hic quaerat in at. Voluptates ea ut ratione odit perspiciatis et et. Explicabo et ducimus temporibus labore repellendus. Voluptatem id sed. Ipsam numquam consequatur et culpa eaque nostrum accusamus alias possimus.",
+  //   updatedAt:
+  //     "Omnis rerum quo reprehenderit maiores provident architecto quasi commodi voluptatem.",
+  //   email: '}[3q1XFz"q',
+  //   password: "nostrum",
+  //   refreshToken: "3R@TUZK(Zh",
+  //   tmpId: "'f6|)I/@s;",
+  // },
+  // {
+  //   id: "Ad cumque sunt magni rerum. Nisi non nostrum perferendis qui. Consequuntur ut quia et a unde. Optio ea qui illo sint eius dolorem aperiam ut.\n \rNisi fugit autem consequatur corrupti blanditiis. Expedita expedita labore. Fuga nostrum id repudiandae fugit enim et ut. Omnis ratione corrupti enim nihil fugiat eius et minima reiciendis. Quis repellendus voluptate nihil enim ducimus molestias quae unde sunt. Fugit vero vel dolores sint exercitationem facere dolorem omnis modi.\n \rConsectetur atque similique odit facilis iste qui. Culpa et est. Distinctio et libero aut aliquid sit.",
+  //   createdAt: "Ex officiis sapiente dolor veniam est.",
+  //   updatedAt: "et",
+  //   email: "w.jZTg}C1U",
+  //   password:
+  //     "Est non dolor aut quia veniam praesentium dolorem voluptate. Accusantium omnis error facere veniam cupiditate. Numquam doloribus aut ipsam sint dolorum dolor delectus vel.",
+  //   refreshToken: "CPvm(GO'*|",
+  //   tmpId: "K2aSP6=OwD",
+  // },
+  // {
+  //   id: "Illo est quibusdam et dolor. Voluptas quis nulla ut excepturi est explicabo harum qui.",
+  //   createdAt: "sunt",
+  //   updatedAt: "est nobis odit",
+  //   email: "s1XgY(K<pZ",
+  //   password: "Maiores similique iste.",
+  //   refreshToken: "'M9a%cQ'BK",
+  //   tmpId: "S01x1DDTXU",
+  // },
+  // {
+  //   id: "Asperiores alias ut non ex vero.\nEt autem fuga natus odit et sit.\nReiciendis doloremque earum et hic facere unde quo.\nNesciunt nihil eveniet iure sint quo dolores porro hic.\nExercitationem ut molestiae repellendus nisi.",
+  //   createdAt:
+  //     "Aliquid dicta ex ullam in sit non. Et delectus commodi corporis aliquam quia qui vel praesentium.",
+  //   updatedAt:
+  //     "Inventore eum commodi molestias quo ratione ut maiores aut. Omnis ratione autem. Nobis sint commodi corporis labore dolores unde esse iure. Dolorem quo ut impedit sit nemo sapiente rerum.",
+  //   email: "6.<#a4kJ=H",
+  //   password: "Nihil nulla vitae repudiandae. Voluptatibus sapiente sed qui.",
+  //   refreshToken: "W]tw[iy&Jx",
+  //   tmpId: '"J0iMQ3JyA',
+  // },
+  // {
+  //   id: "Commodi eos sit molestias qui et voluptas cumque nihil dicta. Qui consequatur alias omnis quis officia temporibus.",
+  //   createdAt: "cumque",
+  //   updatedAt: "odio",
+  //   email: "AVadtT+d6P",
+  //   password:
+  //     "Voluptas explicabo error eos vel cumque atque voluptatem aut. Soluta qui excepturi id facilis maiores voluptas. At quo atque corporis minus. Odit beatae minus architecto.\n \rId eveniet dignissimos ut voluptate labore veniam in. Rem eveniet ea. Laudantium culpa in enim repudiandae beatae. Alias sit error possimus hic aut unde. Deleniti perferendis magnam doloribus sed. Dolore perferendis ducimus ut sunt et.\n \rEt et dolor. Et id veritatis quo consequatur voluptas. Eaque ea excepturi. Amet ullam voluptatem reprehenderit est facilis maxime minima. Ex et quos voluptatem ea debitis earum est nam. Id recusandae expedita cupiditate voluptatem.",
+  //   refreshToken: "AuH`S=#@6D",
+  //   tmpId: "FH8wI[,cd{",
+  // },
+  // {
+  //   id: "Impedit vitae reiciendis commodi maiores esse quo in. Numquam culpa dolores architecto sunt ut. Qui sint omnis distinctio explicabo voluptatibus accusantium ut. Ut qui doloribus sunt fugiat est voluptatem veniam. Repellendus nihil nam. Ab et inventore.",
+  //   createdAt: "Et velit earum distinctio et.",
+  //   updatedAt:
+  //     "Beatae earum iusto nihil aspernatur debitis dolorum eaque. Quia rerum est voluptatem saepe corporis rerum et facilis aut. Voluptas et deserunt et deserunt dolores rerum. Aut magnam placeat est unde voluptatem tempore qui odit eum.",
+  //   email: "_P|-vuv<mm",
+  //   password: "placeat delectus explicabo",
+  //   refreshToken: "ZQ_iW\\]xk0",
+  //   tmpId: "))K7']yh4/",
+  // },
+  // {
+  //   id: "Voluptas quos doloribus facilis quae nihil distinctio sint dolor nesciunt.",
+  //   createdAt: "libero",
+  //   updatedAt: "Est suscipit consequatur.\nRatione natus animi iure et qui ab.",
+  //   email: "&nFqyzHwOT",
+  //   password: "Consequatur est dolore velit sed.",
+  //   refreshToken: "a:3/ePbC5<",
+  //   tmpId: "mlm6i(D$)Z",
+  // },
 ];
