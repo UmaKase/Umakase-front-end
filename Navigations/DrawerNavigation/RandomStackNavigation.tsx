@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import RandomResultScreen from "../../Screens/Home/Random/RandomResultScreen";
-import RandomScreen from "../../Screens/Home/RandomScreen";
+import RandomScreen from "../../Screens/Home/Random/RandomScreen";
 import { RandomStackNavigationProps } from "../../Types/Navigations/HomeDrawer/RandomStack";
 
 const RandomStackNavigation: React.FC = () => {

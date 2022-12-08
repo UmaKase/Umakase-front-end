@@ -2,12 +2,12 @@ import { DrawerActions } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
+import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
 import {
   lightTextColor,
   windowHeight,
   windowWidth,
-} from "../../Constants/cssConst";
+} from "../../../Constants/cssConst";
 import {
   Entypo,
   FontAwesome,
@@ -15,17 +15,17 @@ import {
   Fontisto,
 } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
-import { RoomAPI } from "../../Constants/backendAPI";
-import { HomeDrawerNavigationProps } from "../../Types/Navigations/HomeDrawer";
+import customAxiosInstance from "../../../Utils/customAxiosInstance";
+import { RoomAPI } from "../../../Constants/backendAPI";
+import { HomeDrawerNavigationProps } from "../../../Types/Navigations/HomeDrawer";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { getItemAsync, setItemAsync } from "expo-secure-store";
 import {
   CURRENTROOM_ID,
   CURRENTROOM_NAME,
-} from "../../Constants/securestoreKey";
+} from "../../../Constants/securestoreKey";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RandomStackNavigationProps } from "../../Types/Navigations/HomeDrawer/RandomStack";
+import { RandomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RandomStack";
 
 type RandomScreenProps = NativeStackScreenProps<
   RandomStackNavigationProps,
