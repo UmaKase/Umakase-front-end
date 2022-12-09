@@ -31,16 +31,12 @@ type RandomScreenProps = NativeStackScreenProps<
   RandomStackNavigationProps,
   "RandomScreen"
 >;
-// type RandomScreenProps = DrawerScreenProps<
-//   HomeDrawerNavigationProps,
-//   "RandomScreen"
-// >;
 
 const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
-  const [currentRoomId, setCurrentRoomId] = useState<string>("");
-  const [currentRoomName, setCurrentRoomName] = useState<string>("");
   const [fetching, setFetching] = useState(true);
   const [mode, setMode] = useState(1);
+  const [currentRoomId, setCurrentRoomId] = useState<string>("");
+  const [currentRoomName, setCurrentRoomName] = useState<string>("");
 
   const randomFunction = () => {
     switch (mode) {
@@ -66,6 +62,7 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
     if (!roomId || !roomName) {
       return Alert.alert("Error", "Cannot get room id and name!");
     }
+    // set room info to state
     setCurrentRoomId(roomId);
     setCurrentRoomName(roomName);
   };
@@ -74,6 +71,14 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
     getCurrentRoomInfo();
     setFetching(false);
   }, []);
+
+  // go random result screen
+  const randomButtonHandler = () => {
+    navigation.navigate("RandomResultScreen", {
+      roomId: currentRoomId,
+      roomName: currentRoomName,
+    });
+  };
 
   return (
     <SafeAreaProvider>
@@ -158,7 +163,7 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
             <View style={styles.startContainer}>
               <TouchableOpacity
                 style={styles.startBtn}
-                onPress={() => console.log("Start")}
+                onPress={randomButtonHandler}
               >
                 <Text style={{ fontSize: windowWidth * 0.1, color: "#FFF" }}>
                   Start
