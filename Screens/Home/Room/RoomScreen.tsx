@@ -74,7 +74,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
         setRoomName(
           res.data.data.room.name === "__default"
             ? "Default"
-            : res.data.data.food.name
+            : res.data.data.room.name
         );
         if (res.data.data.room.description) {
           setRoomDescription(res.data.data.room.description);
