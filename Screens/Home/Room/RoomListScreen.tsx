@@ -37,21 +37,24 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
   useEffect(() => {
-    // get room list
-    customAxiosInstance({
-      method: "get",
-      url: `${RoomAPI}/`,
-    })
-      .then((res) => {
-        console.log(res.data.data.rooms);
-        setRooms(res.data.data.rooms);
-        setFetching(false);
+    const unSubscribe = navigation.addListener("focus", () => {
+      // get room list
+      customAxiosInstance({
+        method: "get",
+        url: `${RoomAPI}/`,
       })
-      .catch((e) => {
-        console.log(e.response.data);
-        return Alert.alert("Error", "Getting room list failed.");
-      });
-  }, []);
+        .then((res) => {
+          console.log(res.data.data.rooms);
+          setRooms(res.data.data.rooms);
+          setFetching(false);
+        })
+        .catch((e) => {
+          console.log(e.response.data);
+          return Alert.alert("Error", "Getting room list failed.");
+        });
+    });
+    return unSubscribe;
+  }, [navigation]);
 
   const createRoom = () => {
     navigation.navigate("RoomConfigSettingScreen");
