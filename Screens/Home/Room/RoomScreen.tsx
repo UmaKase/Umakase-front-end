@@ -16,8 +16,8 @@ import customAxiosInstance from "../../../Utils/customAxiosInstance";
 import { RoomAPI } from "../../../Constants/backendAPI";
 import { getItemAsync, setItemAsync } from "expo-secure-store";
 import {
-  CURRENTROOM_ID,
-  CURRENTROOM_NAME,
+  CURRENTROOM_ID_KEY,
+  CURRENTROOM_NAME_KEY,
 } from "../../../Constants/securestoreKey";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { UserContext } from "../../../Context/UserContext";
@@ -43,8 +43,8 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
     if (!roomName) {
       return console.log("error: there is no roomName data.");
     }
-    await setItemAsync(CURRENTROOM_ID, roomId);
-    await setItemAsync(CURRENTROOM_NAME, roomName);
+    await setItemAsync(CURRENTROOM_ID_KEY, roomId);
+    await setItemAsync(CURRENTROOM_NAME_KEY, roomName);
     navigation.goBack();
     return Alert.alert(
       "Notification",
@@ -57,7 +57,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
   };
 
   const checkRoomIsUsed = async () => {
-    const currentRoom = await getItemAsync(CURRENTROOM_ID);
+    const currentRoom = await getItemAsync(CURRENTROOM_ID_KEY);
     if (currentRoom === roomId) {
       setRoomIsUsed(true);
     }

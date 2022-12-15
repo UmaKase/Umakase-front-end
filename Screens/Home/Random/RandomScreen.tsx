@@ -21,8 +21,8 @@ import { HomeDrawerNavigationProps } from "../../../Types/Navigations/HomeDrawer
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { getItemAsync, setItemAsync } from "expo-secure-store";
 import {
-  CURRENTROOM_ID,
-  CURRENTROOM_NAME,
+  CURRENTROOM_ID_KEY,
+  CURRENTROOM_NAME_KEY,
 } from "../../../Constants/securestoreKey";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RandomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RandomStack";
@@ -57,8 +57,8 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
 
   const getCurrentRoomInfo = async () => {
     // getting room id and name from the SecureStore
-    const roomId = await getItemAsync(CURRENTROOM_ID);
-    const roomName = await getItemAsync(CURRENTROOM_NAME);
+    const roomId = await getItemAsync(CURRENTROOM_ID_KEY);
+    const roomName = await getItemAsync(CURRENTROOM_NAME_KEY);
     if (!roomId || !roomName) {
       return Alert.alert("Error", "Cannot get room id and name!");
     }
