@@ -1,5 +1,5 @@
 import { Alert, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   createDrawerNavigator,
   DrawerContentComponentProps,
@@ -27,16 +27,48 @@ import {
 import { DrawerLabel, logoutPopout } from "../Constants/homeConst";
 import BookmarkedStackNavigation from "./DrawerNavigation/BookmarkedStackNavigation";
 import { deleteItemAsync } from "expo-secure-store";
-import { ACCESS_KEY, REFRESH_KEY } from "../Constants/securestoreKey";
+import {
+  ACCESS_KEY,
+  CURRENTROOM_ID_KEY,
+  CURRENTROOM_NAME_KEY,
+  REFRESH_KEY,
+} from "../Constants/securestoreKey";
 import axios from "axios";
 import { AuthAPI } from "../Constants/backendAPI";
 import * as SecureStore from "expo-secure-store";
 import RandomStackNavigation from "./DrawerNavigation/RandomStackNavigation";
+import { CurrentRoomInfo, GlobalContext } from "../Context/GlobalContext";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
 const HomeDrawerNavigation: React.FC = () => {
+  // navigation instance
   const navigation = useNavigation();
+
+  // global state
+  const [currentRoomId, setCurrentRoomId] = useState("");
+  const [currentRoomName, setCurrentRoomName] = useState("");
+  // getCurrentRoomFunction
+  const getCurrentRoomFunction = async () => {
+    let roomId = await SecureStore.getItemAsync(CURRENTROOM_ID_KEY);
+    let roomName = await SecureStore.getItemAsync(CURRENTROOM_NAME_KEY);
+    if (!roomId || !roomName) {
+      return Alert.alert("Error", "No current room been set!");
+    }
+    console.log(roomId);
+    console.log(roomName);
+    setCurrentRoomId(roomId);
+    setCurrentRoomName(roomName);
+  };
+  // setCurrentRoomFunction
+  const setCurrentRoomFunction = (inputRoom: CurrentRoomInfo) => {
+    setCurrentRoomId(inputRoom.id);
+    setCurrentRoomName(inputRoom.name);
+    SecureStore.setItemAsync(CURRENTROOM_ID_KEY, inputRoom.id);
+    SecureStore.setItemAsync(CURRENTROOM_NAME_KEY, inputRoom.name);
+  };
+
+  // logout function
   const logoutFunction = () => {
     return Alert.alert(logoutPopout.title, logoutPopout.description, [
       {
@@ -84,56 +116,72 @@ const HomeDrawerNavigation: React.FC = () => {
       }
     });
   };
+  // for initial loading
+  useEffect(() => {
+    getCurrentRoomFunction();
+    return () => {};
+  }, []);
+
   const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     return (
-      <DrawerContentScrollView {...props}>
-        <DrawerItemList {...props} />
-        {/* devide line */}
-        <DrawerItem
-          label=""
-          onPress={() => {}}
-          style={{
-            height: 0,
-            width: windowWidth * 0.63,
-            borderWidth: 0.5,
-            borderColor: "#FFF",
-            marginVertical: windowHeight * 0.02,
-          }}
-        />
-        {/* Profile Button */}
-        <DrawerItem
-          label={DrawerLabel.profile}
-          onPress={() => {
-            navigation.dispatch(DrawerActions.jumpTo("ProfileStackNavigation"));
-          }}
-          icon={() => (
-            <Entypo name="user" size={windowWidth * 0.06} color="#FFF" />
-          )}
-          labelStyle={{
-            color: "#FFF",
-            fontSize: windowWidth * 0.04,
-            fontWeight: "500",
-          }}
-        />
-        {/* Logout Button */}
-        <DrawerItem
-          label={DrawerLabel.logout}
-          onPress={() => logoutFunction()}
-          icon={() => (
-            <Entypo name="log-out" size={windowWidth * 0.06} color="#FFF" />
-          )}
-          labelStyle={{
-            color: "#FFF",
-            fontSize: windowWidth * 0.04,
-            fontWeight: "500",
-          }}
-        />
-        <Drawer.Screen
-          name="ProfileNavigation"
-          options={{ drawerLabel: DrawerLabel.profile }}
-          component={ProfileStackNavigation}
-        ></Drawer.Screen>
-      </DrawerContentScrollView>
+      <GlobalContext.Provider
+        value={{
+          currentRoomId: currentRoomId,
+          currentRoomName: currentRoomName,
+          setCurrentRoom: setCurrentRoomFunction,
+        }}
+      >
+        <DrawerContentScrollView {...props}>
+          <DrawerItemList {...props} />
+          {/* devide line */}
+          <DrawerItem
+            label=""
+            onPress={() => {}}
+            style={{
+              height: 0,
+              width: windowWidth * 0.63,
+              borderWidth: 0.5,
+              borderColor: "#FFF",
+              marginVertical: windowHeight * 0.02,
+            }}
+          />
+          {/* Profile Button */}
+          <DrawerItem
+            label={DrawerLabel.profile}
+            onPress={() => {
+              navigation.dispatch(
+                DrawerActions.jumpTo("ProfileStackNavigation")
+              );
+            }}
+            icon={() => (
+              <Entypo name="user" size={windowWidth * 0.06} color="#FFF" />
+            )}
+            labelStyle={{
+              color: "#FFF",
+              fontSize: windowWidth * 0.04,
+              fontWeight: "500",
+            }}
+          />
+          {/* Logout Button */}
+          <DrawerItem
+            label={DrawerLabel.logout}
+            onPress={() => logoutFunction()}
+            icon={() => (
+              <Entypo name="log-out" size={windowWidth * 0.06} color="#FFF" />
+            )}
+            labelStyle={{
+              color: "#FFF",
+              fontSize: windowWidth * 0.04,
+              fontWeight: "500",
+            }}
+          />
+          <Drawer.Screen
+            name="ProfileNavigation"
+            options={{ drawerLabel: DrawerLabel.profile }}
+            component={ProfileStackNavigation}
+          ></Drawer.Screen>
+        </DrawerContentScrollView>
+      </GlobalContext.Provider>
     );
   };
   return (
