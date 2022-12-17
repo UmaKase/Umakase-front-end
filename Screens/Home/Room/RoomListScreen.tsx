@@ -59,8 +59,8 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
   const createRoom = () => {
     navigation.navigate("RoomConfigSettingScreen");
   };
-  const goRoom = (roomId: string) => {
-    navigation.navigate("RoomScreen", { roomId: roomId });
+  const goRoom = (roomId: string, roomName: string) => {
+    navigation.navigate("RoomScreen", { roomId: roomId, roomName: roomName });
   };
   return (
     <SafeAreaProvider>
@@ -80,7 +80,9 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
                   return (
                     <RoomBox
                       key={item.room.id}
-                      onPressHandler={() => goRoom(item.room.id)}
+                      onPressHandler={() =>
+                        goRoom(item.room.id, item.room.name)
+                      }
                       roomName={item.room.name}
                     />
                   );
