@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RandomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RandomStack";
 import Background from "../../../Components/Universal/Background";
@@ -13,6 +13,8 @@ import customAxiosInstance from "../../../Utils/customAxiosInstance";
 import { FoodAPI, ImgAPI } from "../../../Constants/backendAPI";
 import CacheImage from "../../../Components/Universal/CacheImage";
 import CenterActivityIndicator from "../../../Components/Universal/CenterActivityIndicator";
+import { Food } from "../../../Types/types";
+import { GlobalContext } from "../../../Context/GlobalContext";
 
 type RandomResultScreenProps = NativeStackScreenProps<
   RandomStackNavigationProps,
@@ -23,26 +25,47 @@ const RandomResultScreen: React.FC<RandomResultScreenProps> = ({
   navigation,
 }) => {
   // getting room id & name from the route
-  const { roomId, roomName } = route.params;
+  const { currentRoomId } = useContext(GlobalContext);
   // fetching state
   const [fetching, setFetching] = useState<boolean>(true);
-
+  // foods
+  const [foods, setFoods] = useState<Food[]>([]);
   // food info
-  const [foodName, setFoodName] = useState<string>("foodname");
-  const [foodImgUrl, setFoodImgUrl] = useState<string>("");
+  const [currentFood, setCurrentFood] = useState(0);
+  // refetching foods
+  const [disabledBtn, setDisabledBtn] = useState(false);
+
+  // get next random food from foods array
+  const nextFood = () => {
+    setDisabledBtn(true);
+    if (currentFood == 4) {
+      randomFoodFunction();
+      return setTimeout(() => {
+        setDisabledBtn(false);
+      }, 200);
+    }
+    setCurrentFood((prev) => prev + 1);
+    return setTimeout(() => {
+      setDisabledBtn(false);
+    }, 200);
+  };
 
   // fetch random food function
   const randomFoodFunction = async () => {
     setFetching(true);
-    customAxiosInstance({
+    await customAxiosInstance({
       method: "get",
-      url: `${FoodAPI}/random/${roomId}`,
-    }).then((res) => {
-      // console.log(res.data.data.randomFoods[0].img);
-      setFoodName(res.data.data.randomFoods[0].name);
-      setFoodImgUrl(`${ImgAPI}/food/${res.data.data.randomFoods[0].img}`);
-      setFetching(false);
-    });
+      url: `${FoodAPI}/random/${currentRoomId}?count=5`,
+    })
+      .then((res) => {
+        console.log(res.data.data.randomFoods[0]);
+        setFoods(res.data.data.randomFoods);
+        setCurrentFood(0);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setFetching(false);
   };
   // useEffect for initial loading
   useEffect(() => {
@@ -56,40 +79,51 @@ const RandomResultScreen: React.FC<RandomResultScreenProps> = ({
   };
   return (
     <Background>
-      <View style={styles.foodCircle}>
-        {fetching ? (
-          <CenterActivityIndicator size="large" color="#FFF" />
-        ) : (
-          <CacheImage url={foodImgUrl} style={styles.foodImgStyle} />
-        )}
-      </View>
-      <View style={styles.controlBar}>
-        <TouchableOpacity onPress={goBackRandomScreen}>
-          <FontAwesome
-            name="chevron-left"
-            size={windowWidth * 0.08}
-            color="#FFF"
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("heart btn")}>
-          <FontAwesome5 name="heart" size={windowWidth * 0.08} color="#FFF" />
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.foodName}>{foodName}</Text>
-      <View style={styles.decisionBar}>
-        <TouchableOpacity
-          onPress={randomFoodFunction}
-          style={[styles.decisionButton, { backgroundColor: "#ECAC72" }]}
-        >
-          <Text style={styles.decisionButtonText}>次の料理</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => console.log("削除する")}
-          style={[styles.decisionButton, { backgroundColor: "#F44D4D" }]}
-        >
-          <Text style={styles.decisionButtonText}>削除する</Text>
-        </TouchableOpacity>
-      </View>
+      {fetching ? (
+        <CenterActivityIndicator size="large" color="#FFF" />
+      ) : (
+        <>
+          <View style={styles.foodCircle}>
+            <CacheImage
+              url={`${ImgAPI}/food/${foods[currentFood].img}`}
+              style={styles.foodImgStyle}
+            />
+          </View>
+          <View style={styles.controlBar}>
+            <TouchableOpacity onPress={goBackRandomScreen}>
+              <FontAwesome
+                name="chevron-left"
+                size={windowWidth * 0.08}
+                color="#FFF"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => console.log("heart btn")}>
+              <FontAwesome5
+                name="heart"
+                size={windowWidth * 0.08}
+                color="#FFF"
+              />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.foodName}>{foods[currentFood].name}</Text>
+          <View style={styles.decisionBar}>
+            <TouchableOpacity
+              disabled={disabledBtn}
+              onPress={nextFood}
+              style={[styles.decisionButton, { backgroundColor: "#ECAC72" }]}
+            >
+              <Text style={styles.decisionButtonText}>次の料理</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              disabled={disabledBtn}
+              onPress={() => console.log("削除する")}
+              style={[styles.decisionButton, { backgroundColor: "#F44D4D" }]}
+            >
+              <Text style={styles.decisionButtonText}>削除する</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </Background>
   );
 };
