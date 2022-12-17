@@ -1,5 +1,5 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { RoomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RoomStack";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Background from "../../../Components/Universal/Background";
@@ -24,6 +24,7 @@ import { UserContext } from "../../../Context/UserContext";
 import { profileScreenStr } from "../../../Constants/ProfileConst";
 import { User } from "../../../Types/types";
 import UserList from "../../../Components/Home/UserList";
+import { GlobalContext } from "../../../Context/GlobalContext";
 type RoomScreenProps = NativeStackScreenProps<
   RoomStackNavigationProps,
   "RoomScreen"
@@ -31,6 +32,10 @@ type RoomScreenProps = NativeStackScreenProps<
 const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
   // const [Room, setRoom] = useState<>();
   const { roomId } = route.params;
+
+  const { currentRoomId, setCurrentRoom } = useContext(GlobalContext);
+
+  console.log(currentRoomId);
 
   const [roomIsUsed, setRoomIsUsed] = useState<boolean>(false);
   const [roomName, setRoomName] = useState();
@@ -43,8 +48,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
     if (!roomName) {
       return console.log("error: there is no roomName data.");
     }
-    await setItemAsync(CURRENTROOM_ID_KEY, roomId);
-    await setItemAsync(CURRENTROOM_NAME_KEY, roomName);
+    setCurrentRoom({ id: roomId, name: roomName });
     navigation.goBack();
     return Alert.alert(
       "Notification",
@@ -54,13 +58,6 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
 
   const deleteRoomFunction = () => {
     console.log(`delete room ${roomName}!`);
-  };
-
-  const checkRoomIsUsed = async () => {
-    const currentRoom = await getItemAsync(CURRENTROOM_ID_KEY);
-    if (currentRoom === roomId) {
-      setRoomIsUsed(true);
-    }
   };
 
   useEffect(() => {
@@ -80,9 +77,6 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
           setRoomDescription(res.data.data.room.description);
         }
         setRoomMembers(res.data.data.room.user);
-      })
-      .then(() => {
-        checkRoomIsUsed();
       })
       .catch((e) => {
         console.log(e);
@@ -138,7 +132,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
         style={styles.changeRoomButton}
       >
         <Text style={{ fontSize: textMedium, color: lightTextColor }}>
-          {roomIsUsed ? "ルーム利用中" : "choose room"}
+          {roomId == currentRoomId ? "ルーム利用中" : "choose room"}
         </Text>
       </TouchableOpacity>
       <UserContext.Provider
