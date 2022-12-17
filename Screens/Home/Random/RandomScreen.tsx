@@ -1,5 +1,5 @@
 import { DrawerActions } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
@@ -15,17 +15,9 @@ import {
   Fontisto,
 } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import customAxiosInstance from "../../../Utils/customAxiosInstance";
-import { RoomAPI } from "../../../Constants/backendAPI";
-import { HomeDrawerNavigationProps } from "../../../Types/Navigations/HomeDrawer";
-import { DrawerScreenProps } from "@react-navigation/drawer";
-import { getItemAsync, setItemAsync } from "expo-secure-store";
-import {
-  CURRENTROOM_ID_KEY,
-  CURRENTROOM_NAME_KEY,
-} from "../../../Constants/securestoreKey";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RandomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RandomStack";
+import { GlobalContext } from "../../../Context/GlobalContext";
 
 type RandomScreenProps = NativeStackScreenProps<
   RandomStackNavigationProps,
@@ -35,8 +27,9 @@ type RandomScreenProps = NativeStackScreenProps<
 const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
   const [fetching, setFetching] = useState(true);
   const [mode, setMode] = useState(1);
-  const [currentRoomId, setCurrentRoomId] = useState<string>("");
-  const [currentRoomName, setCurrentRoomName] = useState<string>("");
+
+  // get global context
+  const { currentRoomId, currentRoomName } = useContext(GlobalContext);
 
   const randomFunction = () => {
     switch (mode) {
@@ -55,21 +48,10 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
     }
   };
 
-  const getCurrentRoomInfo = async () => {
-    // getting room id and name from the SecureStore
-    const roomId = await getItemAsync(CURRENTROOM_ID_KEY);
-    const roomName = await getItemAsync(CURRENTROOM_NAME_KEY);
-    if (!roomId || !roomName) {
-      return Alert.alert("Error", "Cannot get room id and name!");
-    }
-    // set room info to state
-    setCurrentRoomId(roomId);
-    setCurrentRoomName(roomName);
-  };
-
   useEffect(() => {
-    getCurrentRoomInfo();
     setFetching(false);
+
+    return () => {};
   }, []);
 
   // go random result screen
