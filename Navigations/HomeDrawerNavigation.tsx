@@ -55,8 +55,6 @@ const HomeDrawerNavigation: React.FC = () => {
     if (!roomId || !roomName) {
       return Alert.alert("Error", "No current room been set!");
     }
-    console.log(roomId);
-    console.log(roomName);
     setCurrentRoomId(roomId);
     setCurrentRoomName(roomName);
   };
@@ -124,106 +122,104 @@ const HomeDrawerNavigation: React.FC = () => {
 
   const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     return (
-      <GlobalContext.Provider
-        value={{
-          currentRoomId: currentRoomId,
-          currentRoomName: currentRoomName,
-          setCurrentRoom: setCurrentRoomFunction,
-        }}
-      >
-        <DrawerContentScrollView {...props}>
-          <DrawerItemList {...props} />
-          {/* devide line */}
-          <DrawerItem
-            label=""
-            onPress={() => {}}
-            style={{
-              height: 0,
-              width: windowWidth * 0.63,
-              borderWidth: 0.5,
-              borderColor: "#FFF",
-              marginVertical: windowHeight * 0.02,
-            }}
-          />
-          {/* Profile Button */}
-          <DrawerItem
-            label={DrawerLabel.profile}
-            onPress={() => {
-              navigation.dispatch(
-                DrawerActions.jumpTo("ProfileStackNavigation")
-              );
-            }}
-            icon={() => (
-              <Entypo name="user" size={windowWidth * 0.06} color="#FFF" />
-            )}
-            labelStyle={{
-              color: "#FFF",
-              fontSize: windowWidth * 0.04,
-              fontWeight: "500",
-            }}
-          />
-          {/* Logout Button */}
-          <DrawerItem
-            label={DrawerLabel.logout}
-            onPress={() => logoutFunction()}
-            icon={() => (
-              <Entypo name="log-out" size={windowWidth * 0.06} color="#FFF" />
-            )}
-            labelStyle={{
-              color: "#FFF",
-              fontSize: windowWidth * 0.04,
-              fontWeight: "500",
-            }}
-          />
-          <Drawer.Screen
-            name="ProfileNavigation"
-            options={{ drawerLabel: DrawerLabel.profile }}
-            component={ProfileStackNavigation}
-          ></Drawer.Screen>
-        </DrawerContentScrollView>
-      </GlobalContext.Provider>
+      <DrawerContentScrollView {...props}>
+        <DrawerItemList {...props} />
+        {/* devide line */}
+        <DrawerItem
+          label=""
+          onPress={() => {}}
+          style={{
+            height: 0,
+            width: windowWidth * 0.63,
+            borderWidth: 0.5,
+            borderColor: "#FFF",
+            marginVertical: windowHeight * 0.02,
+          }}
+        />
+        {/* Profile Button */}
+        <DrawerItem
+          label={DrawerLabel.profile}
+          onPress={() => {
+            navigation.dispatch(DrawerActions.jumpTo("ProfileStackNavigation"));
+          }}
+          icon={() => (
+            <Entypo name="user" size={windowWidth * 0.06} color="#FFF" />
+          )}
+          labelStyle={{
+            color: "#FFF",
+            fontSize: windowWidth * 0.04,
+            fontWeight: "500",
+          }}
+        />
+        {/* Logout Button */}
+        <DrawerItem
+          label={DrawerLabel.logout}
+          onPress={() => logoutFunction()}
+          icon={() => (
+            <Entypo name="log-out" size={windowWidth * 0.06} color="#FFF" />
+          )}
+          labelStyle={{
+            color: "#FFF",
+            fontSize: windowWidth * 0.04,
+            fontWeight: "500",
+          }}
+        />
+        <Drawer.Screen
+          name="ProfileNavigation"
+          options={{ drawerLabel: DrawerLabel.profile }}
+          component={ProfileStackNavigation}
+        ></Drawer.Screen>
+      </DrawerContentScrollView>
     );
   };
   return (
-    <Drawer.Navigator
-      initialRouteName="RandomStackNavigation"
-      screenOptions={{
-        headerShown: false,
-        drawerStyle: {
-          backgroundColor: drawerColor,
-        },
-        drawerActiveTintColor: drawerColor,
-        drawerInactiveTintColor: lightTextColor,
-        drawerActiveBackgroundColor: "#FFF",
+    <GlobalContext.Provider
+      value={{
+        currentRoomId: currentRoomId,
+        currentRoomName: currentRoomName,
+        setCurrentRoom: setCurrentRoomFunction,
       }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
-      <Drawer.Screen
-        name="ProfileNavigation"
-        options={{ drawerLabel: DrawerLabel.profile }}
-        component={ProfileStackNavigation}
-      />
-      <Drawer.Screen
-        name="RandomStackNavigation"
-        options={{ drawerLabel: DrawerLabel.random }}
-        component={RandomStackNavigation}
-      />
-      <Drawer.Screen
-        name="BookmarkedStackNavigation"
-        options={{ drawerLabel: DrawerLabel.bookmarked }}
-        component={BookmarkedStackNavigation}
-      />
-      <Drawer.Screen
-        name="Room"
-        options={{ drawerLabel: DrawerLabel.room }}
-        component={RoomStackNavigation}
-      />
-      <Drawer.Screen
-        name="SettingNavigation"
-        options={{ drawerLabel: DrawerLabel.setting }}
-        component={SettingStackNavigation}
-      />
-    </Drawer.Navigator>
+      <Drawer.Navigator
+        initialRouteName="RandomStackNavigation"
+        screenOptions={{
+          headerShown: false,
+          drawerStyle: {
+            backgroundColor: drawerColor,
+          },
+          drawerActiveTintColor: drawerColor,
+          drawerInactiveTintColor: lightTextColor,
+          drawerActiveBackgroundColor: "#FFF",
+        }}
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+      >
+        <Drawer.Screen
+          name="ProfileNavigation"
+          options={{ drawerLabel: DrawerLabel.profile }}
+          component={ProfileStackNavigation}
+        />
+        <Drawer.Screen
+          name="RandomStackNavigation"
+          options={{ drawerLabel: DrawerLabel.random }}
+          component={RandomStackNavigation}
+        />
+        <Drawer.Screen
+          name="BookmarkedStackNavigation"
+          options={{ drawerLabel: DrawerLabel.bookmarked }}
+          component={BookmarkedStackNavigation}
+        />
+        <Drawer.Screen
+          name="Room"
+          options={{ drawerLabel: DrawerLabel.room }}
+          component={RoomStackNavigation}
+        />
+        <Drawer.Screen
+          name="SettingNavigation"
+          options={{ drawerLabel: DrawerLabel.setting }}
+          component={SettingStackNavigation}
+        />
+      </Drawer.Navigator>
+    </GlobalContext.Provider>
   );
 };
 
