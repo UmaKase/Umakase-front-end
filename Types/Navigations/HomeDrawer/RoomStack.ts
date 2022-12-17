@@ -3,5 +3,6 @@ export type RoomStackNavigationProps = {
   RoomConfigSettingScreen: undefined;
   RoomScreen: {
     roomId: string;
+    roomName: string;
   };
 };
