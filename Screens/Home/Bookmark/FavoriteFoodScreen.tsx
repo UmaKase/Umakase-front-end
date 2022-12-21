@@ -1,6 +1,7 @@
 import {
   Alert,
   FlatList,
+  ListRenderItemInfo,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,25 +14,21 @@ import Background from "../../../Components/Universal/Background";
 import SearchBarForBookMark from "../../../Components/Home/Bookmark/SearchBarForBookMark";
 import {
   backgroundColor,
-  lightTextColor,
-  paddingMedium,
-  textLarge,
   windowHeight,
   windowWidth,
 } from "../../../Constants/cssConst";
 import ControlBar from "../../../Components/Home/Bookmark/ControlBar";
-import { FontAwesome } from "@expo/vector-icons";
 import { BookMarkFood, Food, FoodsList } from "../../../Types/InitialSteps";
 import customAxiosInstance from "../../../Utils/customAxiosInstance";
 import ToggleFood from "../../../Components/InitialStep/ToggleFood";
 import { FoodAPI, RoomAPI } from "../../../Constants/backendAPI";
 import CenterActivityIndicator from "../../../Components/Universal/CenterActivityIndicator";
-import { TagContext } from "../../../Context/TagContext";
 import Modal from "react-native-modal";
 import axios from "axios";
 import _ from "lodash";
 import ToggleFoodForSearch from "../../../Components/InitialStep/ToggleFoodForSearch";
 import SearchBar from "../../../Components/InitialStep/SearchBar";
+import Footer from "../../../Components/InitialStep/Footer";
 
 type Props = NativeStackScreenProps<BookmarkedStackProps, "FavoriteFoodScreen">;
 const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
@@ -161,7 +158,55 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }, [modalPage]);
 
-  // update room's food library
+  // useCallback to return renderItem for flatlist
+  // const mainScreenFoods = useCallback(
+  //   (item: Food, index: number, flag: boolean) => {
+  //     console.log(flag);
+  //     return (
+  //       <ToggleFood
+  //         key={index.toString()}
+  //         food={item}
+  //         checked={flag}
+  //         onPressHandler={() => {
+  //           if (flag) {
+  //             console.log("now is true.");
+  //             setSelectedFood((prev) => prev.filter((id) => id !== item.id));
+  //           } else {
+  //             console.log("now is false.");
+  //             setSelectedFood((prev) => [...prev, item.id]);
+  //           }
+  //         }}
+  //       />
+  //     );
+  //   },
+  //   []
+  // );
+  // foodcard
+  const mainScreenFoods = (info: ListRenderItemInfo<Food>) => {
+    const { item, index } = info;
+    let flag = selectedFood.find((selectedFood) => selectedFood === item.id)
+      ? true
+      : false;
+    return (
+      <ToggleFood
+        key={index.toString()}
+        food={item}
+        checked={flag}
+        onPressHandler={() => {
+          if (flag) {
+            console.log("now is true.");
+            setSelectedFood((prev) => prev.filter((id) => id !== item.id));
+          } else {
+            console.log("now is false.");
+            setSelectedFood((prev) => [...prev, item.id]);
+          }
+        }}
+      />
+    );
+  };
+
+  //
+  // TODO update room's food library
   const updateFoodHandler = () => {
     customAxiosInstance({
       url: `${RoomAPI}/update/`,
@@ -217,42 +262,22 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
       ) : (
         <FlatList
           data={showFood}
-          extraData={showFood}
-          keyExtractor={(item, index) => index.toString()}
           // keyExtractor={(item, index) => index.toString()}
           style={{ flex: 1 }}
           columnWrapperStyle={{ justifyContent: "space-evenly" }}
           numColumns={2}
-          renderItem={({ item, index }) => {
-            const isChecked = !!selectedFood.find!!(
-              (foodId) => foodId === item.id
-            );
-            return (
-              <ToggleFood
-                food={item}
-                checked={isChecked}
-                onPressHandler={() => {
-                  const temptFood = food[index];
-                  if (isChecked) {
-                    setSelectedFood((prev) =>
-                      prev.filter((id) => id !== item.id)
-                    );
-                  } else {
-                    setSelectedFood((prev) => [...prev, item.id]);
-                    setFood((prev) => {
-                      return [
-                        temptFood,
-                        ...prev.filter((target) => target !== temptFood),
-                      ];
-                    });
-                  }
-                }}
-              ></ToggleFood>
-            );
-          }}
+          renderItem={mainScreenFoods}
         />
       )}
       {/* footer ===================== */}
+      {/* <View style={styles.footerContainer}>
+        
+      </View> */}
+      <Footer
+        goBackFunc={() => navigation.goBack()}
+        goNextFunc={() => console.log("no next step so far.")}
+        skipFunc={() => console.log("no skip function.")}
+      />
       {/* <TouchableOpacity
         onPress={() => optionHandler()}
         style={{
@@ -357,6 +382,13 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
 export default FavoriteFoodScreen;
 
 const styles = StyleSheet.create({
+  // footer
+  footerContainer: {
+    width: windowWidth,
+    height: windowHeight * 0.1,
+    borderWidth: 1,
+  },
+
   // modal
   modal: {
     margin: 0,
