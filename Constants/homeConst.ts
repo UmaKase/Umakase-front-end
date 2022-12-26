@@ -40,8 +40,4 @@ export const functionTipsMessage={
     6:["このページはプロフィールページです。プロフィールと現在のメンバーシップを確認することができます。"],
     7:[""],
     8:["このページは設定ページです。アプリ関する設定を変更できます。Umakaseの使用案内と制約を確認することもできます。"]}
-<<<<<<< HEAD
 export const tipCloseStr="閉じる";
-=======
-export const tipCloseStr="閉じる";
->>>>>>> origin/function/profile
