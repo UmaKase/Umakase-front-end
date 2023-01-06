@@ -2,4 +2,5 @@
 export type SettingStackProps = {
   //screens
   SettingScreen: undefined;
+  ReportScreen: undefined;
 };
