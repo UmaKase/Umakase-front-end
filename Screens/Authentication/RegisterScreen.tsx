@@ -12,195 +12,135 @@ import {
 import {
   backgroundColor,
   cornerRadius,
+  paddingLarge,
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
-import { Fontisto, Feather, FontAwesome } from "@expo/vector-icons";
+import {
+  Fontisto,
+  Feather,
+  FontAwesome,
+  FontAwesome5,
+} from "@expo/vector-icons";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI } from "../../Constants/backendAPI";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthNavigationProps } from "../../Types/Navigations/Auth";
 import AuthInputWithErrMsg from "../../Components/Auth/AuthInputWithErrMsg";
 import { registerError } from "../../Types/api";
+import AuthInput from "../../Components/Auth/AuthInput";
+import RegisterInput from "../../Components/Auth/RegisterInput";
+import SubmitButton from "../../Components/Auth/SubmitButton";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
-  //useState
+  //states for
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
-  const [emailErrMsgShow, setEmailErrMsgShow] = useState(false);
-  const [usernameErrMsgShow, setUsernameErrMsgShow] = useState(false);
-  const [passwordErrMsgShow, setPasswordErrMsgShow] = useState(false);
 
-  const RegisterProcess = async () => {
-    if (
-      email == "" ||
-      username == "" ||
-      password == "" ||
-      passwordCheck == ""
-    ) {
-      return Alert.alert("Error", "Missing input value!");
-    } else if (password != passwordCheck) {
-      return Alert.alert(
-        "Password check failed",
-        "The password input is not the same, please check it again!"
-      );
-    }
-    axios({
-      method: "post",
-      url: `${AuthAPI}/register`,
-      data: {
-        email: email,
-        username: username,
-        password: password,
-        firstname: "",
-        lastname: "",
-      },
-    })
-      .then((result) => {
-        return Alert.alert("Register", "Register success!", [
-          { text: "OK", onPress: () => navigation.pop() },
-        ]);
-      })
-      .catch((e) => {
-        setEmailErrMsgShow(false);
-        setUsernameErrMsgShow(false);
-        setPasswordErrMsgShow(false);
-        const errors = e.response.data.data.error as registerError[];
-        let errorMsg = "";
-        errors.forEach((error) => {
-          console.log("param:", error.param);
-          if (errorMsg === "") {
-            errorMsg = `${errorMsg}${error.param}:${error.msg}`;
-          } else {
-            errorMsg = `${errorMsg}\n${error.param}:${error.msg}`;
-          }
-          if (error.param == "email") {
-            setEmailErrMsgShow(true);
-          }
-          if (error.param == "username") {
-            setUsernameErrMsgShow(true);
-          }
-          if (error.param == "password") {
-            setPasswordErrMsgShow(true);
-          }
-        });
-        return Alert.alert("Register error", errorMsg);
-      });
-  };
+  // error show
+  const [emailErr, setEmailErr] = useState(false);
+  const [usernameErr, setUsernameErr] = useState(false);
+  const [firstNameErr, setFirstNameErr] = useState(false);
+  const [lastNameErr, setLastNameErr] = useState(false);
+  const [passwordErr, setPasswordErr] = useState(false);
+  const [passwordCheckErr, setPasswordCheckErr] = useState(false);
 
+  function register() {
+    console.log("register");
+    setEmailErr(!emailErr);
+    setPasswordErr(!passwordErr);
+    setPasswordCheckErr(!passwordCheckErr);
+  }
+
+  const iconSize = windowWidth * 0.07;
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAvoidingView behavior="position">
-          {/* Header */}
-          <View style={styles.topContainer}>
-            <TouchableOpacity
-              style={styles.goback}
-              onPress={() => navigation.goBack()}
-            >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <FontAwesome
                 name="angle-double-left"
-                size={windowWidth * 0.12}
+                size={windowWidth * 0.1}
                 color="#FFF"
               />
             </TouchableOpacity>
-            <Text style={styles.headerTextContainer}>Register</Text>
+            <Text style={styles.headerText}>新規会員登録</Text>
           </View>
-          {/* Body */}
-          <View style={styles.mainContainer}>
-            <AuthInputWithErrMsg
+          <View style={styles.inputContainer}>
+            <RegisterInput
               InputIcon={
-                <Fontisto name="email" size={windowWidth * 0.07} color="#FFF" />
+                <FontAwesome name="user" size={iconSize} color="#FFF" />
               }
               SetInputState={setEmail}
-              PlaceHolder="Enter email"
+              PlaceHolder="メールアドレス"
               PasswordMode={false}
+              errMsg="plz enter valid email"
+              errorShow={emailErr}
             />
-            {emailErrMsgShow ? (
-              <View style={styles.errMsgContainer}>
-                <Text style={styles.errMsg}>
-                  Email should be 12345@123.12 format
-                </Text>
-              </View>
-            ) : (
-              <></>
-            )}
-            <AuthInputWithErrMsg
+            <RegisterInput
               InputIcon={
-                <Feather name="user" size={windowWidth * 0.07} color="#FFF" />
+                <FontAwesome name="user" size={iconSize} color="#FFF" />
               }
               SetInputState={setUsername}
-              PlaceHolder="Enter user name"
+              PlaceHolder="ユーザー名"
               PasswordMode={false}
+              errMsg="plz enter valid email"
+              errorShow={usernameErr}
             />
-            {usernameErrMsgShow ? (
-              <View style={styles.errMsgContainer}>
-                <Text style={styles.errMsg}>
-                  Username should be at least 5 letters long
-                </Text>
-              </View>
-            ) : (
-              <></>
-            )}
-            <AuthInputWithErrMsg
+            <RegisterInput
               InputIcon={
-                <Fontisto
-                  name="locked"
-                  size={windowWidth * 0.07}
-                  color="#FFF"
-                />
+                <FontAwesome name="user" size={iconSize} color="#FFF" />
+              }
+              SetInputState={setFirstName}
+              PlaceHolder="姓"
+              PasswordMode={false}
+              errMsg="plz enter valid email"
+              errorShow={firstNameErr}
+            />
+            <RegisterInput
+              InputIcon={
+                <FontAwesome name="user" size={iconSize} color="#FFF" />
+              }
+              SetInputState={setLastName}
+              PlaceHolder="名"
+              PasswordMode={false}
+              errMsg="plz enter valid email"
+              errorShow={lastNameErr}
+            />
+            <RegisterInput
+              InputIcon={
+                <FontAwesome5 name="unlock-alt" size={iconSize} color="#FFF" />
               }
               SetInputState={setPassword}
-              PlaceHolder="Enter password"
+              PlaceHolder="パスワード"
               PasswordMode={true}
+              errMsg="plz enter valid email"
+              errorShow={passwordErr}
             />
-            {passwordErrMsgShow ? (
-              <View style={styles.errMsgContainer}>
-                <Text style={styles.errMsg}>
-                  Password should be at least 5 letters long
-                </Text>
-              </View>
-            ) : (
-              <></>
-            )}
-            <AuthInputWithErrMsg
+            <RegisterInput
               InputIcon={
-                <Fontisto
-                  name="locked"
-                  size={windowWidth * 0.07}
-                  color="#FFF"
-                />
+                <FontAwesome5 name="unlock-alt" size={iconSize} color="#FFF" />
               }
               SetInputState={setPasswordCheck}
-              PlaceHolder="Enter password again"
+              PlaceHolder="確認用パスワード"
               PasswordMode={true}
+              errMsg="plz enter valid email"
+              errorShow={passwordCheckErr}
             />
-            {passwordErrMsgShow ? (
-              <View style={styles.errMsgContainer}>
-                <Text style={styles.errMsg}>
-                  Password should be at least 5 letters long
-                </Text>
-              </View>
-            ) : (
-              <></>
-            )}
           </View>
         </KeyboardAvoidingView>
-        {/* Footer */}
-        <View style={styles.bottomContainer}>
-          <View style={styles.cuttingBottomContainer}>
-            {/* Auth container */}
-            <TouchableOpacity
-              style={styles.authBtn}
-              onPress={() => RegisterProcess()}
-            >
-              <Text style={styles.btnText}>SUBMIT</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.submitContainer}>
+          <SubmitButton text="登録" onPressHandler={register} />
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -214,69 +154,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: backgroundColor,
   },
-  //Header
-  topContainer: {
-    width: windowWidth,
-    height: windowHeight * 0.2,
+  header: {
+    flex: 0.1,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingBottom: windowHeight * 0.05,
+    paddingLeft: paddingLarge,
   },
-  goback: {
-    width: windowWidth * 0.12,
-    height: windowWidth * 0.12,
-    marginRight: windowWidth * 0.88,
+  inputContainer: {
+    flex: 0.5,
     alignItems: "center",
-    justifyContent: "center",
   },
-  headerTextContainer: {
+  headerText: {
+    fontSize: windowWidth * 0.06,
     color: "#FFF",
-    fontFamily: "MajorMonoDisplay",
-    fontSize: 54,
-    paddingTop: windowHeight * 0.02,
+    marginLeft: windowWidth * 0.21,
   },
-  //Body
-  mainContainer: {
-    width: windowWidth,
-    height: windowHeight * 0.5,
+  submitContainer: {
     alignItems: "center",
-    justifyContent: "center",
-    borderTopLeftRadius: cornerRadius,
-    borderBottomRightRadius: cornerRadius,
-  },
-  //Footer
-  bottomContainer: {
-    width: windowWidth,
-    height: windowHeight * 0.3,
-  },
-  cuttingBottomContainer: {
-    flex: 1,
-    backgroundColor: backgroundColor,
-    borderTopLeftRadius: cornerRadius,
-    borderBottomRightRadius: windowHeight * 0.3,
-    alignItems: "center",
-    // justifyContent: "center",
-  },
-  authBtn: {
-    width: windowWidth * 0.5,
-    height: windowHeight * 0.07,
-    marginTop: cornerRadius / 1.5,
-    borderWidth: 1.5,
-    borderColor: "#FFF",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  btnText: {
-    fontSize: windowWidth * 0.075,
-    color: "#FFF",
-  },
-  errMsgContainer: {
-    width: windowWidth * 0.85,
-    // alignItems: "flex-start",
-    // justifyContent: "flex-start",
-  },
-  errMsg: {
-    color: "#F00",
+    marginBottom: windowHeight * 0.05,
   },
 });
