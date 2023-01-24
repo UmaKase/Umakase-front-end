@@ -8,9 +8,18 @@ export const commonStyle = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
+    margin: paddingLarge,
     paddingTop: paddingSmall,
     paddingBottom: paddingLarge,
     justifyContent: "flex-start",
+  },
+  titleContainer:{
+    marginTop:0,
+    marginBottom:paddingLarge,
+  },
+  blockContainer:{
+    marginTop:paddingLarge,
+    marginBottom:paddingLarge,
   },
   rowContainer: {
     flexDirection: "row",
@@ -23,6 +32,11 @@ export const commonStyle = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     marginBottom: windowHeight * 0.04,
+  },
+  sideContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
   button_active: {
     alignItems: "center",

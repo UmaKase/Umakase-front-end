@@ -1,4 +1,4 @@
-import { DrawerActions } from "@react-navigation/native";
+import { DrawerActions, useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
 import { functionCategory } from "../../../Constants/homeConst";
@@ -33,6 +33,12 @@ type ReportScreenProps = NativeStackScreenProps<
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const [typeChecked, setTypeChecked] = React.useState("comment");
   const [reportComment, setReportComment] = React.useState("");
+  //if user go back to this page, it will redirect to profile page
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => navigation.navigate("SettingScreen");
+    }, [])
+  );
   return (
     <SafeAreaProvider>
       <SafeAreaView style={commonStyle.safeArea}>
@@ -44,17 +50,23 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           ></CustomHeader>
         </TipsContext.Provider>
         <View style={commonStyle.mainContainer}>
-          <View style={commonStyle.rowContainer}></View>
-          <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
-            {reportScreenConst.reportTitle}
-          </Text>
-          <View style={commonStyle.rowContainer}>
+          <View style={[commonStyle.rowContainer, commonStyle.titleContainer]}>
+            <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
+              {reportScreenConst.reportTitle}
+            </Text>
+          </View>
+          <View style={[commonStyle.rowContainer, commonStyle.blockContainer]}>
             <Text style={[commonStyle.textContainer, , { textAlign: "left" }]}>
               {reportScreenConst.reportDesc}
             </Text>
           </View>
           <View
-            style={[commonStyle.rowContainer, { justifyContent: "flex-start" }]}
+            style={[
+              commonStyle.rowContainer,
+              ,
+              commonStyle.blockContainer,
+              { justifyContent: "flex-start" },
+            ]}
           >
             <RadioButton.Group
               onValueChange={(newValue) => setTypeChecked(newValue)}
@@ -87,7 +99,12 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
             </RadioButton.Group>
           </View>
           <View
-            style={[commonStyle.rowContainer, { height: windowHeight * 0.06 }]}
+            style={[
+              commonStyle.rowContainer,
+              ,
+              commonStyle.blockContainer,
+              { height: windowHeight * 0.06 },
+            ]}
           >
             <TextInput
               style={styles.textbox}
@@ -97,6 +114,31 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
               numberOfLines={4}
               onChangeText={setReportComment}
             ></TextInput>
+          </View>
+        </View>
+        <View style={[commonStyle.footer]}>
+          <View style={commonStyle.sideContainer}>
+            <TouchableOpacity
+              style={[styles.modeBtn]}
+              onPress={() => {
+                navigation.navigate("SettingScreen");
+              }}
+            >
+              <FontAwesome
+                name="arrow-left"
+                size={windowWidth * 0.09}
+                color={lightTextColor}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={commonStyle.sideContainer}>
+            <TouchableOpacity style={[styles.modeBtn]} onPress={() => {}}>
+              <FontAwesome
+                name="check"
+                size={windowWidth * 0.09}
+                color={lightTextColor}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
@@ -121,7 +163,6 @@ const styles = StyleSheet.create({
     width: windowWidth,
     height: windowHeight * 0.2,
     flex: 0.9,
-    fontSize: windowWidth * 0.06,
     color: lightTextColor,
     borderBottomWidth: 1,
     backgroundColor: drawerColor,

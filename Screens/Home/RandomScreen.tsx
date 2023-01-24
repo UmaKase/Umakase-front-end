@@ -16,6 +16,8 @@ import { RoomAPI } from "../../Constants/backendAPI";
 import { HomeDrawerNavigationProps } from "../../Types/Navigations/HomeDrawer";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { setItemAsync } from "expo-secure-store";
+import { TipsContext } from "../../Context/TipsContext";
+import { functionCategory } from "../../Constants/homeConst";
 
 type RandomScreenProps = DrawerScreenProps<
   HomeDrawerNavigationProps,
@@ -72,11 +74,15 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
         ) : (
           <View style={styles.background}>
             {/* header =========================================== */}
-            <CustomHeader
-              toggleMenu={() =>
-                navigation.dispatch(DrawerActions.toggleDrawer())
-              }
-            ></CustomHeader>
+            <TipsContext.Provider
+              value={{ currentCategory: functionCategory.random }}
+            >
+              <CustomHeader
+                toggleMenu={() =>
+                  navigation.dispatch(DrawerActions.toggleDrawer())
+                }
+              ></CustomHeader>
+            </TipsContext.Provider>
             {/* mode  =========================================== */}
             <View style={styles.modeContainer}>
               {/* left arrow */}
