@@ -29,7 +29,7 @@ const SearchBarForBookMark: React.FC<Props> = ({
       <TextInput
         style={styles.searchbar}
         value={input}
-        autoFocus={true}
+        autoFocus={false}
         onChangeText={(newText) => {
           setInput(newText);
           searchFunction(newText);

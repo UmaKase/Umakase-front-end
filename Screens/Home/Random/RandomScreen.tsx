@@ -1,9 +1,13 @@
 import { DrawerActions } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
-import { windowHeight, windowWidth } from "../../Constants/cssConst";
+import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
+import {
+  lightTextColor,
+  windowHeight,
+  windowWidth,
+} from "../../../Constants/cssConst";
 import {
   Entypo,
   FontAwesome,
@@ -11,23 +15,23 @@ import {
   Fontisto,
 } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
-import { RoomAPI } from "../../Constants/backendAPI";
-import { HomeDrawerNavigationProps } from "../../Types/Navigations/HomeDrawer";
-import { DrawerScreenProps } from "@react-navigation/drawer";
-import { setItemAsync } from "expo-secure-store";
-import { TipsContext } from "../../Context/TipsContext";
-import { functionCategory } from "../../Constants/homeConst";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RandomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RandomStack";
+import { GlobalContext } from "../../../Context/GlobalContext";
+import { functionCategory } from "../../../Constants/homeConst";
+import { TipsContext } from "../../../Context/TipsContext";
 
-type RandomScreenProps = DrawerScreenProps<
-  HomeDrawerNavigationProps,
+type RandomScreenProps = NativeStackScreenProps<
+  RandomStackNavigationProps,
   "RandomScreen"
 >;
 
 const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
-  const [defaultRoomId, setDefaultRoomId] = useState();
   const [fetching, setFetching] = useState(true);
   const [mode, setMode] = useState(1);
+
+  // get global context
+  const { currentRoomId, currentRoomName } = useContext(GlobalContext);
 
   const randomFunction = () => {
     switch (mode) {
@@ -46,26 +50,20 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
     }
   };
 
-  const getRoomInfo = async () => {
-    // get default room id
-    await customAxiosInstance({
-      method: "get",
-      url: `${RoomAPI}/`,
-    })
-      .then((getRooms) => {
-        setDefaultRoomId(getRooms.data.data.rooms[0].room.id);
-      })
-      .catch((e) => {
-        console.log("get rooms Error:", e.response.data.message);
-        return Alert.alert("Error", "not getting default room!");
-      });
+  useEffect(() => {
+    setFetching(false);
+
+    return () => {};
+  }, []);
+
+  // go random result screen
+  const randomButtonHandler = () => {
+    navigation.navigate("RandomResultScreen", {
+      roomId: currentRoomId,
+      roomName: currentRoomName,
+    });
   };
 
-  useEffect(() => {
-    getRoomInfo().then(() => {
-      setFetching(false);
-    });
-  }, []);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -153,7 +151,7 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
             <View style={styles.startContainer}>
               <TouchableOpacity
                 style={styles.startBtn}
-                onPress={() => console.log(defaultRoomId)}
+                onPress={randomButtonHandler}
               >
                 <Text style={{ fontSize: windowWidth * 0.1, color: "#FFF" }}>
                   Start
@@ -163,11 +161,23 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
             {/* notify text */}
             <View
               // prettier-ignore
-              style={{flex: 0.3, alignItems: "center", justifyContent: "center",}}
+              style={{flex: 0.3, alignItems: "center", justifyContent: "center",borderWidth:1}}
             >
               <Text style={{ fontSize: windowWidth * 0.07, color: "#FFF" }}>
                 まず献立を決めます
               </Text>
+              <Text
+                style={{
+                  color: lightTextColor,
+                  fontSize: windowWidth * 0.04,
+                  marginVertical: windowHeight * 0.01,
+                  width: windowWidth * 0.5,
+                  flexWrap: "wrap",
+                }}
+              >{`Room id: ${currentRoomId}`}</Text>
+              <Text
+                style={{ color: lightTextColor, fontSize: windowWidth * 0.04 }}
+              >{`Room name: ${currentRoomName}`}</Text>
             </View>
             {/* bottom part */}
             <View

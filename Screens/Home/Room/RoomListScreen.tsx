@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -37,26 +37,30 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
   useEffect(() => {
-    // get room list
-    customAxiosInstance({
-      method: "get",
-      url: `${RoomAPI}/`,
-    })
-      .then((res) => {
-        console.log(res.data.data.rooms);
-        setRooms(res.data.data.rooms);
-        setFetching(false);
+    const unSubscribe = navigation.addListener("focus", () => {
+      // get room list
+      customAxiosInstance({
+        method: "get",
+        url: `${RoomAPI}/`,
       })
-      .catch((e) => {
-        console.log(e.response.data);
-      });
-  }, []);
+        .then((res) => {
+          console.log(res.data.data.rooms);
+          setRooms(res.data.data.rooms);
+          setFetching(false);
+        })
+        .catch((e) => {
+          console.log(e.response.data);
+          return Alert.alert("Error", "Getting room list failed.");
+        });
+    });
+    return unSubscribe;
+  }, [navigation]);
 
   const createRoom = () => {
     navigation.navigate("RoomConfigSettingScreen");
   };
-  const goRoom = (roomId: string) => {
-    navigation.navigate("RoomScreen", { roomId: roomId });
+  const goRoom = (roomId: string, roomName: string) => {
+    navigation.navigate("RoomScreen", { roomId: roomId, roomName: roomName });
   };
   return (
     <SafeAreaProvider>
@@ -76,7 +80,9 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
                   return (
                     <RoomBox
                       key={item.room.id}
-                      onPressHandler={() => goRoom(item.room.id)}
+                      onPressHandler={() =>
+                        goRoom(item.room.id, item.room.name)
+                      }
                       roomName={item.room.name}
                     />
                   );

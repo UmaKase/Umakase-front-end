@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Food } from "../../Types/InitialSteps";
 import {
   backgroundColor,
@@ -12,19 +12,25 @@ import CacheImage from "../Universal/CacheImage";
 
 interface ToggleFoodProps {
   food: Food;
-  checked: boolean;
+  // checked: boolean;
   onPressHandler: () => void;
 }
 
 const ToggleFood: React.FC<ToggleFoodProps> = ({
   food,
-  checked,
+  // checked,
   onPressHandler,
 }) => {
+  const [checked, setChecked] = useState(food.checked);
+  useEffect(() => {
+    console.log("render item");
+  }, []);
+
   return (
     <TouchableOpacity
       onPress={() => {
         onPressHandler();
+        setChecked((prev) => !prev);
       }}
       style={[
         styles.cardBackground,

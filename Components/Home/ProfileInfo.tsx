@@ -8,7 +8,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
-import { REFRESH_KEY, CURRENTROOM_NAME } from "../../Constants/securestoreKey";
+import {
+  REFRESH_KEY,
+  CURRENTROOM_NAME_KEY,
+} from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
@@ -54,7 +57,7 @@ const profileProcess = async (successCallBack: any) => {
 const getCurrentRoomName = async (
   setter: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const tempRoomName = await SecureStore.getItemAsync(CURRENTROOM_NAME);
+  const tempRoomName = await SecureStore.getItemAsync(CURRENTROOM_NAME_KEY);
   setter(tempRoomName != null ? tempRoomName : profileInfoStr.notSet);
 };
 const ProfileInfo: React.FC<ProfileInfoProps> = ({

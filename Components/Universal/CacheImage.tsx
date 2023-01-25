@@ -38,7 +38,8 @@ const CacheImage: React.FC<Props> = ({ url, style }) => {
       setFetching(false);
       setSource(uri);
     });
-  }, []);
+    return console.log("refetching img...");
+  }, [url]);
 
   return fetching ? (
     <ActivityIndicator size="large" color="#FFF" style={styles.centerObject} />
