@@ -41,3 +41,30 @@ export const functionTipsMessage={
     7:["このページに選択したおすすめ料理をリストされています。"],
     8:[""]}
 export const tipCloseStr="閉じる";
+export const registerErrorCategory={
+    default:0,
+    emailInput:1,
+    usernameInput:2,
+    passwordInput:3,
+    confirmPasswordInput:4,
+    emailExist:5,
+    emailInvalid:6,
+    passwordUnmatch:7,
+    passwordMinimum:8,
+}
+export const registerErrorMessage={
+    0:"",
+    1:"メールアドレスを入力してください。",
+    2:"ユーザー名を入力してください。",
+    3:"パスワードを入力してください。",
+    4:"確認用パスワードを入力ください。",
+    5:"メールアドレスが登録されています。別のメールアドレスを入力ください。",
+    6:"有効のメールアドレスを入力してください。",
+    7:"確認パスワードはパスポートと不一致です。もう一回入力してください。",
+    8:"パスワードは5文字以上で入力してください。",
+}
+
+export const registerResultTitle={
+    success:"登録成功",
+    failure:"登録失敗",
+}

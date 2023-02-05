@@ -31,11 +31,16 @@ import { registerError } from "../../Types/api";
 import AuthInput from "../../Components/Auth/AuthInput";
 import RegisterInput from "../../Components/Auth/RegisterInput";
 import SubmitButton from "../../Components/Auth/SubmitButton";
+import {
+  registerErrorCategory,
+  registerErrorMessage,
+  registerResultTitle,
+} from "../../Constants/homeConst";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
-  //states for
+  //value of input field
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -43,7 +48,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
 
-  // error show
+  //flag for input error msg
   const [emailErr, setEmailErr] = useState(false);
   const [usernameErr, setUsernameErr] = useState(false);
   const [firstNameErr, setFirstNameErr] = useState(false);
@@ -51,11 +56,79 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [passwordErr, setPasswordErr] = useState(false);
   const [passwordCheckErr, setPasswordCheckErr] = useState(false);
 
+  const resetErrMsg = () => {
+    setEmailErr(false);
+    setUsernameErr(false);
+    setFirstNameErr(false);
+    setLastNameErr(false);
+    setPasswordErr(false);
+    setPasswordCheckErr(false);
+  };
+  const RegisterProcess = async () => {
+    //input empty check
+    resetErrMsg();
+    let preCheck = true;
+    if (email == undefined || email == "") {
+      setEmailErr(true);
+      preCheck = false;
+    }
+    if (username == undefined || username == "") {
+      setUsernameErr(true);
+      preCheck = false;
+    }
+    if (password == undefined || password == "") {
+      setPasswordErr(true);
+      preCheck = false;
+    }
+    if (passwordCheck == undefined || passwordCheck == "") {
+      setPasswordCheckErr(true);
+      preCheck = false;
+    }
+    if (password != passwordCheck) {
+      preCheck = false;
+      return Alert.alert(
+        registerResultTitle.failure,
+        registerErrorMessage[registerErrorCategory.passwordUnmatch]
+      );
+    }
+    if (preCheck) {
+      axios({
+        method: "post",
+        url: `${AuthAPI}/register`,
+        data: {
+          email: email,
+          username: username,
+          password: password,
+          firstname: firstName,
+          lastname: lastName,
+        },
+      })
+        .then((result) => {
+          return Alert.alert("Register", "Register success!", [
+            { text: "OK", onPress: () => navigation.pop() },
+          ]);
+        })
+        .catch((e) => {
+          setEmailErr(false);
+          setUsernameErr(false);
+          setPasswordErr(false);
+          setPasswordCheckErr(false);
+          const errors = e.response.data.data.error as registerError[];
+          let errorMsg = "";
+          errors.forEach((error) => {
+            console.log(`$error:${error.msg}, param:${error.param}`);
+            if (errorMsg === "") {
+              errorMsg = `${errorMsg}${error.param}:${error.msg}`;
+            } else {
+              errorMsg = `${errorMsg}\n${error.param}:${error.msg}`;
+            }
+          });
+          return Alert.alert(registerResultTitle.failure, errorMsg);
+        });
+    }
+  };
   function register() {
-    console.log("register");
-    setEmailErr(!emailErr);
-    setPasswordErr(!passwordErr);
-    setPasswordCheckErr(!passwordCheckErr);
+    RegisterProcess();
   }
 
   const iconSize = windowWidth * 0.07;
@@ -84,7 +157,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setEmail}
               PlaceHolder="メールアドレス"
               PasswordMode={false}
-              errMsg="plz enter valid email"
+              errMsg={registerErrorMessage[registerErrorCategory.emailInput]}
               errorShow={emailErr}
             />
             <RegisterInput
@@ -94,7 +167,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setUsername}
               PlaceHolder="ユーザー名"
               PasswordMode={false}
-              errMsg="plz enter valid email"
+              errMsg={registerErrorMessage[registerErrorCategory.usernameInput]}
               errorShow={usernameErr}
             />
             <RegisterInput
@@ -124,7 +197,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setPassword}
               PlaceHolder="パスワード"
               PasswordMode={true}
-              errMsg="plz enter valid email"
+              errMsg={registerErrorMessage[registerErrorCategory.passwordInput]}
               errorShow={passwordErr}
             />
             <RegisterInput
@@ -134,14 +207,16 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setPasswordCheck}
               PlaceHolder="確認用パスワード"
               PasswordMode={true}
-              errMsg="plz enter valid email"
+              errMsg={
+                registerErrorMessage[registerErrorCategory.confirmPasswordInput]
+              }
               errorShow={passwordCheckErr}
             />
           </View>
+          <View style={styles.submitContainer}>
+            <SubmitButton text="登録" onPressHandler={register} />
+          </View>
         </KeyboardAvoidingView>
-        <View style={styles.submitContainer}>
-          <SubmitButton text="登録" onPressHandler={register} />
-        </View>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -161,7 +236,7 @@ const styles = StyleSheet.create({
     paddingLeft: paddingLarge,
   },
   inputContainer: {
-    flex: 0.5,
+    flex: 0.8,
     alignItems: "center",
   },
   headerText: {
@@ -170,7 +245,7 @@ const styles = StyleSheet.create({
     marginLeft: windowWidth * 0.21,
   },
   submitContainer: {
+    flex: 0.1,
     alignItems: "center",
-    marginBottom: windowHeight * 0.05,
   },
 });

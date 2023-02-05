@@ -41,42 +41,43 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   //useState
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const LoginProcess = async () => {
-  //   if (username == "" || password == "") {
-  //     return Alert.alert("Error", "email or password input is missing!");
-  //   }
-  //   axios({
-  //     method: "post",
-  //     url: `${AuthAPI}/login`,
-  //     data: {
-  //       username: username,
-  //       password: password,
-  //     },
-  //   })
-  //     .then(async (loginResult) => {
-  //       //ANCHOR saving basic info
-  //       // prettier-ignore
-  //       await SecureStore.setItemAsync(ACCESS_KEY, loginResult.data.data.accessToken);
-  //       // prettier-ignore
-  //       await SecureStore.setItemAsync(REFRESH_KEY, loginResult.data.data.refreshToken);
+  const LoginProcess = async () => {
+    console.log("fire");
+    if (email == "" || password == "") {
+      return Alert.alert("Error", "email or password input is missing!");
+    }
+    axios({
+      method: "post",
+      url: `${AuthAPI}/login`,
+      data: {
+        username: email,
+        password: password,
+      },
+    })
+      .then(async (loginResult) => {
+        //ANCHOR saving basic info
+        // prettier-ignore
+        await SecureStore.setItemAsync(ACCESS_KEY, loginResult.data.data.accessToken);
+        // prettier-ignore
+        await SecureStore.setItemAsync(REFRESH_KEY, loginResult.data.data.refreshToken);
 
-  //       // await SecureStore.setItemAsync(USERID_KEY, loginResult.data.profile.id);
+        // await SecureStore.setItemAsync(USERID_KEY, loginResult.data.profile.id);
 
-  //       // await SecureStore.setItemAsync(USERNAME_KEY, username);
+        // await SecureStore.setItemAsync(USERNAME_KEY, username);
 
-  //       // await SecureStore.setItemAsync(SHOWNAME_KEY, loginResult.data.profile.showname);
-  //       navigation.dispatch(
-  //         CommonActions.reset({ routes: [{ name: "HomeStackNavigation" }] })
-  //       );
-  //     })
-  //     .catch((e) => {
-  //       if (e.response.status == 400) {
-  //         Alert.alert("Login failed", e.response.data.message);
-  //       } else {
-  //         console.log("login catch else error:", e.response.data.message);
-  //       }
-  //     });
-  // };
+        // await SecureStore.setItemAsync(SHOWNAME_KEY, loginResult.data.profile.showname);
+        navigation.dispatch(
+          CommonActions.reset({ routes: [{ name: "HomeStackNavigation" }] })
+        );
+      })
+      .catch((e) => {
+        if (e.response.status == 400) {
+          Alert.alert("Login failed", e.response.data.message);
+        } else {
+          console.log("login catch else error:", e.response.data.message);
+        }
+      });
+  };
 
   const iconSize = windowWidth * 0.07;
   return (
@@ -106,7 +107,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         />
         <SubmitButton
           onPressHandler={() => {
-            console.log("login");
+            LoginProcess();
           }}
           text="ログイン"
           style={{
