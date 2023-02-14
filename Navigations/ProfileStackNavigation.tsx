@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import LoginScreen from "../Screens/Authentication/LoginScreen";
-import RegisterScreen from "../Screens/Authentication/RegisterScreen";
 import ProfileScreen from "../Screens/Home/ProfileScreen";
 import ProfileUpdateScreen from "../Screens/Home/ProfileUpdateScreen";
+import LoginScreen from "../Screens/Merge/LoginScreen";
+import RegisterScreen from "../Screens/Merge/RegisterScreen";
 //Stack Navigation for profile screens
 const ProfileStack = createNativeStackNavigator();
 export const ProfileStackNavigation = () => (

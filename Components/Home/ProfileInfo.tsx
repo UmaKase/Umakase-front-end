@@ -172,7 +172,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
           <TouchableOpacity
             style={commonStyle.button_active}
-            onPress={async () => navigation.navigate("LoginScreen")}
+            onPress={async () => navigation.navigate("RegisterScreen")}
           >
             <Text style={commonStyle.textContainer}>
               {profileInfoStr.mergedUserRegisterBut}
