@@ -156,7 +156,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
   //if user go back to this page, it will redirect to profile page
   useFocusEffect(
     React.useCallback(() => {
-      return () => navigation.goBack();
+      return () => navigation.reset;
     }, [])
   );
   let inputForm;
@@ -338,7 +338,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({
                       }
 
                       setErrMsg(profileUpdScreenStr.errMsgEmpty);
-                      navigation.navigate("ProfileScreen");
+                      navigation.pop();
                     },
                     () => {
                       setErrMsg(profileUpdScreenStr.errMsgLogin);

@@ -33,12 +33,12 @@ type ReportScreenProps = NativeStackScreenProps<
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const [typeChecked, setTypeChecked] = React.useState("comment");
   const [reportComment, setReportComment] = React.useState("");
-  //if user go back to this page, it will redirect to profile page
-  useFocusEffect(() => {
+  //if user go back to this page, it will redirect to profile page\
+  useFocusEffect(
     React.useCallback(() => {
-      return () => navigation.goBack();
-    }, []);
-  });
+      return () => navigation.reset;
+    }, [])
+  );
   return (
     <SafeAreaProvider>
       <SafeAreaView style={commonStyle.safeArea}>
