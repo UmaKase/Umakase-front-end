@@ -1,7 +1,7 @@
-import { functionTipsMessage, tipCloseStr } from "../Constants/homeConst";
+import { tipCloseStr } from "../Constants/homeConst";
 import React, { useContext, useState } from "react";
 import {
-  Alert,
+  Image,
   Modal,
   Pressable,
   StyleSheet,
@@ -10,14 +10,23 @@ import {
   View,
 } from "react-native";
 import { TipsContext } from "../Context/TipsContext";
-import {
-  backgroundColor,
-  paddingSmall,
-  windowHeight,
-  windowWidth,
-} from "../Constants/cssConst";
-import { FontAwesome, Fontisto } from "@expo/vector-icons";
-
+import { paddingSmall, windowHeight, windowWidth } from "../Constants/cssConst";
+import { FontAwesome } from "@expo/vector-icons";
+const tipImages = {
+  0: [null],
+  1: [require("../Image/Tips/homepage.jpg")],
+  2: [require("../Image/Tips/room1.jpg"), require("../Image/Tips/room2.jpg")],
+  3: [null],
+  4: [
+    require("../Image/Tips/favorite1.jpg"),
+    require("../Image/Tips/favorite2.jpg"),
+    require("../Image/Tips/favorite3.jpg"),
+  ],
+  5: [null],
+  6: [null],
+  7: [null],
+  8: [null],
+};
 interface ModalProps {
   modalVisible: boolean;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,15 +38,13 @@ export const TipsModel: React.FunctionComponent<ModalProps> = ({
   tipMessages,
 }) => {
   const [tipPage, setTipPage] = useState(0);
+  const { currentCategory } = useContext(TipsContext);
+  const tipImagesLoad = tipImages[currentCategory];
   const nextPageFunc = () => {
     if (tipMessages.length - 1 > tipPage) setTipPage(tipPage + 1);
-    console.log("tipPage:" + tipPage);
-    console.log("tipMessages.length: " + tipMessages.length);
-    console.log("current page:" + tipPage);
   };
   const prevPageFunc = () => {
     if (tipPage > 0) setTipPage(tipPage - 1);
-    console.log("current page:" + tipPage);
   };
   return (
     <Modal
@@ -45,14 +52,21 @@ export const TipsModel: React.FunctionComponent<ModalProps> = ({
       transparent={true}
       visible={modalVisible}
       onRequestClose={() => {
-        Alert.alert("Modal has been closed.");
         setModalVisible(!modalVisible);
       }}
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <View style={{ flex: 1, justifyContent: "center" }}>
-            <View style={{ flex: 1, justifyContent: "center" }}></View>
+            <View
+              style={{
+                flex: 2,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Image style={styles.modelPic} source={tipImagesLoad[tipPage]} />
+            </View>
             <View
               style={{
                 flex: 1,
@@ -77,7 +91,14 @@ export const TipsModel: React.FunctionComponent<ModalProps> = ({
                   color="#2196F3"
                 />
               </TouchableOpacity>
-              <Text style={styles.modalText}>{tipMessages[tipPage]}</Text>
+              <Text
+                style={[
+                  styles.modalText,
+                  tipMessages.length > 1 ? {} : { width: windowWidth * 0.6 },
+                ]}
+              >
+                {tipMessages[tipPage]}
+              </Text>
               <TouchableOpacity
                 onPress={() => {
                   nextPageFunc();
@@ -150,7 +171,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   modelPic: {
-    margin: windowWidth * 0.05,
+    width: windowWidth * 0.6,
+    height: windowHeight * 0.2,
+    padding: 5,
   },
   modalText: {
     width: windowWidth * 0.4,
