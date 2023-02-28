@@ -7,7 +7,6 @@
     "lib": ["es6", "esnext.asynciterable", "es2017"],
     "strict": true,
     "esModuleInterop": true,
-    "rootDir": ".",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -18,7 +17,12 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "allowSyntheticDefaultImports": true,
-    "removeComments": true
+    "removeComments": true,
+    "rootDir": ".",
+    "paths": {
+      "@Screen": ["src/Screen"],
+      "@Components/Auth": ["Components/Auth"]
+    }
   },
   "extends": "expo/tsconfig.base"
 }
