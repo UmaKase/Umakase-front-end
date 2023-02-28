@@ -2,32 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { CommonActions } from "@react-navigation/native";
-import {
-  ACCESS_KEY,
-  CONFIG_KEY,
-  REFRESH_KEY,
-  TEMPUSERID_KEY,
-  TEMPUSERPASS_KEY,
-} from "../../Constants/securestoreKey";
+import { ACCESS_KEY, CONFIG_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
 import { FontAwesome } from "@expo/vector-icons";
-import {
-  windowWidth,
-  backgroundColor,
-  windowHeight,
-} from "../../Constants/cssConst";
+import { windowWidth, backgroundColor, windowHeight } from "../../Constants/cssConst";
 import ToggleFood from "../../Components/InitialStep/ToggleFood";
 import Footer from "../../Components/InitialStep/Footer";
-import { Food } from "../../Types/InitialSteps";
+import { FoodCheck } from "../../Types/InitialSteps";
 import axios from "axios";
 import { AuthAPI, FoodAPI } from "../../Constants/backendAPI";
 import _ from "lodash";
@@ -44,8 +26,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const [loadingText, setLoadingText] = useState("Creating new account");
 
   // food var
-  const [selectedFood, setSelectedFood] = useState<string[]>([]);
-  const [food, setFoods] = useState<Food[]>([]);
+  const [foods, setFoods] = useState<FoodCheck[]>([]);
   const [page, setPage] = useState(1);
   const [foodEnd, setFoodEnd] = useState(false);
 
@@ -54,7 +35,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // search food
   const [searchMode, setSearchMode] = useState(false);
-  const [searchFoods, setSearchFoods] = useState<Food[]>([]);
+  const [searchFoods, setSearchFoods] = useState<FoodCheck[]>([]);
   const [searchPage, setSearchPage] = useState(1);
   const [searchEnd, setSearchEnd] = useState(false);
 
@@ -70,7 +51,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         url: `${AuthAPI}/register`,
         data: {
           isTemp: true,
-          foodIds: selectedFood,
+          foodIds: foods.filter((food) => food.checked === true),
           name: "__default",
         },
       });
@@ -143,17 +124,22 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           url: `${FoodAPI}/db?name=${input}&take=20&page=${searchPage}`,
           data: {
             tagIds: route.params.TargetTags,
-            excludeFoods: selectedFood,
+            excludeFoods: foods.map((food) => food.id),
           },
         })
           .then((res) => {
-            setSearchFoods(res.data.data.foods);
+            setSearchFoods(() => [
+              ...res.data.data.foods.map((foodData: FoodCheck) => {
+                foodData.checked = false;
+                return foodData;
+              }),
+            ]);
           })
           .catch((e) => console.log("food request error:", e));
       }
       console.log(input);
     }, 500),
-    []
+    [inputText]
   );
 
   // ANCHOR skip setting function
@@ -221,17 +207,25 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         method: "post",
         data: {
           tagIds: route.params.TargetTags,
-          excludeFoods: selectedFood,
+          excludeFoods: foods.map((food) => food.id),
         },
       })
         .then((res) => {
           if (res.data.data.foods[0]) {
-            setFoods((prev) => [...prev, ...res.data.data.foods]);
+            setFoods((prev) => [
+              ...prev,
+              ...res.data.data.foods.map((foodData: FoodCheck) => {
+                foodData.checked = false;
+                return foodData;
+              }),
+            ]);
           } else {
             setFoodEnd(true);
           }
         })
         .catch((e) => console.log(e.response));
+    } else {
+      return Alert.alert("You have reached the end of the foods list.");
     }
   }, [page]);
 
@@ -243,7 +237,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         method: "post",
         data: {
           tagIds: route.params.TargetTags,
-          excludeFoods: selectedFood,
+          excludeFoods: foods.map((food) => food.id),
         },
       })
         .then((res) => {
@@ -258,6 +252,56 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       setSearchEnd(true);
     }
   }, [searchPage]);
+
+  //ANCHOR render item for foods flatlist
+  const renderItemFood = useCallback(
+    ({ item, index }: { item: FoodCheck; index: number }) => {
+      function onFoodPressHandler() {
+        // set foods checked status
+        setFoods((prev) => {
+          prev.splice(index, 1, { ...item, checked: !item.checked });
+          return [...prev];
+        });
+      }
+      return <ToggleFood food={item} onPressHandler={onFoodPressHandler} />;
+    },
+    [foods]
+  );
+
+  // ANCHOR render item for search foods flatlist
+  const renderItemFoodSearch = useCallback(
+    ({ item, index }: { item: FoodCheck; index: number }) => {
+      function onSearchFoodPressHandler() {
+        console.log("item status: ", item.checked);
+        // set foods & searchFoods checked status depands on the checked value
+        if (item.checked === false) {
+          console.log("false!!!!!");
+          // if not checked
+          setFoods((prev) => {
+            prev = [...prev, { ...item, checked: true }];
+            return [...prev];
+          });
+          setSearchFoods((prev) => {
+            prev.splice(index, 1, { ...item, checked: !item.checked });
+            return [...prev];
+          });
+        } else {
+          console.log("true!!!!!");
+          // if checked
+          setFoods((prev) => {
+            prev.splice(index, 1, { ...item, checked: !item.checked });
+            return [...prev];
+          });
+          setSearchFoods((prev) => {
+            prev.splice(index, 1, { ...item, checked: !item.checked });
+            return [...prev];
+          });
+        }
+      }
+      return <ToggleFoodForSearch food={item} onPressHandler={onSearchFoodPressHandler}></ToggleFoodForSearch>;
+    },
+    [searchFoods]
+  );
 
   return (
     <SafeAreaProvider
@@ -283,12 +327,17 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       ) : (
         <SafeAreaView style={styles.safeArea}>
           {/* header */}
-          <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.header}
+            onPress={() => {
+              console.log(foods.filter((food) => food.checked === true).map((food) => food.name));
+            }}
+          >
             <Text style={styles.headerFont}>
               お気入り料理を{"\n"}
               選択してください
             </Text>
-          </View>
+          </TouchableOpacity>
           {/* search Btn */}
           <View style={styles.searchContainer}>
             <TouchableOpacity
@@ -304,56 +353,21 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
               />
             </TouchableOpacity>
           </View>
-          {/* food container */}
+          {/* food flatlist */}
           <FlatList
-            data={food}
-            extraData={food}
+            data={foods}
+            extraData={foods}
             onEndReached={() => onEndReachedHandler()}
             keyExtractor={(item) => item.id}
-            // keyExtractor={(item, index) => index.toString()}
             style={styles.foodsContainer}
             columnWrapperStyle={{ justifyContent: "space-evenly" }}
             numColumns={2}
-            renderItem={({ item, index }) => {
-              const isChecked = !!selectedFood.find!!(
-                (foodId) => foodId === item.id
-              );
-              return (
-                <ToggleFood
-                  food={item}
-                  checked={isChecked}
-                  onPressHandler={() => {
-                    const temptFood = food[index];
-                    if (isChecked) {
-                      setSelectedFood((prev) =>
-                        prev.filter((id) => id !== item.id)
-                      );
-                    } else {
-                      setSelectedFood((prev) => [...prev, item.id]);
-                      setFoods((prev) => {
-                        return [
-                          temptFood,
-                          ...prev.filter((target) => target !== temptFood),
-                        ];
-                      });
-                    }
-                  }}
-                ></ToggleFood>
-              );
-            }}
+            renderItem={renderItemFood}
           />
           {/* footer */}
-          <Footer
-            goBackFunc={() => navigation.pop()}
-            goNextFunc={() => submit()}
-            skipFunc={() => skipSetting()}
-          />
+          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit()} skipFunc={() => skipSetting()} />
           {searchMode ? (
-            <Modal
-              isVisible={searchMode}
-              onBackdropPress={() => leaveSearchMode()}
-              style={styles.modal}
-            >
+            <Modal isVisible={searchMode} onBackdropPress={() => leaveSearchMode()} style={styles.modal}>
               <View style={styles.modalBackground}>
                 <SearchBar
                   input={inputText}
@@ -361,53 +375,16 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                   placeholderText="料理を入力してください"
                   searchFunction={(input: string) => debounceSearchFood(input)}
                 ></SearchBar>
-                {/* flatlist loop out foods */}
+                {/* searchFoods flatlist */}
                 <FlatList
                   data={searchFoods}
-                  extraData={searchFoods}
-                  // keyExtractor={(item) => item.id}
+                  // extraData={searchFoods}
+                  keyExtractor={(item, index) => index.toString()}
                   style={styles.foodsContainer}
                   columnWrapperStyle={{ justifyContent: "space-evenly" }}
                   numColumns={2}
                   onEndReached={() => onModalScrollToBottom()}
-                  renderItem={({ item, index }) => {
-                    const isChecked = !!selectedFood.find!!(
-                      (foodId) => foodId === item.id
-                    );
-                    return (
-                      <ToggleFoodForSearch
-                        key={index.toString()}
-                        food={item}
-                        checked={isChecked}
-                        onPressHandler={() => {
-                          const tempFood = searchFoods[index];
-                          if (isChecked) {
-                            setSelectedFood((prev) =>
-                              prev.filter((id) => id !== item.id)
-                            );
-                          } else {
-                            setSelectedFood((prev) => [...prev, item.id]);
-                            setFoods((prev) => {
-                              return [
-                                tempFood,
-                                ...prev.filter(
-                                  (target) => target.id != tempFood.id
-                                ),
-                              ];
-                            });
-                            setSearchFoods((prev) => {
-                              return [
-                                tempFood,
-                                ...prev.filter(
-                                  (target) => target.id != tempFood.id
-                                ),
-                              ];
-                            });
-                          }
-                        }}
-                      />
-                    );
-                  }}
+                  renderItem={renderItemFoodSearch}
                 />
                 {/* modal footer */}
                 <View style={styles.modalFooter}>
