@@ -51,7 +51,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         url: `${AuthAPI}/register`,
         data: {
           isTemp: true,
-          foodIds: foods.filter((food) => food.checked === true),
+          foodIds: [...foods.filter((food) => food.checked === true).map((food) => food.id)],
           name: "__default",
         },
       });
@@ -369,12 +369,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           {searchMode ? (
             <Modal isVisible={searchMode} onBackdropPress={() => leaveSearchMode()} style={styles.modal}>
               <View style={styles.modalBackground}>
-                <SearchBar
-                  input={inputText}
-                  setInput={setInputText}
-                  placeholderText="料理を入力してください"
-                  searchFunction={(input: string) => debounceSearchFood(input)}
-                ></SearchBar>
+                <SearchBar input={inputText} setInput={setInputText} placeholderText="料理を入力してください" searchFunction={(input: string) => debounceSearchFood(input)}></SearchBar>
                 {/* searchFoods flatlist */}
                 <FlatList
                   data={searchFoods}
