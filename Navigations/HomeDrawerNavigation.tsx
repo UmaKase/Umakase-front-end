@@ -1,5 +1,5 @@
 import { Alert, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   createDrawerNavigator,
   DrawerContentComponentProps,
@@ -7,7 +7,6 @@ import {
   DrawerItem,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import RandomScreen from "../Screens/Home/RandomScreen";
 import { HomeDrawerNavigationProps } from "../Types/Navigations/HomeDrawer";
 import {
   drawerColor,
@@ -28,15 +27,46 @@ import {
 import { DrawerLabel, logoutPopout } from "../Constants/homeConst";
 import BookmarkedStackNavigation from "./DrawerNavigation/BookmarkedStackNavigation";
 import { deleteItemAsync } from "expo-secure-store";
-import { ACCESS_KEY, REFRESH_KEY } from "../Constants/securestoreKey";
+import {
+  ACCESS_KEY,
+  CURRENTROOM_ID_KEY,
+  CURRENTROOM_NAME_KEY,
+  REFRESH_KEY,
+} from "../Constants/securestoreKey";
 import axios from "axios";
 import { AuthAPI } from "../Constants/backendAPI";
 import * as SecureStore from "expo-secure-store";
+import RandomStackNavigation from "./DrawerNavigation/RandomStackNavigation";
+import { CurrentRoomInfo, GlobalContext } from "../Context/GlobalContext";
 
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
 const HomeDrawerNavigation: React.FC = () => {
+  // navigation instance
   const navigation = useNavigation();
+
+  // global state
+  const [currentRoomId, setCurrentRoomId] = useState("");
+  const [currentRoomName, setCurrentRoomName] = useState("");
+  // getCurrentRoomFunction
+  const getCurrentRoomFunction = async () => {
+    let roomId = await SecureStore.getItemAsync(CURRENTROOM_ID_KEY);
+    let roomName = await SecureStore.getItemAsync(CURRENTROOM_NAME_KEY);
+    if (!roomId || !roomName) {
+      return Alert.alert("Error", "No current room been set!");
+    }
+    setCurrentRoomId(roomId);
+    setCurrentRoomName(roomName);
+  };
+  // setCurrentRoomFunction
+  const setCurrentRoomFunction = (inputRoom: CurrentRoomInfo) => {
+    setCurrentRoomId(inputRoom.id);
+    setCurrentRoomName(inputRoom.name);
+    SecureStore.setItemAsync(CURRENTROOM_ID_KEY, inputRoom.id);
+    SecureStore.setItemAsync(CURRENTROOM_NAME_KEY, inputRoom.name);
+  };
+
+  // logout function
   const logoutFunction = () => {
     return Alert.alert(logoutPopout.title, logoutPopout.description, [
       {
@@ -73,7 +103,7 @@ const HomeDrawerNavigation: React.FC = () => {
       url: `${AuthAPI}/token/logout`,
       headers: { Authorization: `Bearer ${localRefreshToken}` },
     }).then(async (response) => {
-      if (response.status) {
+      if (response.status === 200) {
         await SecureStore.deleteItemAsync(ACCESS_KEY);
         await SecureStore.deleteItemAsync(REFRESH_KEY);
         navigation.dispatch(
@@ -84,6 +114,12 @@ const HomeDrawerNavigation: React.FC = () => {
       }
     });
   };
+  // for initial loading
+  useEffect(() => {
+    getCurrentRoomFunction();
+    return () => {};
+  }, []);
+
   const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     return (
       <DrawerContentScrollView {...props}>
@@ -137,45 +173,53 @@ const HomeDrawerNavigation: React.FC = () => {
     );
   };
   return (
-    <Drawer.Navigator
-      initialRouteName="RandomScreen"
-      screenOptions={{
-        headerShown: false,
-        drawerStyle: {
-          backgroundColor: drawerColor,
-        },
-        drawerActiveTintColor: drawerColor,
-        drawerInactiveTintColor: lightTextColor,
-        drawerActiveBackgroundColor: "#FFF",
+    <GlobalContext.Provider
+      value={{
+        currentRoomId: currentRoomId,
+        currentRoomName: currentRoomName,
+        setCurrentRoom: setCurrentRoomFunction,
       }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
-      <Drawer.Screen
-        name="ProfileNavigation"
-        options={{ drawerLabel: DrawerLabel.profile }}
-        component={ProfileStackNavigation}
-      />
-      <Drawer.Screen
-        name="RandomScreen"
-        options={{ drawerLabel: DrawerLabel.random }}
-        component={RandomScreen}
-      />
-      <Drawer.Screen
-        name="BookmarkedStackNavigation"
-        options={{ drawerLabel: DrawerLabel.bookmarked }}
-        component={BookmarkedStackNavigation}
-      />
-      <Drawer.Screen
-        name="Room"
-        options={{ drawerLabel: DrawerLabel.room }}
-        component={RoomStackNavigation}
-      />
-      <Drawer.Screen
-        name="SettingNavigation"
-        options={{ drawerLabel: DrawerLabel.setting }}
-        component={SettingStackNavigation}
-      />
-    </Drawer.Navigator>
+      <Drawer.Navigator
+        initialRouteName="RandomStackNavigation"
+        screenOptions={{
+          headerShown: false,
+          drawerStyle: {
+            backgroundColor: drawerColor,
+          },
+          drawerActiveTintColor: drawerColor,
+          drawerInactiveTintColor: lightTextColor,
+          drawerActiveBackgroundColor: "#FFF",
+        }}
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+      >
+        <Drawer.Screen
+          name="ProfileNavigation"
+          options={{ drawerLabel: DrawerLabel.profile }}
+          component={ProfileStackNavigation}
+        />
+        <Drawer.Screen
+          name="RandomStackNavigation"
+          options={{ drawerLabel: DrawerLabel.random }}
+          component={RandomStackNavigation}
+        />
+        <Drawer.Screen
+          name="BookmarkedStackNavigation"
+          options={{ drawerLabel: DrawerLabel.bookmarked }}
+          component={BookmarkedStackNavigation}
+        />
+        <Drawer.Screen
+          name="Room"
+          options={{ drawerLabel: DrawerLabel.room }}
+          component={RoomStackNavigation}
+        />
+        <Drawer.Screen
+          name="SettingNavigation"
+          options={{ drawerLabel: DrawerLabel.setting }}
+          component={SettingStackNavigation}
+        />
+      </Drawer.Navigator>
+    </GlobalContext.Provider>
   );
 };
 

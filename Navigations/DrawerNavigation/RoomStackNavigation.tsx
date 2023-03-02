@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RoomStackNavigationProps } from "../../Types/Navigations/HomeDrawer/RoomStack";
 import RoomListScreen from "../../Screens/Home/Room/RoomListScreen";
 import RoomConfigSettingScreen from "../../Screens/Home/Room/CreateRoom/RoomConfigSettingScreen";
-import RoomScreen from "../../Screens/Home/Room/CreateRoom/RoomScreen";
+import RoomScreen from "../../Screens/Home/Room/RoomScreen";
 
 const RoomStack = createNativeStackNavigator<RoomStackNavigationProps>();
 

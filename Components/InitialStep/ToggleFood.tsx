@@ -1,53 +1,40 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
-import { Food } from "../../Types/InitialSteps";
-import {
-  backgroundColor,
-  drawerColor,
-  windowHeight,
-  windowWidth,
-} from "../../Constants/cssConst";
+import React, { useEffect, useState } from "react";
+import { Food, FoodCheck } from "../../Types/InitialSteps";
+import { backgroundColor, drawerColor, windowHeight, windowWidth } from "../../Constants/cssConst";
 import { ImgAPI } from "../../Constants/backendAPI";
 import CacheImage from "../Universal/CacheImage";
+import { AuthInput, AuthInputWithErrMsg } from "@Components/Auth";
 
 interface ToggleFoodProps {
-  food: Food;
-  checked: boolean;
+  food: FoodCheck;
   onPressHandler: () => void;
 }
 
-const ToggleFood: React.FC<ToggleFoodProps> = ({
-  food,
-  checked,
-  onPressHandler,
-}) => {
+const ToggleFood: React.FC<ToggleFoodProps> = ({ food, onPressHandler }) => {
+  useEffect(() => {
+    console.log(`mounted : ${food.name}`);
+    return () => console.log(`unmount : ${food.name}`);
+  }, []);
+
   return (
     <TouchableOpacity
       onPress={() => {
         onPressHandler();
       }}
-      style={[
-        styles.cardBackground,
-        { backgroundColor: checked ? "#FFF" : backgroundColor },
-      ]}
+      style={[styles.cardBackground, { backgroundColor: food.checked ? "#FFF" : backgroundColor }]}
     >
       <View style={styles.imgContainer}>
         {food.img ? (
           <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
         ) : (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
             <Text style={{ color: "#777" }}>No Image</Text>
           </View>
         )}
       </View>
       <View style={styles.nameContainer}>
-        <Text
-          style={[styles.name, { color: checked ? backgroundColor : "#FFF" }]}
-        >
-          {food.name}
-        </Text>
+        <Text style={[styles.name, { color: food.checked ? backgroundColor : "#FFF" }]}>{food.name}</Text>
       </View>
     </TouchableOpacity>
   );
