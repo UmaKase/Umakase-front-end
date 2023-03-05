@@ -23,7 +23,7 @@ import {
   FontAwesome5,
 } from "@expo/vector-icons";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { AuthAPI } from "../../Constants/backendAPI";
+import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthNavigationProps } from "../../Types/Navigations/Auth";
 import AuthInputWithErrMsg from "../../Components/Auth/AuthInputWithErrMsg";
@@ -36,6 +36,16 @@ import {
   registerErrorMessage,
   registerResultTitle,
 } from "../../Constants/homeConst";
+import {
+  ACCESS_KEY,
+  REFRESH_KEY,
+  TEMPUSERID_KEY,
+  TEMPUSERPASS_KEY,
+} from "../../Constants/securestoreKey";
+import * as SecureStore from "expo-secure-store";
+import { CommonActions } from "@react-navigation/native";
+import customAxiosInstance from "../../Utils/customAxiosInstance";
+import { merge } from "lodash";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
@@ -63,6 +73,65 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     setLastNameErr(false);
     setPasswordErr(false);
     setPasswordCheckErr(false);
+  };
+  const MergeProcess = async () => {
+    const tmpUser = await SecureStore.getItemAsync(TEMPUSERID_KEY);
+    const tmpPassword = await SecureStore.getItemAsync(TEMPUSERPASS_KEY);
+
+    await customAxiosInstance({
+      method: "post",
+      url: `${UserAPI}/tmp/merge`,
+      data: {
+        tmpId: tmpUser,
+        tmpPass: tmpPassword,
+      },
+    })
+      .then(async (mergeResult) => {
+        // prettier-ignore
+        await SecureStore.setItemAsync(
+          ACCESS_KEY,
+          mergeResult.data.data.accessToken
+        );
+        // prettier-ignore
+        await SecureStore.setItemAsync(
+          REFRESH_KEY,
+          mergeResult.data.data.refreshToken
+        );
+        Alert.alert("Success", "Merge user success");
+      })
+      .catch((e) => {
+        console.log(e.response.data);
+        console.log("merge user Error:", e.response.data.message);
+        return Alert.alert("Error", "cannot merge user");
+      });
+  };
+  const LoginProcess = async () => {
+    axios({
+      method: "post",
+      url: `${AuthAPI}/login`,
+      data: {
+        username: username,
+        password: password,
+      },
+    })
+      .then(async (loginResult) => {
+        console.log("login success");
+        console.log(loginResult);
+        //ANCHOR saving basic info
+        // prettier-ignore
+        await SecureStore.setItemAsync(ACCESS_KEY, loginResult.data.data.accessToken);
+        // prettier-ignore
+        await SecureStore.setItemAsync(REFRESH_KEY, loginResult.data.data.refreshToken);
+
+        MergeProcess();
+      })
+      .catch((e) => {
+        if (e.response.status == 400) {
+          Alert.alert("Login failed", e.response.data.message);
+        } else {
+          console.log("login catch else error:", e.response.data.message);
+        }
+      });
   };
   const RegisterProcess = async () => {
     //input empty check
@@ -105,7 +174,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       })
         .then((result) => {
           return Alert.alert("Register", "Register success!", [
-            { text: "OK", onPress: () => navigation.pop() },
+            { text: "OK", onPress: () => LoginProcess() },
           ]);
         })
         .catch((e) => {

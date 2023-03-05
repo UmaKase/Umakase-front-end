@@ -18,6 +18,8 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RandomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RandomStack";
 import { GlobalContext } from "../../../Context/GlobalContext";
+import { functionCategory } from "../../../Constants/homeConst";
+import { TipsContext } from "../../../Context/TipsContext";
 
 type RandomScreenProps = NativeStackScreenProps<
   RandomStackNavigationProps,
@@ -70,11 +72,15 @@ const RandomScreen: React.FC<RandomScreenProps> = ({ navigation, route }) => {
         ) : (
           <View style={styles.background}>
             {/* header =========================================== */}
-            <CustomHeader
-              toggleMenu={() =>
-                navigation.dispatch(DrawerActions.toggleDrawer())
-              }
-            ></CustomHeader>
+            <TipsContext.Provider
+              value={{ currentCategory: functionCategory.random }}
+            >
+              <CustomHeader
+                toggleMenu={() =>
+                  navigation.dispatch(DrawerActions.toggleDrawer())
+                }
+              ></CustomHeader>
+            </TipsContext.Provider>
             {/* mode  =========================================== */}
             <View style={styles.modeContainer}>
               {/* left arrow */}

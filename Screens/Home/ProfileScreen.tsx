@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { RoomAPI } from "../../Constants/backendAPI";
-import { DrawerActions } from "@react-navigation/native";
+import { DrawerActions, useFocusEffect } from "@react-navigation/native";
 import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
 import ProfileInfo from "../../Components/Home/ProfileInfo";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -45,7 +45,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
       },
       () => {}
     );
-    console.log(`user:${userId},room${defaultRoomId}`);
   }, [setUserId]);
 
   return (

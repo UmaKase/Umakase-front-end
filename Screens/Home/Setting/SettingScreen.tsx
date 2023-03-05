@@ -1,14 +1,14 @@
 import { CommonActions, DrawerActions } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import CustomHeader from "../../Components/HomeDrawer/CustomHeader";
+import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { commonStyle } from "../../Style/CommonStyle";
-import { SettingStackProps } from "../../Types/Home/Setting/SettingStackProps";
-import { settingScreenConst } from "../../Constants/settingConst";
-import { TipsContext } from "../../Context/TipsContext";
-import { functionCategory } from "../../Constants/homeConst";
+import { commonStyle } from "../../../Style/CommonStyle";
+import { SettingStackProps } from "../../../Types/Home/Setting/SettingStackProps";
+import { settingScreenConst } from "../../../Constants/settingConst";
+import { TipsContext } from "../../../Context/TipsContext";
+import { functionCategory } from "../../../Constants/homeConst";
 
 type SettingScreenProps = NativeStackScreenProps<
   SettingStackProps,
@@ -63,25 +63,15 @@ const SettingScreen: React.FC<SettingScreenProps> = ({ navigation, route }) => {
           </View>
           <View style={commonStyle.rowContainer}>
             <TouchableOpacity
-              style={commonStyle.button_disable}
-              onPress={() => {}}
+              style={commonStyle.button_active}
+              onPress={() => {
+                navigation.navigate("ReportScreen");
+              }}
             >
               <Text
                 style={[commonStyle.textContainer, commonStyle.subtitleText]}
               >
-                {settingScreenConst.faqBut}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={commonStyle.rowContainer}>
-            <TouchableOpacity
-              style={commonStyle.button_disable}
-              onPress={() => {}}
-            >
-              <Text
-                style={[commonStyle.textContainer, commonStyle.subtitleText]}
-              >
-                {settingScreenConst.recipeRequestBut}
+                {settingScreenConst.reportBut}
               </Text>
             </TouchableOpacity>
           </View>
@@ -89,30 +79,6 @@ const SettingScreen: React.FC<SettingScreenProps> = ({ navigation, route }) => {
             <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
               {settingScreenConst.otherTitle}
             </Text>
-          </View>
-          <View style={commonStyle.rowContainer}>
-            <TouchableOpacity
-              style={commonStyle.button_disable}
-              onPress={() => {}}
-            >
-              <Text
-                style={[commonStyle.textContainer, commonStyle.subtitleText]}
-              >
-                {settingScreenConst.useRultBut}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={commonStyle.rowContainer}>
-            <TouchableOpacity
-              style={commonStyle.button_disable}
-              onPress={() => {}}
-            >
-              <Text
-                style={[commonStyle.textContainer, commonStyle.subtitleText]}
-              >
-                {settingScreenConst.premiumUseRuleBut}
-              </Text>
-            </TouchableOpacity>
           </View>
           <View style={commonStyle.rowContainer}>
             <TouchableOpacity
@@ -135,18 +101,6 @@ const SettingScreen: React.FC<SettingScreenProps> = ({ navigation, route }) => {
                 style={[commonStyle.textContainer, commonStyle.subtitleText]}
               >
                 {settingScreenConst.privacyPolicyBut}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={commonStyle.rowContainer}>
-            <TouchableOpacity
-              style={commonStyle.button_disable}
-              onPress={() => {}}
-            >
-              <Text
-                style={[commonStyle.textContainer, commonStyle.subtitleText]}
-              >
-                {settingScreenConst.openSourceLicense}
               </Text>
             </TouchableOpacity>
           </View>
