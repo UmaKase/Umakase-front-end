@@ -3,13 +3,14 @@ export const profileScreenStr={
     userListHeaderText:"ルームメイト",
 }
 export const profileInfoStr={
-    IdHint:"id:",
+    IdHint:"ID:",
     IdMask:"****",
     membershipHint:"メンバーシップ:",
     roomHint:"設定ルーム:",
     mergedUserRegisterBut:"新規会員登録",
     premiumRegisterBut:"プレミアムサービス登録",
     notSet:"未設定",
+    unregisterUserName:"ゲスト",
 }
 export const profileInfoNum={
     default:0,
@@ -34,8 +35,8 @@ export const profileUpdScreenStr={
     titlePostfix:"更新",
     newPwdHint:"新しいパスワード",
     oldPwdHint:"古いパスワード",
-    surnameHint:"氏",
-    lastnameHint:"名",
+    surnameHint:"名",
+    lastnameHint:"姓",
     mailHint:"メールアドレス"
 }
 export const profileUpdateMode ={

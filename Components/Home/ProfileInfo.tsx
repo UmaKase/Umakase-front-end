@@ -84,12 +84,31 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     useContext(ProfileContext);
   getCurrentRoomName(setCurrentRoomName);
 
+  const displayName = () => {
+    if (membership == profileInfoNum.memberUnregister)
+      return (
+        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
+          {`${profileInfoStr.unregisterUserName}`}
+        </Text>
+      );
+    else if (lastName == "" && firstName == "")
+      return (
+        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
+          {`${userName}`}
+        </Text>
+      );
+    else
+      return (
+        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
+          {`${lastName} ${firstName}`}
+        </Text>
+      );
+  };
   const profileSuccessHandler = (res: AxiosResponse<any, any>) => {
     try {
       //convert response to user profile type
       const resData = res.data.data.user as UserProfileContainer;
       //set user id in the parent screen
-      console.log(resData);
       setUserId(resData.profile.userId);
       setUserName(resData.profile.username);
       if (resData.email != null && resData.email != "") {
@@ -141,12 +160,16 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           />
         </View>
         <View style={styles.infoRightView}>
-          <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-            {`${lastName} ${firstName}`}
-          </Text>
-          <Text
-            style={[commonStyle.textContainer, { fontSize: textLarge }]}
-          >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
+          {displayName()}
+          {membership == profileInfoNum.memberUnregister ? (
+            <Text
+              style={[commonStyle.textContainer, { fontSize: textLarge }]}
+            >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
+          ) : (
+            <Text
+              style={[commonStyle.textContainer, { fontSize: textLarge }]}
+            >{`${profileInfoStr.IdHint}${userName}`}</Text>
+          )}
         </View>
       </View>
       {/* membership display*/}
@@ -183,15 +206,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
           <TouchableOpacity
             style={commonStyle.button_disable}
-            onPress={() => {
-              navigation.navigate("ProfileUpdateScreen", {
-                mode: profileUpdateMode.personalInfo,
-                userId: userId ? userId : "",
-                userName: userName,
-                setLastName: setLastName,
-                setFirstName: setFirstName,
-              });
-            }}
+            onPress={() => {}}
+            disabled
           >
             <Text style={commonStyle.textContainer}>
               {profileInfoStr.premiumRegisterBut}
@@ -207,6 +223,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
               mode: profileUpdateMode.personalInfo,
               userId: userId ? userId : "",
               userName: userName,
+              lastName: lastName,
+              firstName: firstName,
               setLastName: setLastName,
               setFirstName: setFirstName,
             })

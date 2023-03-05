@@ -45,7 +45,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
       },
       () => {}
     );
-    console.log(`user:${userId},room${defaultRoomId}`);
   }, [setUserId]);
 
   return (
