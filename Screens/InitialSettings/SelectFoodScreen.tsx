@@ -17,6 +17,7 @@ import SearchBar from "../../Components/InitialStep/SearchBar";
 import Modal from "react-native-modal";
 import ToggleFoodForSearch from "../../Components/InitialStep/ToggleFoodForSearch";
 import { setItemAsync } from "expo-secure-store";
+import {axiosErrorPreProcess} from '../../Utils/axiosErrorPreProcess'
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -197,12 +198,10 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  // get foods
-  useEffect(() => {
-    // fetch foods
-    if (!foodEnd) {
-      console.log("Target Tags", route.params.TargetTags);
-      axios({
+  // get foods async function
+  async function getFoodFromAPI(){
+    try {
+      const res = await axios({
         url: `${FoodAPI}/db?take=20&page=${page}`,
         method: "post",
         data: {
@@ -210,20 +209,29 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           excludeFoods: foods.map((food) => food.id),
         },
       })
-        .then((res) => {
-          if (res.data.data.foods[0]) {
-            setFoods((prev) => [
-              ...prev,
-              ...res.data.data.foods.map((foodData: FoodCheck) => {
-                foodData.checked = false;
-                return foodData;
-              }),
-            ]);
-          } else {
-            setFoodEnd(true);
-          }
-        })
-        .catch((e) => console.log(e.response));
+      if (res.data.data.foods[0]) {
+        setFoods((prev) => [
+          ...prev,
+          ...res.data.data.foods.map((foodData: FoodCheck) => {
+            foodData.checked = false;
+            return foodData;
+          }),
+        ]);
+      } else {
+        setFoodEnd(true);
+      }
+    } catch (error) {
+      axiosErrorPreProcess(error, true,
+        ()=>navigation.pop(), ()=>{
+        console.log(error);
+        return Alert.alert("Have error.response from server", "please check with the code.")
+      })
+    }
+  }
+  useEffect(() => {
+    // fetch foods
+    if (!foodEnd) {
+      getFoodFromAPI();
     } else {
       return Alert.alert("You have reached the end of the foods list.");
     }
