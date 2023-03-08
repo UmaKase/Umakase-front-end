@@ -1,25 +1,13 @@
-import {
-  paddingLarge,
-  textLarge,
-  textMedium,
-  windowWidth,
-} from "../../Constants/cssConst";
+import { paddingLarge, textLarge, textMedium, windowWidth } from "../../Constants/cssConst";
 import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
+import customAxiosInstance from "../../Utils/authAxiosInstance";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
-import {
-  REFRESH_KEY,
-  CURRENTROOM_NAME_KEY,
-} from "../../Constants/securestoreKey";
+import { REFRESH_KEY, CURRENTROOM_NAME_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
-import {
-  profileInfoStr,
-  profileUpdateMode,
-  profileUpdateTitle,
-} from "../../Constants/ProfileConst";
+import { profileInfoStr, profileUpdateMode, profileUpdateTitle } from "../../Constants/ProfileConst";
 import { AxiosResponse } from "axios";
 import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
 import { FontAwesome } from "@expo/vector-icons";
@@ -30,11 +18,7 @@ import { ProfileContext } from "../../Context/ProfileContext";
 interface ProfileInfoProps {
   userId: string | undefined;
   setUserId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  navigation: NativeStackNavigationProp<
-    ProfileStackProps,
-    "ProfileScreen",
-    undefined
-  >;
+  navigation: NativeStackNavigationProp<ProfileStackProps, "ProfileScreen", undefined>;
 }
 const profileProcess = async (successCallBack: any) => {
   const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
@@ -52,29 +36,19 @@ const profileProcess = async (successCallBack: any) => {
     .catch((e) => console.log(e.response.data));
 };
 // get current room name and set it to state
-const getCurrentRoomName = async (
-  setter: React.Dispatch<React.SetStateAction<string>>
-) => {
+const getCurrentRoomName = async (setter: React.Dispatch<React.SetStateAction<string>>) => {
   const tempRoomName = await SecureStore.getItemAsync(CURRENTROOM_NAME_KEY);
   setter(tempRoomName != null ? tempRoomName : profileInfoStr.notSet);
 };
-const ProfileInfo: React.FC<ProfileInfoProps> = ({
-  userId,
-  setUserId,
-  navigation,
-}) => {
+const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation }) => {
   //state variable defined
-  const [userProfileContainer, setUseProfileContainer] =
-    useState<UserProfileContainer>();
+  const [userProfileContainer, setUseProfileContainer] = useState<UserProfileContainer>();
   const [userName, setUserName] = useState<string>("");
-  const [currentRoomName, setCurrentRoomName] = useState<string>(
-    profileInfoStr.notSet
-  );
+  const [currentRoomName, setCurrentRoomName] = useState<string>(profileInfoStr.notSet);
   const [fetching, setFetching] = useState<boolean>(true);
 
   //current
-  const { lastName, firstName, setLastName, setFirstName } =
-    useContext(ProfileContext);
+  const { lastName, firstName, setLastName, setFirstName } = useContext(ProfileContext);
   getCurrentRoomName(setCurrentRoomName);
 
   //onload
@@ -93,10 +67,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           console.log("setLastName:" + resData.profile.lastname);
           setLastName(resData.profile.lastname);
         }
-        if (
-          setFirstName != undefined &&
-          resData.profile.firstname != undefined
-        ) {
+        if (setFirstName != undefined && resData.profile.firstname != undefined) {
           setFirstName(resData.profile.firstname);
         }
         setFetching(false);
@@ -122,38 +93,22 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     <View style={[commonStyle.mainContainer, { paddingTop: paddingLarge }]}>
       <View style={commonStyle.rowContainer}>
         <View style={styles.infoLeftView}>
-          <FontAwesome
-            name="user-circle"
-            size={windowWidth * 0.18}
-            color="black"
-          />
+          <FontAwesome name="user-circle" size={windowWidth * 0.18} color="black" />
         </View>
         <View style={styles.infoRightView}>
-          <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-            {`${lastName} ${firstName}`}
-          </Text>
-          <Text
-            style={[commonStyle.textContainer, { fontSize: textLarge }]}
-          >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
+          <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${lastName} ${firstName}`}</Text>
+          <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
         </View>
       </View>
       {/* membership display*/}
       <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
-        <Text style={[commonStyle.textContainer, styles.membership]}>
-          {profileInfoStr.membershipHint}
-        </Text>
-        <Text style={[commonStyle.textContainer, styles.membership]}>
-          {profileInfoStr.membershipFree}
-        </Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>{profileInfoStr.membershipHint}</Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>{profileInfoStr.membershipFree}</Text>
       </View>
       {/* */}
       <View style={commonStyle.rowContainer}>
-        <Text style={[commonStyle.textContainer, styles.membership]}>
-          {profileInfoStr.roomHint}
-        </Text>
-        <Text style={[commonStyle.textContainer, styles.membership]}>
-          {currentRoomName}
-        </Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>{profileInfoStr.roomHint}</Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>{currentRoomName}</Text>
       </View>
       <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
         <TouchableOpacity
@@ -169,9 +124,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             });
           }}
         >
-          <Text style={commonStyle.textContainer}>
-            {profileInfoStr.premiumBut}
-          </Text>
+          <Text style={commonStyle.textContainer}>{profileInfoStr.premiumBut}</Text>
         </TouchableOpacity>
       </View>
       <View style={commonStyle.rowContainer}>
@@ -187,9 +140,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text style={commonStyle.textContainer}>
-            {profileUpdateTitle[profileUpdateMode.personalInfo]}
-          </Text>
+          <Text style={commonStyle.textContainer}>{profileUpdateTitle[profileUpdateMode.personalInfo]}</Text>
         </TouchableOpacity>
       </View>
       <View style={commonStyle.rowContainer}>
@@ -203,9 +154,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             })
           }
         >
-          <Text style={commonStyle.textContainer}>
-            {profileUpdateTitle[profileUpdateMode.password]}
-          </Text>
+          <Text style={commonStyle.textContainer}>{profileUpdateTitle[profileUpdateMode.password]}</Text>
         </TouchableOpacity>
       </View>
     </View>

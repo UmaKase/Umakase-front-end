@@ -3,27 +3,17 @@ import React, { useContext, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RandomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RandomStack";
 import Background from "../../../Components/Universal/Background";
-import {
-  textMedium,
-  windowHeight,
-  windowWidth,
-} from "../../../Constants/cssConst";
+import { textMedium, windowHeight, windowWidth } from "../../../Constants/cssConst";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import customAxiosInstance from "../../../Utils/customAxiosInstance";
+import customAxiosInstance from "../../../Utils/authAxiosInstance";
 import { FoodAPI, ImgAPI } from "../../../Constants/backendAPI";
 import CacheImage from "../../../Components/Universal/CacheImage";
 import CenterActivityIndicator from "../../../Components/Universal/CenterActivityIndicator";
 import { Food } from "../../../Types/types";
 import { GlobalContext } from "../../../Context/GlobalContext";
 
-type RandomResultScreenProps = NativeStackScreenProps<
-  RandomStackNavigationProps,
-  "RandomResultScreen"
->;
-const RandomResultScreen: React.FC<RandomResultScreenProps> = ({
-  route,
-  navigation,
-}) => {
+type RandomResultScreenProps = NativeStackScreenProps<RandomStackNavigationProps, "RandomResultScreen">;
+const RandomResultScreen: React.FC<RandomResultScreenProps> = ({ route, navigation }) => {
   // getting room id & name from the route
   const { currentRoomId } = useContext(GlobalContext);
   // fetching state
@@ -84,41 +74,22 @@ const RandomResultScreen: React.FC<RandomResultScreenProps> = ({
       ) : (
         <>
           <View style={styles.foodCircle}>
-            <CacheImage
-              url={`${ImgAPI}/food/${foods[currentFood].img}`}
-              style={styles.foodImgStyle}
-            />
+            <CacheImage url={`${ImgAPI}/food/${foods[currentFood].img}`} style={styles.foodImgStyle} />
           </View>
           <View style={styles.controlBar}>
             <TouchableOpacity onPress={goBackRandomScreen}>
-              <FontAwesome
-                name="chevron-left"
-                size={windowWidth * 0.08}
-                color="#FFF"
-              />
+              <FontAwesome name="chevron-left" size={windowWidth * 0.08} color="#FFF" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => console.log("heart btn")}>
-              <FontAwesome5
-                name="heart"
-                size={windowWidth * 0.08}
-                color="#FFF"
-              />
+              <FontAwesome5 name="heart" size={windowWidth * 0.08} color="#FFF" />
             </TouchableOpacity>
           </View>
           <Text style={styles.foodName}>{foods[currentFood].name}</Text>
           <View style={styles.decisionBar}>
-            <TouchableOpacity
-              disabled={disabledBtn}
-              onPress={nextFood}
-              style={[styles.decisionButton, { backgroundColor: "#ECAC72" }]}
-            >
+            <TouchableOpacity disabled={disabledBtn} onPress={nextFood} style={[styles.decisionButton, { backgroundColor: "#ECAC72" }]}>
               <Text style={styles.decisionButtonText}>次の料理</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              disabled={disabledBtn}
-              onPress={() => console.log("削除する")}
-              style={[styles.decisionButton, { backgroundColor: "#F44D4D" }]}
-            >
+            <TouchableOpacity disabled={disabledBtn} onPress={() => console.log("削除する")} style={[styles.decisionButton, { backgroundColor: "#F44D4D" }]}>
               <Text style={styles.decisionButtonText}>削除する</Text>
             </TouchableOpacity>
           </View>

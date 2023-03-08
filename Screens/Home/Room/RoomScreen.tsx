@@ -3,32 +3,18 @@ import React, { useContext, useEffect, useState } from "react";
 import { RoomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RoomStack";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Background from "../../../Components/Universal/Background";
-import {
-  lightTextColor,
-  paddingLarge,
-  paddingMedium,
-  textLarge,
-  textMedium,
-  windowHeight,
-  windowWidth,
-} from "../../../Constants/cssConst";
-import customAxiosInstance from "../../../Utils/customAxiosInstance";
+import { lightTextColor, paddingLarge, paddingMedium, textLarge, textMedium, windowHeight, windowWidth } from "../../../Constants/cssConst";
+import customAxiosInstance from "../../../Utils/authAxiosInstance";
 import { RoomAPI } from "../../../Constants/backendAPI";
 import { getItemAsync, setItemAsync } from "expo-secure-store";
-import {
-  CURRENTROOM_ID_KEY,
-  CURRENTROOM_NAME_KEY,
-} from "../../../Constants/securestoreKey";
+import { CURRENTROOM_ID_KEY, CURRENTROOM_NAME_KEY } from "../../../Constants/securestoreKey";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { UserContext } from "../../../Context/UserContext";
 import { profileScreenStr } from "../../../Constants/ProfileConst";
 import { User } from "../../../Types/types";
 import UserList from "../../../Components/Home/UserList";
 import { GlobalContext } from "../../../Context/GlobalContext";
-type RoomScreenProps = NativeStackScreenProps<
-  RoomStackNavigationProps,
-  "RoomScreen"
->;
+type RoomScreenProps = NativeStackScreenProps<RoomStackNavigationProps, "RoomScreen">;
 const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
   // const [Room, setRoom] = useState<>();
   const { roomId } = route.params;
@@ -39,9 +25,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
 
   const [roomIsUsed, setRoomIsUsed] = useState<boolean>(false);
   const [roomName, setRoomName] = useState();
-  const [roomDescription, setRoomDescription] = useState(
-    "this is room description."
-  );
+  const [roomDescription, setRoomDescription] = useState("this is room description.");
   const [roomMembers, setRoomMembers] = useState<User[]>([]);
 
   const settingRandomRoom = async () => {
@@ -50,10 +34,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
     }
     setCurrentRoom({ id: roomId, name: roomName });
     navigation.goBack();
-    return Alert.alert(
-      "Notification",
-      `Change current room to ${roomName} success.`
-    );
+    return Alert.alert("Notification", `Change current room to ${roomName} success.`);
   };
 
   const deleteRoomFunction = () => {
@@ -68,11 +49,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
     })
       .then((res) => {
         console.log(res.data.data.room.user);
-        setRoomName(
-          res.data.data.room.name === "__default"
-            ? "Default"
-            : res.data.data.room.name
-        );
+        setRoomName(res.data.data.room.name === "__default" ? "Default" : res.data.data.room.name);
         if (res.data.data.room.description) {
           setRoomDescription(res.data.data.room.description);
         }
@@ -106,10 +83,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
         {roomName === "Default" ? (
           <></>
         ) : (
-          <TouchableOpacity
-            onPress={deleteRoomFunction}
-            style={{ marginRight: windowWidth * 0.05 }}
-          >
+          <TouchableOpacity onPress={deleteRoomFunction} style={{ marginRight: windowWidth * 0.05 }}>
             <FontAwesome5 name="trash" size={textLarge} color="#FFF" />
           </TouchableOpacity>
         )}
@@ -127,13 +101,8 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
         </Text>
       </View>
       <View style={[styles.title, { height: windowHeight * 0.1 }]}></View>
-      <TouchableOpacity
-        onPress={settingRandomRoom}
-        style={styles.changeRoomButton}
-      >
-        <Text style={{ fontSize: textMedium, color: lightTextColor }}>
-          {roomId == currentRoomId ? "ルーム利用中" : "choose room"}
-        </Text>
+      <TouchableOpacity onPress={settingRandomRoom} style={styles.changeRoomButton}>
+        <Text style={{ fontSize: textMedium, color: lightTextColor }}>{roomId == currentRoomId ? "ルーム利用中" : "choose room"}</Text>
       </TouchableOpacity>
       <UserContext.Provider
         value={{
@@ -148,14 +117,8 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => navigation.pop()}>
           <FontAwesome name="home" size={windowWidth * 0.12} color="#FFF" />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => console.log("what is going to be next?")}
-        >
-          <FontAwesome
-            name="arrow-circle-right"
-            size={windowWidth * 0.12}
-            color="#FFF"
-          />
+        <TouchableOpacity onPress={() => console.log("what is going to be next?")}>
+          <FontAwesome name="arrow-circle-right" size={windowWidth * 0.12} color="#FFF" />
         </TouchableOpacity>
       </View>
     </Background>

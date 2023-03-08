@@ -5,18 +5,13 @@ import { RoomStackNavigationProps } from "../../../../Types/Navigations/HomeDraw
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../../../Components/HomeDrawer/CustomHeader";
 import { DrawerActions } from "@react-navigation/native";
-import {
-  backgroundColor,
-  paddingLarge,
-  windowHeight,
-  windowWidth,
-} from "../../../../Constants/cssConst";
+import { backgroundColor, paddingLarge, windowHeight, windowWidth } from "../../../../Constants/cssConst";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import SearchBar from "../../../../Components/InitialStep/SearchBar";
 import _ from "lodash";
-import customAxiosInstance from "../../../../Utils/customAxiosInstance";
+import customAxiosInstance from "../../../../Utils/authAxiosInstance";
 import { RoomAPI } from "../../../../Constants/backendAPI";
 import UserList from "../../../../Components/Home/UserList";
 import { UserContext } from "../../../../Context/UserContext";
@@ -24,13 +19,8 @@ import { profileScreenStr } from "../../../../Constants/ProfileConst";
 import { User } from "../../../../Types/types";
 import CenterActivityIndicator from "../../../../Components/Universal/CenterActivityIndicator";
 
-type RoomConfigSettingScreeProps = NativeStackScreenProps<
-  RoomStackNavigationProps,
-  "RoomConfigSettingScreen"
->;
-const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
-  navigation,
-}) => {
+type RoomConfigSettingScreeProps = NativeStackScreenProps<RoomStackNavigationProps, "RoomConfigSettingScreen">;
+const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({ navigation }) => {
   const [fetching, setFetching] = useState(true);
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
@@ -86,9 +76,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.background}>
-        <CustomHeader
-          toggleMenu={() => navigation.dispatch(DrawerActions.openDrawer)}
-        ></CustomHeader>
+        <CustomHeader toggleMenu={() => navigation.dispatch(DrawerActions.openDrawer)}></CustomHeader>
         {/* title header  ================================================================ */}
         <View style={styles.title}>
           {/* prettier-ignore */}
@@ -107,13 +95,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
           </TouchableOpacity>
         </View>
         {/* title input  ================================================================  */}
-        <TextInput
-          style={styles.titleInput}
-          value={titleInput}
-          onChangeText={(value) => setTitleInput(value)}
-          selectionColor="#FFF"
-          caretHidden={true}
-        ></TextInput>
+        <TextInput style={styles.titleInput} value={titleInput} onChangeText={(value) => setTitleInput(value)} selectionColor="#FFF" caretHidden={true}></TextInput>
         {/* description  */}
         <View style={styles.title}>
           <Text
@@ -126,13 +108,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
             説明
           </Text>
         </View>
-        <TextInput
-          style={styles.titleInput}
-          value={descriptionInput}
-          onChangeText={(value) => setDescriptionInput(value)}
-          selectionColor="#FFF"
-          caretHidden={true}
-        ></TextInput>
+        <TextInput style={styles.titleInput} value={descriptionInput} onChangeText={(value) => setDescriptionInput(value)} selectionColor="#FFF" caretHidden={true}></TextInput>
         {/* member picking ======================================================== */}
         {/* <View style={styles.title}>
           <Text
@@ -182,11 +158,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({
             <FontAwesome name="home" size={windowWidth * 0.12} color="#FFF" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => createRoom()}>
-            <FontAwesome
-              name="arrow-circle-right"
-              size={windowWidth * 0.12}
-              color="#FFF"
-            />
+            <FontAwesome name="arrow-circle-right" size={windowWidth * 0.12} color="#FFF" />
           </TouchableOpacity>
         </View>
         {/* search modal =================================================== */}
@@ -281,8 +253,7 @@ const fakeUserData = [
   },
   {
     id: "Dicta in praesentium sit porro id nam est rerum provident.",
-    createdAt:
-      "Quia aut consequatur. Molestiae ullam quia corporis quasi qui nesciunt qui corporis. Eaque commodi dolorum cum illum totam.",
+    createdAt: "Quia aut consequatur. Molestiae ullam quia corporis quasi qui nesciunt qui corporis. Eaque commodi dolorum cum illum totam.",
     updatedAt:
       "Consequatur beatae provident unde. Totam qui incidunt ipsum blanditiis magnam. Aut possimus deleniti aliquam consequatur voluptate delectus incidunt sit. Qui repellendus accusamus dolorem sunt sint.\n \rVoluptatibus nemo ea quo ab ea enim sunt debitis. Deserunt rerum voluptate aliquid. Ut velit rem porro impedit eos et soluta voluptate debitis. Adipisci ab dolores vitae repudiandae blanditiis itaque eos qui adipisci. Et quas numquam a placeat odio amet.\n \rQui dolor qui dignissimos sit fugiat. Qui atque corrupti molestias et suscipit officia et id. Minus quasi explicabo enim dolores magnam et. Tempore libero velit. Placeat magnam natus reprehenderit. Delectus nihil laboriosam eaque aut suscipit ducimus.",
     email: "J]V}4xb[a;",
