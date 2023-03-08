@@ -11,7 +11,7 @@ import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import SearchBar from "../../../../Components/InitialStep/SearchBar";
 import _ from "lodash";
-import customAxiosInstance from "../../../../Utils/authAxiosInstance";
+import authAxiosInstance from "../../../../Utils/authAxiosInstance";
 import { RoomAPI } from "../../../../Constants/backendAPI";
 import UserList from "../../../../Components/Home/UserList";
 import { UserContext } from "../../../../Context/UserContext";
@@ -29,7 +29,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({ naviga
 
   // create room function
   const createRoom = async () => {
-    await customAxiosInstance({
+    await authAxiosInstance({
       method: "post",
       url: `${RoomAPI}/new`,
       data: {

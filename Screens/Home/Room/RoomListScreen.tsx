@@ -6,7 +6,7 @@ import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RoomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/RoomStack";
 import { DrawerActions } from "@react-navigation/native";
-import customAxiosInstance from "../../../Utils/authAxiosInstance";
+import authAxiosInstance from "../../../Utils/authAxiosInstance";
 import { RoomAPI } from "../../../Constants/backendAPI";
 import { Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -34,7 +34,7 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
   useEffect(() => {
     const unSubscribe = navigation.addListener("focus", () => {
       // get room list
-      customAxiosInstance({
+      authAxiosInstance({
         method: "get",
         url: `${RoomAPI}/`,
       })

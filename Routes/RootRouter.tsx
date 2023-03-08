@@ -8,7 +8,7 @@ import HomeStackNavigation from "../Navigations/HomeStackNavigation";
 import { AuthAPI } from "../Constants/backendAPI";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
 import { RootNavigationProps } from "../Types/Navigations/Root";
-import customAxiosInstance from "../Utils/authAxiosInstance";
+import authAxiosInstance from "../Utils/authAxiosInstance";
 import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import { ACCESS_KEY, CONFIG_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../Constants/securestoreKey";
 
@@ -23,7 +23,7 @@ const RootRouter: React.FC = () => {
   const tokenValidation = async () => {
     const config = await getItemAsync(CONFIG_KEY);
     if (config) {
-      await customAxiosInstance({
+      await authAxiosInstance({
         method: "post",
         url: `${AuthAPI}/token/access`,
       })

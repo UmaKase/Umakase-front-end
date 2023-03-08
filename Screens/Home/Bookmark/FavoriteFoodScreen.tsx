@@ -7,7 +7,7 @@ import SearchBarForBookMark from "../../../Components/Home/Bookmark/SearchBarFor
 import { backgroundColor, windowHeight, windowWidth } from "../../../Constants/cssConst";
 import ControlBar from "../../../Components/Home/Bookmark/ControlBar";
 import { BookMarkFood, Food, FoodsList } from "../../../Types/InitialSteps";
-import customAxiosInstance from "../../../Utils/authAxiosInstance";
+import authAxiosInstance from "../../../Utils/authAxiosInstance";
 import ToggleFood from "../../../Components/InitialStep/ToggleFood";
 import { FoodAPI, RoomAPI } from "../../../Constants/backendAPI";
 import CenterActivityIndicator from "../../../Components/Universal/CenterActivityIndicator";
@@ -63,7 +63,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const fetchFoods = async () => {
     try {
-      const res = await customAxiosInstance.get(`${FoodAPI}/default`);
+      const res = await authAxiosInstance.get(`${FoodAPI}/default`);
       console.log(res.data.data.foods);
       setFoods(res.data.data.foods.map((_: any) => ({ ..._.food, checked: false })));
     } catch (error: any) {
@@ -200,7 +200,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
   //
   // TODO update room's food library
   const updateFoodHandler = () => {
-    customAxiosInstance({
+    authAxiosInstance({
       url: `${RoomAPI}/update/`,
       data: {
         event: "update",

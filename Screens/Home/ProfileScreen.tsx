@@ -8,7 +8,7 @@ import ProfileInfo from "../../Components/Home/ProfileInfo";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import { commonStyle } from "../../Style/CommonStyle";
-import customAxiosInstance from "../../Utils/authAxiosInstance";
+import authAxiosInstance from "../../Utils/authAxiosInstance";
 import { ProfileContext } from "../../Context/ProfileContext";
 import { TipsContext } from "../../Context/TipsContext";
 import { functionCategory } from "../../Constants/homeConst";
@@ -16,7 +16,7 @@ type ProfileScreenProps = NativeStackScreenProps<ProfileStackProps, "ProfileScre
 //get default room ID of user
 const getRoomIdCall = async (successCallBack: any, failCallback: any) => {
   // get default room id
-  await customAxiosInstance({
+  await authAxiosInstance({
     method: "get",
     url: `${RoomAPI}/`,
   })

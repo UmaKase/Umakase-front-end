@@ -1,7 +1,7 @@
 import { paddingLarge, textLarge, textMedium, windowWidth } from "../../Constants/cssConst";
 import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
-import customAxiosInstance from "../../Utils/authAxiosInstance";
+import authAxiosInstance from "../../Utils/authAxiosInstance";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
 import { REFRESH_KEY, CURRENTROOM_NAME_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
@@ -26,7 +26,7 @@ const profileProcess = async (successCallBack: any) => {
     console.log("No local refresh token");
     return Alert.alert("Error", "No local refresh token");
   }
-  customAxiosInstance({
+  authAxiosInstance({
     method: "get",
     url: `${UserAPI}/profile`,
   })

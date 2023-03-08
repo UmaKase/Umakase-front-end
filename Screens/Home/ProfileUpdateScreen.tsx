@@ -9,7 +9,7 @@ import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
 import { profileUpdateMode, profileUpdateTitle, profileUpdScreenStr } from "../../Constants/ProfileConst";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { TextInput } from "react-native-gesture-handler";
-import customAxiosInstance from "../../Utils/authAxiosInstance";
+import authAxiosInstance from "../../Utils/authAxiosInstance";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
 import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
@@ -56,7 +56,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
     }
     console.log(requestData);
     //call update property api
-    customAxiosInstance({
+    authAxiosInstance({
       method: requestMethod,
       url: requestUrl,
       data: requestData,

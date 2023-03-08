@@ -5,7 +5,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { backgroundColor, lightTextColor, paddingLarge, paddingMedium, paddingSmall, textMedium, windowHeight, windowWidth } from "../../Constants/cssConst";
 import UserItem from "./UserItem";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
-import customAxiosInstance from "../../Utils/authAxiosInstance";
+import authAxiosInstance from "../../Utils/authAxiosInstance";
 import { RoomAPI } from "../../Constants/backendAPI";
 import { UserContext } from "../../Context/UserContext";
 import { Room } from "../../Types/types";
@@ -15,7 +15,7 @@ const UserList: FunctionComponent<UserListProps> = () => {
   const [roomId, setRoomId] = useState("");
   //get default room id from api
   useEffect(() => {
-    customAxiosInstance({
+    authAxiosInstance({
       method: "get",
       url: `${RoomAPI}/info/:id`,
     })

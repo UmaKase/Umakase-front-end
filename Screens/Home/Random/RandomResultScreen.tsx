@@ -5,7 +5,7 @@ import { RandomStackNavigationProps } from "../../../Types/Navigations/HomeDrawe
 import Background from "../../../Components/Universal/Background";
 import { textMedium, windowHeight, windowWidth } from "../../../Constants/cssConst";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import customAxiosInstance from "../../../Utils/authAxiosInstance";
+import authAxiosInstance from "../../../Utils/authAxiosInstance";
 import { FoodAPI, ImgAPI } from "../../../Constants/backendAPI";
 import CacheImage from "../../../Components/Universal/CacheImage";
 import CenterActivityIndicator from "../../../Components/Universal/CenterActivityIndicator";
@@ -43,7 +43,7 @@ const RandomResultScreen: React.FC<RandomResultScreenProps> = ({ route, navigati
   // fetch random food function
   const randomFoodFunction = async () => {
     setFetching(true);
-    await customAxiosInstance({
+    await authAxiosInstance({
       method: "get",
       url: `${FoodAPI}/random/${currentRoomId}?count=5`,
     })
