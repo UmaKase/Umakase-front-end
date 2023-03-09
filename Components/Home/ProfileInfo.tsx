@@ -28,6 +28,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { commonStyle } from "../../Style/CommonStyle";
 import LoadingSpinner from "../../Components/Auth/LoadingSpinner";
 import { ProfileContext } from "../../Context/ProfileContext";
+import { useFocusEffect } from "@react-navigation/core";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -83,51 +84,69 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     useContext(ProfileContext);
   getCurrentRoomName(setCurrentRoomName);
 
-  //onload
-  useEffect(() => {
-    profileProcess((res: AxiosResponse<any, any>) => {
-      try {
-        //convert response to user profile type
-        const resData = res.data.data.user as UserProfileContainer;
-        //set user id in the parent screen
-        console.log(resData);
-        setUserId(resData.profile.userId);
-        setUserName(resData.profile.username);
-        if (resData.email != null && resData.email != "") {
-          setMembership(profileInfoNum.membershipFree);
-          setMembershipText(profileMembership[profileInfoNum.membershipFree]);
-        } else {
-          setMembership(profileInfoNum.memberUnregister);
-          setMembershipText(profileMembership[profileInfoNum.memberUnregister]);
-        }
-        //set user profile to state
-        setUseProfileContainer(resData);
-        if (setLastName != undefined && resData.profile.lastname != undefined) {
-          setLastName(resData.profile.lastname);
-        }
-        if (
-          setFirstName != undefined &&
-          resData.profile.firstname != undefined
-        ) {
-          setFirstName(resData.profile.firstname);
-        }
-        setFetching(false);
-      } catch (e) {
-        console.log(e);
-        const resData = {
-          profile: {
-            id: "",
-            username: "",
-            firstname: "",
-            lastname: "",
-            userId: "",
-          },
-        } as UserProfileContainer;
-        setUseProfileContainer(resData);
-        setFetching(false);
+  const displayName = () => {
+    if (membership == profileInfoNum.memberUnregister)
+      return (
+        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
+          {`${profileInfoStr.unregisterUserName}`}
+        </Text>
+      );
+    else if (lastName == "" && firstName == "")
+      return (
+        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
+          {`${userName}`}
+        </Text>
+      );
+    else
+      return (
+        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
+          {`${lastName} ${firstName}`}
+        </Text>
+      );
+  };
+  const profileSuccessHandler = (res: AxiosResponse<any, any>) => {
+    try {
+      //convert response to user profile type
+      const resData = res.data.data.user as UserProfileContainer;
+      //set user id in the parent screen
+      setUserId(resData.profile.userId);
+      setUserName(resData.profile.username);
+      if (resData.email != null && resData.email != "") {
+        setMembership(profileInfoNum.membershipFree);
+        setMembershipText(profileMembership[profileInfoNum.membershipFree]);
+      } else {
+        setMembership(profileInfoNum.memberUnregister);
+        setMembershipText(profileMembership[profileInfoNum.memberUnregister]);
       }
-    });
-  }, []);
+      //set user profile to state
+      setUseProfileContainer(resData);
+      if (setLastName != undefined && resData.profile.lastname != undefined) {
+        setLastName(resData.profile.lastname);
+      }
+      if (setFirstName != undefined && resData.profile.firstname != undefined) {
+        setFirstName(resData.profile.firstname);
+      }
+      setFetching(false);
+    } catch (e) {
+      console.log(e);
+      const resData = {
+        profile: {
+          id: "",
+          username: "",
+          firstname: "",
+          lastname: "",
+          userId: "",
+        },
+      } as UserProfileContainer;
+      setUseProfileContainer(resData);
+      setFetching(false);
+    }
+  };
+  useFocusEffect(
+    React.useCallback(() => {
+      profileProcess(profileSuccessHandler);
+    }, [])
+  );
   return fetching ? (
     <LoadingSpinner />
   ) : (
@@ -141,12 +160,16 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           />
         </View>
         <View style={styles.infoRightView}>
-          <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-            {`${lastName} ${firstName}`}
-          </Text>
-          <Text
-            style={[commonStyle.textContainer, { fontSize: textLarge }]}
-          >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
+          {displayName()}
+          {membership == profileInfoNum.memberUnregister ? (
+            <Text
+              style={[commonStyle.textContainer, { fontSize: textLarge }]}
+            >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
+          ) : (
+            <Text
+              style={[commonStyle.textContainer, { fontSize: textLarge }]}
+            >{`${profileInfoStr.IdHint}${userName}`}</Text>
+          )}
         </View>
       </View>
       {/* membership display*/}
@@ -172,7 +195,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
           <TouchableOpacity
             style={commonStyle.button_active}
-            onPress={async () => navigation.navigate("LoginScreen")}
+            onPress={async () => navigation.navigate("RegisterScreen")}
           >
             <Text style={commonStyle.textContainer}>
               {profileInfoStr.mergedUserRegisterBut}
@@ -183,15 +206,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
           <TouchableOpacity
             style={commonStyle.button_disable}
-            onPress={() => {
-              navigation.navigate("ProfileUpdateScreen", {
-                mode: profileUpdateMode.personalInfo,
-                userId: userId ? userId : "",
-                userName: userName,
-                setLastName: setLastName,
-                setFirstName: setFirstName,
-              });
-            }}
+            onPress={() => {}}
+            disabled
           >
             <Text style={commonStyle.textContainer}>
               {profileInfoStr.premiumRegisterBut}
@@ -211,6 +227,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
               mode: profileUpdateMode.personalInfo,
               userId: userId ? userId : "",
               userName: userName,
+              lastName: lastName,
+              firstName: firstName,
               setLastName: setLastName,
               setFirstName: setFirstName,
             })

@@ -6,6 +6,8 @@ export type ProfileStackProps = {
     mode:number;
     userId:string;
     userName:string;
+    firstName?:string;
+    lastName?:string;
     setFirstName?:React.Dispatch<React.SetStateAction<string>>;
     setLastName?:React.Dispatch<React.SetStateAction<string>>;
   };

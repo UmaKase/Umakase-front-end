@@ -17,6 +17,8 @@ import { Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import RoomBox from "../../../Components/Home/Room/RoomBox";
 import CenterActivityIndicator from "../../../Components/Universal/CenterActivityIndicator";
+import { TipsContext } from "../../../Context/TipsContext";
+import { functionCategory } from "../../../Constants/homeConst";
 
 type Props = NativeStackScreenProps<RoomStackNavigationProps, "RoomListScreen">;
 
@@ -65,9 +67,15 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.background}>
-        <CustomHeader
-          toggleMenu={() => navigation.dispatch(DrawerActions.openDrawer)}
-        ></CustomHeader>
+        {/* header =========================================== */}
+        <TipsContext.Provider
+          value={{ currentCategory: functionCategory.room }}
+        >
+          <CustomHeader
+            toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+          ></CustomHeader>
+        </TipsContext.Provider>
+        {/* mode  =========================================== */}
         {fetching ? (
           <CenterActivityIndicator size={"large"} color="#FFF" />
         ) : (
