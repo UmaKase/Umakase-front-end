@@ -201,7 +201,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       )}
       <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={commonStyle.button_active}
+          style={
+            membership == profileInfoNum.memberUnregister
+              ? commonStyle.button_disable
+              : commonStyle.button_active
+          }
           onPress={() =>
             navigation.navigate("ProfileUpdateScreen", {
               mode: profileUpdateMode.personalInfo,
@@ -211,6 +215,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
               setFirstName: setFirstName,
             })
           }
+          disabled={membership == profileInfoNum.memberUnregister}
         >
           <Text style={commonStyle.textContainer}>
             {profileUpdateTitle[profileUpdateMode.personalInfo]}
@@ -219,7 +224,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       </View>
       <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={commonStyle.button_active}
+          style={
+            membership == profileInfoNum.memberUnregister
+              ? commonStyle.button_disable
+              : commonStyle.button_active
+          }
           onPress={() =>
             navigation.navigate("ProfileUpdateScreen", {
               mode: profileUpdateMode.password,
@@ -227,6 +236,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
               userId: userId ? userId : "",
             })
           }
+          disabled={membership == profileInfoNum.memberUnregister}
         >
           <Text style={commonStyle.textContainer}>
             {profileUpdateTitle[profileUpdateMode.password]}
