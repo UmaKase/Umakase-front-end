@@ -146,6 +146,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({ naviga
                   console.log(user.id);
                 },
                 handleSelect: () => {},
+                handleAdd: ()=>console.log("this is the problem!")
               }}
             >
               <UserList />
