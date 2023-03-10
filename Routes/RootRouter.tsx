@@ -11,6 +11,7 @@ import { RootNavigationProps } from "../Types/Navigations/Root";
 import authAxiosInstance from "../Utils/authAxiosInstance";
 import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import { ACCESS_KEY, CONFIG_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../Constants/securestoreKey";
+import {navigationRef} from '../Ref'
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
@@ -69,7 +70,7 @@ const RootRouter: React.FC = () => {
   return fetching ? (
     <LoadingSpinner />
   ) : (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName={access ? "HomeStackNavigation" : "AuthNavigation"} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
         <Stack.Screen name="HomeStackNavigation" component={HomeStackNavigation} />

@@ -35,6 +35,7 @@ import _ from "lodash";
 import ToggleTagForSearch from "../../Components/InitialStep/ToggleTagForSearch";
 import Modal from "react-native-modal";
 import { setItemAsync } from "expo-secure-store";
+import normalAxios from "../../Utils/normalAxios";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -165,10 +166,10 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
     navigation.navigate("SelectFoodScreen", { TargetTags: selectedTagId });
   };
 
-  // get tags function (base on page change)
+  //ANCHOR fetch tags function (base on page change)
   useEffect(() => {
     if (!tagEnd) {
-      axios({
+      normalAxios({
         method: "post",
         url: `${TagAPI}/?take=20&page=${page}`,
         data: {
@@ -192,7 +193,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // search tag on reachend handler
   useEffect(() => {
     if (searchPage !== 1 && !searchEnd) {
-      axios({
+      normalAxios({
         method: "post",
         url: `${TagAPI}/search?name=${inputText}&take=20&page=${searchPage}`,
         data: {
