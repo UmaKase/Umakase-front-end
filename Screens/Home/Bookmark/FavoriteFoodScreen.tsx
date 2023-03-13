@@ -1,22 +1,10 @@
-import {
-  Alert,
-  FlatList,
-  ListRenderItemInfo,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, FlatList, ListRenderItemInfo, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { BookmarkedStackProps } from "../../../Types/Navigations/HomeDrawer/BookmarkedStack";
 import Background from "../../../Components/Universal/Background";
 import SearchBarForBookMark from "../../../Components/Home/Bookmark/SearchBarForBookMark";
-import {
-  backgroundColor,
-  windowHeight,
-  windowWidth,
-} from "../../../Constants/cssConst";
+import { backgroundColor, windowHeight, windowWidth } from "../../../Constants/cssConst";
 import ControlBar from "../../../Components/Home/Bookmark/ControlBar";
 import { BookMarkFood, Food, FoodsList } from "../../../Types/InitialSteps";
 import customAxiosInstance from "../../../Utils/customAxiosInstance";
@@ -77,9 +65,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
     try {
       const res = await customAxiosInstance.get(`${FoodAPI}/default`);
       console.log(res.data.data.foods);
-      setFoods(
-        res.data.data.foods.map((_: any) => ({ ..._.food, checked: false }))
-      );
+      setFoods(res.data.data.foods.map((_: any) => ({ ..._.food, checked: false })));
     } catch (error: any) {
       console.log(error);
     } finally {
@@ -282,11 +268,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
       {fetching ? (
         <></>
       ) : (
-        <Footer
-          goBackFunc={() => navigation.goBack()}
-          goNextFunc={() => console.log("no next step so far.")}
-          skipFunc={skipFunc}
-        />
+        <Footer goBackFunc={() => navigation.goBack()} goNextFunc={() => console.log("no next step so far.")} skipFunc={skipFunc} />
       )}
       {/* <TouchableOpacity
         onPress={() => optionHandler()}
@@ -317,17 +299,13 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
         />
       </TouchableOpacity> */}
       {searchMode ? (
-        <Modal
-          isVisible={searchMode}
-          style={styles.modal}
-          onBackdropPress={leaveSearchMode}
-        >
+        <Modal isVisible={searchMode} style={styles.modal} onBackdropPress={leaveSearchMode}>
           <View style={styles.modalBackground}>
             {/* ANCHOR search bar */}
             <SearchBar
               input={modalInputText}
               setInput={setModalInputText}
-              placeholderText={"find food"}
+              placeholderText={"料理を入力してください"}
               searchFunction={(input: string) => debounceSearchFood(input)}
             />
             {/* ANCHOR toggleFoods */}
@@ -339,11 +317,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
               numColumns={2}
               onEndReached={() => onModalScrollToBottom()}
               renderItem={({ item, index }) => {
-                let checkFlag = modalSelectedFood.find(
-                  (selectedFood) => selectedFood === item.id
-                )
-                  ? true
-                  : false;
+                let checkFlag = modalSelectedFood.find((selectedFood) => selectedFood === item.id) ? true : false;
                 return (
                   <ToggleFoodForSearch
                     key={index.toString()}
@@ -352,9 +326,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
                     onPressHandler={() => {
                       const tempFood = modalFood[index];
                       if (checkFlag) {
-                        setModalSelectedFood((prev) =>
-                          prev.filter((id) => id !== item.id)
-                        );
+                        setModalSelectedFood((prev) => prev.filter((id) => id !== item.id));
                       } else {
                         setModalSelectedFood((prev) => [...prev, item.id]);
                         setModalFood((prev) => [
