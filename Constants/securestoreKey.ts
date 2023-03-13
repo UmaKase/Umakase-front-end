@@ -8,4 +8,6 @@ export const TEMPUSERID_KEY = "TempUserId";
 export const TEMPUSERPASS_KEY = "TempUserPass";
 export const CURRENTROOM_ID_KEY = "CurrentRoomId";
 export const CURRENTROOM_NAME_KEY = "CurrentRoomName";
-export const INITIAL_STAGE_DATA = "InitialStageData";
+export const INITIAL_STAGE_TAG = "InitialStageFood";
+export const INITIAL_STAGE_FOOD = "InitialStageTag";
+
