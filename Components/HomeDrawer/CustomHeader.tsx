@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import {
+  greyTextColor,
   lightTextColor,
   paddingLarge,
   paddingMedium,
@@ -51,9 +52,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ toggleMenu }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconContainer}
-          onPress={() => Alert.alert("notification", "this is on todo list.")}
+          // onPress={() => Alert.alert("notification", "this is on todo list.")}
         >
-          <FontAwesome name="bell" size={30} color={lightTextColor} />
+          <FontAwesome name="bell" size={30} color={greyTextColor} />
         </TouchableOpacity>
       </View>
       <TipsModel

@@ -206,8 +206,11 @@ const HomeDrawerNavigation: React.FC = () => {
       >
         <Drawer.Screen
           name="ProfileStackNavigation"
-          options={{ drawerLabel: DrawerLabel.profile }}
           component={ProfileStackNavigation}
+          options={{
+            drawerLabel: DrawerLabel.profile,
+            drawerItemStyle: { height: 0 },
+          }}
         />
         <Drawer.Screen
           name="RandomStackNavigation"
