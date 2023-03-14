@@ -11,7 +11,7 @@ import { INITIAL_STAGE_FOOD } from '../Constants/securestoreKey';
 type UseFoodFetchResponse = [
   foods: FoodCheck[],
   setFoods: React.Dispatch<React.SetStateAction<FoodCheck[]>>,
-  setPage: React.Dispatch<React.SetStateAction<number>>
+  foodPageAdd: ()=>void
 ];
 
 export default function useFoodFetch(tags: string[]): UseFoodFetchResponse {
@@ -72,6 +72,10 @@ export default function useFoodFetch(tags: string[]): UseFoodFetchResponse {
   };
   // !SECTION
 
+  function foodPageAdd(){
+    setPage(prev=> prev+1);
+  }
+
   //ANCHOR initial fetch foods data, trigger is when page change.
   useEffect(() => {
     //NOTE check is foodListEnd is true, if not keep fetching data into foods array
@@ -83,5 +87,5 @@ export default function useFoodFetch(tags: string[]): UseFoodFetchResponse {
   }, [page]);
 
 
-  return [ foods, setFoods, setPage ];
+  return [ foods, setFoods, foodPageAdd ];
 }
