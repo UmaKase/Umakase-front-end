@@ -15,7 +15,7 @@ import {
   windowWidth,
 } from "../Constants/cssConst";
 
-import { ProfileStackNavigation } from "./ProfileStackNavigation";
+import ProfileStackNavigation from "./ProfileStackNavigation";
 import RoomStackNavigation from "./DrawerNavigation/RoomStackNavigation";
 import { SettingStackNavigation } from "./SettingStackNavigation";
 import { Entypo } from "@expo/vector-icons";
@@ -23,6 +23,7 @@ import {
   CommonActions,
   DrawerActions,
   useNavigation,
+  useRoute,
 } from "@react-navigation/native";
 import { DrawerLabel, logoutPopout } from "../Constants/homeConst";
 import BookmarkedStackNavigation from "./DrawerNavigation/BookmarkedStackNavigation";
@@ -38,13 +39,19 @@ import { AuthAPI } from "../Constants/backendAPI";
 import * as SecureStore from "expo-secure-store";
 import RandomStackNavigation from "./DrawerNavigation/RandomStackNavigation";
 import { CurrentRoomInfo, GlobalContext } from "../Context/GlobalContext";
-
 const Drawer = createDrawerNavigator<HomeDrawerNavigationProps>();
 
 const HomeDrawerNavigation: React.FC = () => {
   // navigation instance
   const navigation = useNavigation();
-
+  // issue:UM-12
+  // get parameter "mode" to decide the first screen
+  const route = useRoute();
+  const params = route.params;
+  const initialScreen =
+    params != undefined && params["mode"] == 1
+      ? "ProfileStackNavigation"
+      : "RandomStackNavigation";
   // global state
   const [currentRoomId, setCurrentRoomId] = useState("");
   const [currentRoomName, setCurrentRoomName] = useState("");
@@ -140,7 +147,11 @@ const HomeDrawerNavigation: React.FC = () => {
         <DrawerItem
           label={DrawerLabel.profile}
           onPress={() => {
-            navigation.dispatch(DrawerActions.jumpTo("ProfileStackNavigation"));
+            navigation.dispatch(
+              CommonActions.reset({
+                routes: [{ name: "HomeDrawerNavigation", params: { mode: 1 } }],
+              })
+            );
           }}
           icon={() => (
             <Entypo name="user" size={windowWidth * 0.06} color="#FFF" />
@@ -165,7 +176,7 @@ const HomeDrawerNavigation: React.FC = () => {
           }}
         />
         <Drawer.Screen
-          name="ProfileNavigation"
+          name="ProfileStackNavigation"
           options={{ drawerLabel: DrawerLabel.profile }}
           component={ProfileStackNavigation}
         ></Drawer.Screen>
@@ -181,7 +192,7 @@ const HomeDrawerNavigation: React.FC = () => {
       }}
     >
       <Drawer.Navigator
-        initialRouteName="RandomStackNavigation"
+        initialRouteName={initialScreen}
         screenOptions={{
           headerShown: false,
           drawerStyle: {
@@ -194,9 +205,12 @@ const HomeDrawerNavigation: React.FC = () => {
         drawerContent={(props) => <CustomDrawerContent {...props} />}
       >
         <Drawer.Screen
-          name="ProfileNavigation"
-          options={{ drawerLabel: DrawerLabel.profile }}
+          name="ProfileStackNavigation"
           component={ProfileStackNavigation}
+          options={{
+            drawerLabel: DrawerLabel.profile,
+            drawerItemStyle: { height: 0 },
+          }}
         />
         <Drawer.Screen
           name="RandomStackNavigation"

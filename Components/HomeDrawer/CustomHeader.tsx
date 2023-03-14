@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import {
+  greyTextColor,
   lightTextColor,
   paddingLarge,
   paddingMedium,
@@ -10,6 +11,8 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { TipsModel } from "../../Model/TipsModel";
+import { TipsContext } from "../../Context/TipsContext";
+import { functionTipsMessage } from "../../Constants/homeConst";
 
 interface CustomHeaderProps {
   toggleMenu: () => void;
@@ -17,6 +20,9 @@ interface CustomHeaderProps {
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({ toggleMenu }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  //get tip messages based on function
+  const { currentCategory } = useContext(TipsContext);
+  const tipMessages = functionTipsMessage[currentCategory];
   return (
     <View style={styles.container}>
       <View style={{ flex: 1 }}>
@@ -28,10 +34,14 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ toggleMenu }) => {
         style={{ flex: 1, justifyContent: "flex-end", flexDirection: "row" }}
       >
         <TouchableOpacity
-          style={styles.iconContainer}
+          style={[
+            styles.iconContainer,
+            tipMessages == undefined || tipMessages[0] == ""
+              ? { display: "none" }
+              : { display: "flex" },
+          ]}
           onPress={() => {
             setModalVisible(true);
-            console.log("tutorial on");
           }}
         >
           <FontAwesome
@@ -42,14 +52,15 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ toggleMenu }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconContainer}
-          onPress={() => Alert.alert("notification", "this is on todo list.")}
+          // onPress={() => Alert.alert("notification", "this is on todo list.")}
         >
-          <FontAwesome name="bell" size={30} color={lightTextColor} />
+          <FontAwesome name="bell" size={30} color={greyTextColor} />
         </TouchableOpacity>
       </View>
       <TipsModel
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}
+        tipMessages={tipMessages}
       />
     </View>
   );

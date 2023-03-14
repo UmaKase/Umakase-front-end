@@ -11,9 +11,9 @@ import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { TextInput } from "react-native-gesture-handler";
 import authAxiosInstance from "../../Utils/authAxiosInstance";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
-import axios, { AxiosError, AxiosResponse } from "axios";
 import { FontAwesome } from "@expo/vector-icons";
 import { commonStyle } from "../../Style/CommonStyle";
 
@@ -25,6 +25,12 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
   const [confirmValue, setConfirmValue] = useState<string>("");
   const [oldPassword, setOldPassword] = useState<string>();
   const [errMsg, setErrMsg] = useState<string>("");
+  const originalLastName: string = route.params.lastName
+    ? route.params.lastName
+    : "";
+  const originalFirstName: string = route.params.firstName
+    ? route.params.firstName
+    : "";
   //predefined function/processes
   //request api to update personal info
   const updateProcess = async (userId: string, mode: number, successCallBack: (res: AxiosResponse) => void, failCallback: (res: Error | AxiosError) => void) => {
@@ -38,8 +44,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
       console.log("No local refresh token");
       return Alert.alert("Error", "No local refresh token");
     }
-    console.log(`userid: ${route.params.userId}, mode: ${mode}`);
-
+    console.log("lasyname" + newLastName);
     //update personal property
     if (mode == profileUpdateMode.personalInfo) {
       requestMethod = "put";
@@ -54,7 +59,6 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
       //incomplete
       return;
     }
-    console.log(requestData);
     //call update property api
     authAxiosInstance({
       method: requestMethod,
@@ -96,7 +100,6 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
   };
   //verify input function
   const verifyInput = (): boolean => {
-    console.log("verifyinput");
     if (route.params.mode == profileUpdateMode.password) {
       if (confirmValue == "" || newValue == "") {
         setErrMsg(profileUpdScreenStr.errMsgNotNull);
@@ -119,12 +122,10 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
     }
     return true;
   };
-  //if user go back to this page, it will redirect to profile page
-  useFocusEffect(
-    React.useCallback(() => {
-      return () => navigation.navigate("ProfileScreen");
-    }, [])
-  );
+  useEffect(() => {
+    setNewLastName(originalLastName);
+    setNewSurName(originalFirstName);
+  }, []);
   let inputForm;
   //if update value is password, add text input for confirming the new password
   if (route.params.mode === profileUpdateMode.password) {
@@ -219,7 +220,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
                       }
 
                       setErrMsg(profileUpdScreenStr.errMsgEmpty);
-                      navigation.navigate("ProfileScreen");
+                      navigation.pop();
                     },
                     () => {
                       setErrMsg(profileUpdScreenStr.errMsgLogin);

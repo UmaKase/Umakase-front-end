@@ -3,14 +3,26 @@ export const profileScreenStr={
     userListHeaderText:"ルームメイト",
 }
 export const profileInfoStr={
-    IdHint:"id:",
+    IdHint:"ID:",
     IdMask:"****",
     membershipHint:"メンバーシップ:",
-    membershipFree:"無料会員",
     roomHint:"設定ルーム:",
-    membershipPremium:"プレミアム会員",
-    premiumBut:"プレミアムサービス登録",
+    mergedUserRegisterBut:"新規会員登録",
+    premiumRegisterBut:"プレミアムサービス登録",
     notSet:"未設定",
+    unregisterUserName:"ゲスト",
+}
+export const profileInfoNum={
+    default:0,
+    memberUnregister:1,
+    membershipFree:2,
+    membershipPremium:3,
+}
+export const profileMembership={
+    0:"",
+    1:"未登録",
+    2:"無料会員",
+    3:"プレミアム会員",
 }
 //data updated in profile update screen
 export const profileUpdScreenStr={
@@ -23,8 +35,8 @@ export const profileUpdScreenStr={
     titlePostfix:"更新",
     newPwdHint:"新しいパスワード",
     oldPwdHint:"古いパスワード",
-    surnameHint:"氏",
-    lastnameHint:"名",
+    surnameHint:"名",
+    lastnameHint:"姓",
     mailHint:"メールアドレス"
 }
 export const profileUpdateMode ={

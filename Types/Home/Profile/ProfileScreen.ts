@@ -1,4 +1,6 @@
 import {Profile} from "../../types"
 export interface UserProfileContainer{
-    profile:Profile
+    profile:Profile,
+    createdAt:string,
+    email:string,
 }

@@ -3,7 +3,7 @@ import { DrawerLabel } from "../../Constants/homeConst";
 export type HomeDrawerNavigationProps = {
   //screens
   RandomStackNavigation: undefined;
-  ProfileNavigation: {
+  ProfileStackNavigation: {
     ProfileScreen: undefined;
     ProfileUpdateScreen: ProfileStackProps;
   };
