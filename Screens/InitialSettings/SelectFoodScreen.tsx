@@ -18,6 +18,8 @@ import Modal from "react-native-modal";
 import ToggleFoodForSearch from "../../Components/InitialStep/ToggleFoodForSearch";
 import { setItemAsync } from "expo-secure-store";
 import normalAxios from "../../Utils/normalAxios";
+import useFoodFetch from "../../Hooks/useFoodFetch";
+import useSearchFoodFetch from "../../Hooks/useSearchFoodFetch";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -26,20 +28,8 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const [startSubmit, setStartSubmit] = useState(false);
   const [loadingText, setLoadingText] = useState("Creating new account");
 
-  // food var
-  const [foods, setFoods] = useState<FoodCheck[]>([]);
-  const [page, setPage] = useState(1);
-  const [foodEnd, setFoodEnd] = useState(false);
-
-  // text input state
-  const [inputText, setInputText] = useState<string>("");
-
-  // search food
-  const [searchMode, setSearchMode] = useState(false);
-  const [searchFoods, setSearchFoods] = useState<FoodCheck[]>([]);
-  const [searchPage, setSearchPage] = useState(1);
-  const [searchEnd, setSearchEnd] = useState(false);
-
+  const [foods, setFoods, foodPageAdd] = useFoodFetch(route.params.TargetTags);
+  const [searchModeController, searchFoodsController] = useSearchFoodFetch(foods);
   // ANCHOR submit function
   const submit = async () => {
     setStartSubmit(true);
@@ -64,7 +54,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       };
     } catch (error) {
       setStartSubmit(false);
-      // return Alert.alert("Submit Error", "Submit failed in phase 1");
+      return console.log("Submit Error", "Submit failed in phase 1");
     }
 
     // phase 2 login with temp user
@@ -95,53 +85,12 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  // on reach end flatlist request
-  const onEndReachedHandler = () => {
-    setPage((prev) => prev + 1);
-  };
 
   // search modal on reached end handler
   const onModalScrollToBottom = () => {
-    setSearchPage((prev) => prev + 1);
+    searchFoodsController.pageAdd();
   };
 
-  // leave search mode
-  const leaveSearchMode = () => {
-    setSearchMode(false);
-    setInputText("");
-    setSearchFoods([]);
-    setSearchPage(1);
-  };
-
-  // search food
-  const debounceSearchFood = useCallback(
-    _.debounce(async (input: string) => {
-      if (input === "") {
-        setSearchFoods([]);
-        setSearchPage(1);
-      } else {
-        axios({
-          method: "post",
-          url: `${FoodAPI}/db?name=${input}&take=20&page=${searchPage}`,
-          data: {
-            tagIds: route.params.TargetTags,
-            excludeFoods: foods.map((food) => food.id),
-          },
-        })
-          .then((res) => {
-            setSearchFoods(() => [
-              ...res.data.data.foods.map((foodData: FoodCheck) => {
-                foodData.checked = false;
-                return foodData;
-              }),
-            ]);
-          })
-          .catch((e) => console.log("food request error:", e));
-      }
-      console.log(input);
-    }, 500),
-    [inputText]
-  );
 
   // ANCHOR skip setting function
   const skipSetting = async () => {
@@ -198,64 +147,6 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  // get foods async function
-  async function getFoodFromAPI(){
-    try {
-      const res = await normalAxios({
-        url: `${FoodAPI}/db?take=20&page=${page}`,
-        method: "post",
-        data: {
-          tagIds: route.params.TargetTags,
-          excludeFoods: foods.map((food) => food.id),
-        },
-      })
-      if (res.data.data.foods[0]) {
-        setFoods((prev) => [
-          ...prev,
-          ...res.data.data.foods.map((foodData: FoodCheck) => {
-            foodData.checked = false;
-            return foodData;
-          }),
-        ]);
-      } else {
-        setFoodEnd(true);
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  useEffect(() => {
-    // fetch foods
-    if (!foodEnd) {
-      getFoodFromAPI();
-    } else {
-      return Alert.alert("You have reached the end of the foods list.");
-    }
-  }, [page]);
-
-  // search food on reachedend handler
-  useEffect(() => {
-    if (searchPage !== 1 && !searchEnd) {
-      axios({
-        url: `${FoodAPI}/db?name=${inputText}&take=20&page=${searchPage}`,
-        method: "post",
-        data: {
-          tagIds: route.params.TargetTags,
-          excludeFoods: foods.map((food) => food.id),
-        },
-      })
-        .then((res) => {
-          if (res.data.data.foods[0]) {
-            setSearchFoods((prev) => [...prev, ...res.data.data.foods]);
-          } else {
-            setSearchEnd(true);
-          }
-        })
-        .catch((e) => console.log(e.response));
-    } else {
-      setSearchEnd(true);
-    }
-  }, [searchPage]);
 
   //ANCHOR render item for foods flatlist
   const renderItemFood = useCallback(
@@ -285,7 +176,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             prev = [...prev, { ...item, checked: true }];
             return [...prev];
           });
-          setSearchFoods((prev) => {
+          searchFoodsController.setSearchFoods((prev) => {
             prev.splice(index, 1, { ...item, checked: !item.checked });
             return [...prev];
           });
@@ -296,7 +187,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             prev.splice(index, 1, { ...item, checked: !item.checked });
             return [...prev];
           });
-          setSearchFoods((prev) => {
+          searchFoodsController.setSearchFoods((prev) => {
             prev.splice(index, 1, { ...item, checked: !item.checked });
             return [...prev];
           });
@@ -304,7 +195,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       }
       return <ToggleFoodForSearch food={item} onPressHandler={onSearchFoodPressHandler}></ToggleFoodForSearch>;
     },
-    [searchFoods]
+    [searchFoodsController.searchFoods]
   );
 
   return (
@@ -346,7 +237,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           <View style={styles.searchContainer}>
             <TouchableOpacity
               onPress={() => {
-                setSearchMode((prev) => !prev);
+                searchModeController.startSearchMode();
               }}
             >
               <FontAwesome
@@ -361,7 +252,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           <FlatList
             data={foods}
             extraData={foods}
-            onEndReached={() => onEndReachedHandler()}
+            onEndReached={() => foodPageAdd()}
             keyExtractor={(item) => item.id}
             style={styles.foodsContainer}
             columnWrapperStyle={{ justifyContent: "space-evenly" }}
@@ -370,13 +261,13 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           />
           {/* footer */}
           <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit()} skipFunc={() => skipSetting()} />
-          {searchMode ? (
-            <Modal isVisible={searchMode} onBackdropPress={() => leaveSearchMode()} style={styles.modal}>
+          {searchModeController.searchMode ? (
+            <Modal isVisible={searchModeController.searchMode} onBackdropPress={() => searchModeController.endSearchMode()} style={styles.modal}>
               <View style={styles.modalBackground}>
-                <SearchBar input={inputText} setInput={setInputText} placeholderText="料理を入力してください" searchFunction={(input: string) => debounceSearchFood(input)}></SearchBar>
+                <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input:string) => searchFoodsController.debounceSearchFoodFunction(input)}></SearchBar>
                 {/* searchFoods flatlist */}
                 <FlatList
-                  data={searchFoods}
+                  data={searchFoodsController.searchFoods}
                   // extraData={searchFoods}
                   keyExtractor={(item, index) => index.toString()}
                   style={styles.foodsContainer}
@@ -389,7 +280,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
                 <View style={styles.modalFooter}>
                   <TouchableOpacity
                     onPress={() => {
-                      leaveSearchMode();
+                      searchModeController.endSearchMode();
                     }}
                     style={styles.modalSubmit}
                   >
