@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Alert } from "react-native";
 import { setItemAsync } from "expo-secure-store";
-import { navigationRef } from "../Ref";
+import { rootNavigationRef } from "../Ref";
 import { INITIAL_STAGE_FOOD, INITIAL_STAGE_TAG } from "../Constants/securestoreKey";
 
 const normalAxios = axios.create();
@@ -14,7 +14,7 @@ normalAxios.interceptors.response.use(
     // NOTE check if error is network error
     if (error.message === "Network Error") {
       // NOTE check if error.config has data & screen name is SelectFoodScreen
-      if (error.config.data && navigationRef.current?.getCurrentRoute()?.name == "SelectFoodScreen") {
+      if (error.config.data && rootNavigationRef.current?.getCurrentRoute()?.name == "SelectFoodScreen") {
         // change JSON to object
         const data = JSON.parse(error.config.data);
         // NOTE check if tagIds & foodIds array length > 0
