@@ -4,7 +4,7 @@ import { RoomStackNavigationProps } from "../../../Types/Navigations/HomeDrawer/
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Background from "../../../Components/Universal/Background";
 import { lightTextColor, paddingLarge, paddingMedium, textLarge, textMedium, windowHeight, windowWidth } from "../../../Constants/cssConst";
-import authAxiosInstance from "../../../Utils/authAxiosInstance";
+import customAxiosInstance from "../../../Utils/customAxiosInstance";
 import { RoomAPI } from "../../../Constants/backendAPI";
 import { getItemAsync, setItemAsync } from "expo-secure-store";
 import { CURRENTROOM_ID_KEY, CURRENTROOM_NAME_KEY } from "../../../Constants/securestoreKey";
@@ -43,7 +43,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     // get room list
-    authAxiosInstance({
+    customAxiosInstance({
       method: "get",
       url: `${RoomAPI}/info/${roomId}`,
     })

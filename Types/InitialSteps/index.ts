@@ -11,12 +11,6 @@ export interface TagsOnFoods {
   tag: Tag;
 }
 
-export interface FoodsList {
-  food: Food;
-  foodId: string;
-  roomId: string;
-}
-
 export interface Food {
   altName: string;
   country: string;
