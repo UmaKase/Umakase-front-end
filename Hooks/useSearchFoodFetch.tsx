@@ -8,21 +8,35 @@ import { FoodAPI } from "../Constants/backendAPI";
 import { FoodCheck } from "../Types/InitialSteps";
 
 type UseSearchFoodFetchResponse = [
-  searchFoods: FoodCheck[],
-  searchMode:boolean,
-  input:string,
   searchModeController: {
+    searchMode:boolean,
     startSearchMode: ()=>void;
     endSearchMode: ()=>void;
   },
   searchActionController:{
-    setInput: React.Dispatch<React.SetStateAction<string>>,
+    searchFoods: FoodCheck[],
     setSearchFoods: React.Dispatch<React.SetStateAction<FoodCheck[]>>
+    input:string,
+    setInput: React.Dispatch<React.SetStateAction<string>>,
     debounceSearchFoodFunction: _.DebouncedFunc<(userInput:string) => void>;
     pageAdd: ()=> void;
   },
 ];
 
+/**
+ *  - Controller of search food modal action
+ *  @param {boolean} searchMode => control modal is show or not,
+ *  @param {()=>void} startSearchMode => function to show modal
+ *  @param {()=>void} endSearchMode => function to hide modal and initialize params
+ * ---------------------------------------------------------------------------------
+ *  - Controller of search food fetch function
+ *  @param {FoodCheck} searchFood - search foods array state
+ *  @param {React.Dispatch<React.SetStateAction<FoodCheck[]>>} setSearchFoods - set search Foods
+ *  @param {string} input - search bar TextInput state
+ *  @param {React.Dispatch<React.SetStateAction<string>>} setInput - search bar add to TextInput onTextChange action to update input
+ *  @param {DebouncedFunc<(userInput: string)=>void>} debounceSearchFoodFunction - Debounce function for TextInput onTextChange action
+ *  @param {()=>void} pageAdd - FlatList onEndReached Handler add a new page will trigger next page api request
+ */
 export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetchResponse {
   // SECTION State 
   // NOTE decide modal be show or not, also control the reset mechanism
@@ -119,12 +133,15 @@ export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetc
   // SECTION Set functions into object to organize output
   // NOTE controller of modal action
   const searchModeController = {
+    searchMode: searchMode,
     startSearchMode: startSearchMode,
     endSearchMode: endSearchMode,
   }
 
   // NOTE controller of data of search foods
   const searchFoodsController = {
+    searchFoods: searchFoods,
+    input: input,
     setInput: setInput,
     setSearchFoods: setSearchFoods,
     debounceSearchFoodFunction: debounceSearchFoodFunction,
@@ -132,5 +149,6 @@ export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetc
   }
   // !SECTION
 
-  return [searchFoods, searchMode, input, searchModeController, searchFoodsController];
+
+  return [ searchModeController, searchFoodsController];
 }
