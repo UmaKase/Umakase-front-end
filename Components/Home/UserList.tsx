@@ -1,25 +1,11 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { FunctionComponent, useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
-import {
-  backgroundColor,
-  lightTextColor,
-  paddingLarge,
-  paddingMedium,
-  paddingSmall,
-  textMedium,
-  windowHeight,
-  windowWidth,
-} from "../../Constants/cssConst";
+import { backgroundColor, lightTextColor, paddingLarge, paddingMedium, paddingSmall, textMedium, windowHeight, windowWidth } from "../../Constants/cssConst";
 import UserItem from "./UserItem";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
-import customAxiosInstance from "../../Utils/customAxiosInstance";
+import authAxiosInstance from "../../Utils/authAxiosInstance";
 import { RoomAPI } from "../../Constants/backendAPI";
 import { UserContext } from "../../Context/UserContext";
 import { Room } from "../../Types/types";
@@ -29,7 +15,7 @@ const UserList: FunctionComponent<UserListProps> = () => {
   const [roomId, setRoomId] = useState("");
   //get default room id from api
   useEffect(() => {
-    customAxiosInstance({
+    authAxiosInstance({
       method: "get",
       url: `${RoomAPI}/info/:id`,
     })
@@ -50,19 +36,13 @@ const UserList: FunctionComponent<UserListProps> = () => {
       <View style={styles.headerLeftView}>
         <Text style={styles.headerTitle}>{headerTitle}</Text>
       </View>
-      <View
-        style={[styles.headerRightView, handleAdd ? {} : { display: "none" }]}
-      >
+      <View style={[styles.headerRightView, handleAdd ? {} : { display: "none" }]}>
         <TouchableOpacity
           onPress={() => {
             handleAdd ? handleAdd(roomId) : {};
           }}
         >
-          <FontAwesome
-            name="plus"
-            size={windowWidth * 0.05}
-            color={lightTextColor}
-          />
+          <FontAwesome name="plus" size={windowWidth * 0.05} color={lightTextColor} />
         </TouchableOpacity>
       </View>
     </View>
