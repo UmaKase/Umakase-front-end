@@ -101,7 +101,7 @@ export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetc
   );
   // !SECTION
 
-  // ANCHOR trigger when the page is changed, and do nothing when pagination reached end
+  // ANCHOR useEffect trigger when the page is changed, and do nothing when pagination reached end
   useEffect(() => {
     if(page !== 1 && !searchFoodListEnd){
       fetchData();
