@@ -1,6 +1,5 @@
 // official const & function & types
 import { useCallback, useEffect, useState } from "react";
-import { Alert } from "react-native";
 import { debounce } from "lodash";
 // custom const & function & types
 import normalAxios from "../Utils/normalAxios";
@@ -75,7 +74,6 @@ export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetc
         })
       }else{
         setSearchFoodListEnd(true);
-        return Alert.alert("You have reached the end of the list.");
       }
     } catch (error) {
       console.log("useSearchFoodFetch:",error)
