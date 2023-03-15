@@ -43,6 +43,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         data: {
           isTemp: true,
           foodIds: [...foods.filter((food) => food.checked === true).map((food) => food.id)],
+          tagIds:route.params.TargetTags,
           name: "__default",
         },
       });
