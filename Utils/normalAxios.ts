@@ -17,10 +17,15 @@ normalAxios.interceptors.response.use(
       if (error.config.data && rootNavigationRef.current?.getCurrentRoute()?.name == "SelectFoodScreen") {
         // change JSON to object
         const data = JSON.parse(error.config.data);
+        console.log("data:",data)
         // NOTE check if tagIds & foodIds array length > 0
-        if (data.tagIds.length > 0 && data.foodIds.length > 0) {
-          setItemAsync(INITIAL_STAGE_TAG, JSON.stringify(data.tagIds));
-          setItemAsync(INITIAL_STAGE_FOOD, JSON.stringify(data.foodIds));
+        if (data.tagIds.length > 0 || data.foodIds.length > 0) {
+          if(data.tagIds.length > 0){
+            setItemAsync(INITIAL_STAGE_TAG, JSON.stringify(data.tagIds));
+          }
+          if(data.foodIds.length > 0){
+            setItemAsync(INITIAL_STAGE_FOOD, JSON.stringify(data.foodIds));
+          }
           Alert.alert("ERROR", "Previous setting had been saved, information will inject automatically on next time open the app, you can close the app safely. :D")
         } else {
           console.log("error: foodIds length is 0!")
