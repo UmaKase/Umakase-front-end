@@ -8,15 +8,10 @@ import HomeStackNavigation from "../Navigations/HomeStackNavigation";
 import { AuthAPI } from "../Constants/backendAPI";
 import LoadingSpinner from "../Components/Auth/LoadingSpinner";
 import { RootNavigationProps } from "../Types/Navigations/Root";
-import customAxiosInstance from "../Utils/customAxiosInstance";
+import authAxiosInstance from "../Utils/authAxiosInstance";
 import { deleteItemAsync, getItemAsync } from "expo-secure-store";
-import {
-  ACCESS_KEY,
-  CONFIG_KEY,
-  REFRESH_KEY,
-  TEMPUSERID_KEY,
-  TEMPUSERPASS_KEY,
-} from "../Constants/securestoreKey";
+import { ACCESS_KEY, CONFIG_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../Constants/securestoreKey";
+import {navigationRef} from '../Ref'
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
@@ -29,7 +24,7 @@ const RootRouter: React.FC = () => {
   const tokenValidation = async () => {
     const config = await getItemAsync(CONFIG_KEY);
     if (config) {
-      await customAxiosInstance({
+      await authAxiosInstance({
         method: "post",
         url: `${AuthAPI}/token/access`,
       })
@@ -75,16 +70,10 @@ const RootRouter: React.FC = () => {
   return fetching ? (
     <LoadingSpinner />
   ) : (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={access ? "HomeStackNavigation" : "AuthNavigation"}
-        screenOptions={{ headerShown: false }}
-      >
+    <NavigationContainer ref={navigationRef}>
+      <Stack.Navigator initialRouteName={access ? "HomeStackNavigation" : "AuthNavigation"} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
-        <Stack.Screen
-          name="HomeStackNavigation"
-          component={HomeStackNavigation}
-        />
+        <Stack.Screen name="HomeStackNavigation" component={HomeStackNavigation} />
       </Stack.Navigator>
     </NavigationContainer>
   );

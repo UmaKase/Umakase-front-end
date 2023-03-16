@@ -17,6 +17,7 @@ import SearchBar from "../../Components/InitialStep/SearchBar";
 import Modal from "react-native-modal";
 import ToggleFoodForSearch from "../../Components/InitialStep/ToggleFoodForSearch";
 import { setItemAsync } from "expo-secure-store";
+import normalAxios from "../../Utils/normalAxios";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -46,7 +47,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     // reset function
     // phase 1 register a temp user
     try {
-      const res = await axios({
+      const res = await normalAxios({
         method: "post",
         url: `${AuthAPI}/register`,
         data: {
@@ -63,7 +64,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       };
     } catch (error) {
       setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 1");
+      // return Alert.alert("Submit Error", "Submit failed in phase 1");
     }
 
     // phase 2 login with temp user
@@ -71,7 +72,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     if(tempData === undefined){return console.log("Submit process failed with tempUserRegisterDate === undifined.")}
     setLoadingText("Login process");
     try {
-      const res = await axios({
+      const res = await normalAxios({
         method: "post",
         url: `${AuthAPI}/login`,
         data: {
@@ -148,7 +149,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     let tempData = undefined;
     // phase 1 register a temp user
     try {
-      const res = await axios({
+      const res = await normalAxios({
         method: "post",
         url: `${AuthAPI}/register`,
         data: {
@@ -174,7 +175,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     if(tempData === undefined){return console.log("Submit process failed with tempUserRegisterDate === undifined.")}
     setLoadingText("Login process");
     try {
-      const res = await axios({
+      const res = await normalAxios({
         method: "post",
         url: `${AuthAPI}/login`,
         data: {
@@ -197,12 +198,10 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  // get foods
-  useEffect(() => {
-    // fetch foods
-    if (!foodEnd) {
-      console.log("Target Tags", route.params.TargetTags);
-      axios({
+  // get foods async function
+  async function getFoodFromAPI(){
+    try {
+      const res = await normalAxios({
         url: `${FoodAPI}/db?take=20&page=${page}`,
         method: "post",
         data: {
@@ -210,20 +209,25 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           excludeFoods: foods.map((food) => food.id),
         },
       })
-        .then((res) => {
-          if (res.data.data.foods[0]) {
-            setFoods((prev) => [
-              ...prev,
-              ...res.data.data.foods.map((foodData: FoodCheck) => {
-                foodData.checked = false;
-                return foodData;
-              }),
-            ]);
-          } else {
-            setFoodEnd(true);
-          }
-        })
-        .catch((e) => console.log(e.response));
+      if (res.data.data.foods[0]) {
+        setFoods((prev) => [
+          ...prev,
+          ...res.data.data.foods.map((foodData: FoodCheck) => {
+            foodData.checked = false;
+            return foodData;
+          }),
+        ]);
+      } else {
+        setFoodEnd(true);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    // fetch foods
+    if (!foodEnd) {
+      getFoodFromAPI();
     } else {
       return Alert.alert("You have reached the end of the foods list.");
     }
