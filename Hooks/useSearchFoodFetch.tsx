@@ -1,6 +1,6 @@
 // official const & function & types
 import { useCallback, useEffect, useState } from "react";
-import { debounce } from "lodash";
+import { debounce, DebouncedFunc } from "lodash";
 // custom const & function & types
 import normalAxios from "../Utils/normalAxios";
 import { FoodAPI } from "../Constants/backendAPI";
@@ -17,7 +17,7 @@ type UseSearchFoodFetchResponse = [
     setSearchFoods: React.Dispatch<React.SetStateAction<FoodCheck[]>>
     input:string,
     setInput: React.Dispatch<React.SetStateAction<string>>,
-    debounceSearchFoodFunction: _.DebouncedFunc<(userInput:string) => void>;
+    debounceSearchFoodFunction: DebouncedFunc<(userInput:string) => void>;
     pageAdd: ()=> void;
   },
 ];
@@ -52,24 +52,27 @@ export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetc
 
   // SECTION Fetch search food data
   async function fetchData(userInput?:string){
-    console.log("this page is:", page);
     try {
       const response = await normalAxios({
         method:'post',
         url: `${FoodAPI}/db?name=${userInput?? input}&take=20&page=${page}`,
         data: {
-          excludeFoods: foods.map((food) => food.id),
+          excludeFoods: [],
         }
       })
       // check if there is still any foods in the response
       if(response.data.data.foods.length > 0){
+
+        const preProcessResponse = response.data.data.foods.map((sFood:FoodCheck)=>{
+          const foodAlreadyInList = foods.find((food)=>food.id === sFood.id);
+          sFood.checked = foodAlreadyInList?.checked ?? false;
+          return sFood;
+        });
+
         // NOTE preprocess food data to add checked value and set to searchFoods State
         setSearchFoods((prev)=>{
-          // process foods from response add checked with default value false
-          prev = [...prev, ...response.data.data.foods.map((food:FoodCheck)=>{
-            food.checked = false;
-            return food
-          })]
+          // process foods from response add checked with default value false          
+          prev = [...prev, ...preProcessResponse];
           return prev
         })
       }else{
@@ -84,20 +87,16 @@ export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetc
   // SECTION Debounce search food function implement to text input object to let it trigger by onTextChange event
   const debounceSearchFoodFunction = useCallback(
     debounce((userInput:string) => {
-      // reset page and end flag
+      // reset page and end flag      
       setPage(1);
+      setSearchFoods([]);
       setSearchFoodListEnd(false);
-      // NOTE check if input is empty string set searchFoods to [] and page to 1
-      if (userInput === "") {
-        setSearchFoods([]);
-        setPage(1);
-        // NOTE fetch data
-      } else{
-        console.log("fetch!!")
+      // NOTE check if input have value before fetch data
+      if (userInput !== "") {
         fetchData(userInput);
       }
-    }, 500),
-    [],
+    }, 1000),
+    [foods],
   );
   // !SECTION
 
