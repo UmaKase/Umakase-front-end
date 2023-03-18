@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import {
@@ -18,12 +18,14 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
-import { setItemAsync } from "expo-secure-store";
+import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
 import axios from "axios";
 import { AuthAPI } from "../../Constants/backendAPI";
 import {
   ACCESS_KEY,
   CONFIG_KEY,
+  INITIAL_STAGE_FOOD,
+  INITIAL_STAGE_TAG,
   REFRESH_KEY,
   TEMPUSERID_KEY,
   TEMPUSERPASS_KEY,
@@ -34,6 +36,33 @@ type Props = NativeStackScreenProps<InitialStepsProps, "IntroScreen">;
 const IntroScreen: React.FC<Props> = ({ navigation }) => {
   const [startSubmit, setStartSubmit] = useState(false);
   const [loadingText, setLoadingText] = useState("Creating new account");
+
+  // SECTION Check if user have previous setting
+  async function checkIfPreviousSetting(){
+    const prevTag = await getItemAsync(INITIAL_STAGE_TAG);
+    const prevFood = await getItemAsync(INITIAL_STAGE_FOOD);
+    if(prevTag || prevFood){
+      Alert.alert("Notify", "You have a previous setting been saved, do you like to proceed with the previous setting?", [
+        {
+          text:"No",
+          onPress:(async()=>{
+            await deleteItemAsync(INITIAL_STAGE_TAG);
+            await deleteItemAsync(INITIAL_STAGE_FOOD);
+          }),
+          style:"cancel"
+        },
+        {
+          text:"Yes",
+          onPress:(async()=>{
+            navigation.navigate("SelectTagScreen");
+          }),
+          style:"default"
+        }
+      ]);
+    }
+  }
+  // !SECTION
+
   const accountLoginHandler = () => {
     setItemAsync(CONFIG_KEY, "Completed");
     navigation.dispatch(
@@ -96,6 +125,11 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
       return Alert.alert("Submit Error", "Submit failed in phase 2");
     }
   };
+
+  useEffect(() => {
+    checkIfPreviousSetting(); 
+  }, [])
+  
   return (
     <SafeAreaProvider
       style={{
