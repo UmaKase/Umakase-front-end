@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { windowWidth, backgroundColor, windowHeight } from "../../Constants/cssConst";
 import ToggleFood from "../../Components/InitialStep/ToggleFood";
@@ -14,6 +14,7 @@ import ToggleFoodForSearch from "../../Components/InitialStep/ToggleFoodForSearc
 import useFoodFetch from "../../Hooks/useFoodFetch";
 import useSearchFoodFetch from "../../Hooks/useSearchFoodFetch";
 import useSubmit from "../../Hooks/InitialStage/useSubmit";
+import SubmitStatus from "../../Components/InitialStep/SubmitStatus";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -24,7 +25,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const [foodsController] = useFoodFetch(route.params.TargetTags);
   const [searchModeController, searchFoodsController] = useSearchFoodFetch(foodsController.foods);
   // useSubmit custom hook
-  const [submitStart, loadingText, submit ] = useSubmit();
+  const [submitStart, loadingText, submit] = useSubmit();
   // !SECTION ============================================================
 
   // SECTION FlatList render item
@@ -46,24 +47,24 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   // ANCHOR Render item => search foods FlatList
   const renderItemFoodSearch = useCallback(
     ({ item, index }: { item: FoodCheck; index: number }) => {
-      function onSearchFoodPressHandler(){
+      function onSearchFoodPressHandler() {
         // NOTE Check if the search food is already in the food list
-        const itemAlreadyInFoods = foodsController.foods.find((food)=>food.id === item.id);
+        const itemAlreadyInFoods = foodsController.foods.find((food) => food.id === item.id);
         // NOTE setFoods function change due to the food is in the list or not
-        if(itemAlreadyInFoods){
+        if (itemAlreadyInFoods) {
           // set food checked to opposite if the food match itemAlreadyInFoods
-          foodsController.setFoods(prev=> prev.map((food)=>{
-            if(food.id === itemAlreadyInFoods.id){
-              return {...food, checked: !food.checked};
+          foodsController.setFoods(prev => prev.map((food) => {
+            if (food.id === itemAlreadyInFoods.id) {
+              return { ...food, checked: !food.checked };
             }
             return food
           }))
-        }else{
-          foodsController.setFoods((prev)=>[...prev, {...item, checked: !item.checked}]);
+        } else {
+          foodsController.setFoods((prev) => [...prev, { ...item, checked: !item.checked }]);
         }
         // NOTE setSearchFoods
-        searchFoodsController.setSearchFoods((prev)=>{
-          prev.splice(index, 1, {...item, checked:!item.checked});
+        searchFoodsController.setSearchFoods((prev) => {
+          prev.splice(index, 1, { ...item, checked: !item.checked });
           return [...prev]
         })
       }
@@ -73,57 +74,61 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   );
   // !SECTION ============================================================
 
+  // SECTION Components
+  // Header
+  const Header: React.FC = () => (
+    <View>
+      <TouchableOpacity
+        style={styles.header}
+        onPress={() => {
+          console.log(foodsController.foods.filter((food) => food.checked === true).map((food) => food.name));
+        }}
+      >
+        <Text style={styles.headerFont}>
+          お気入り料理を{"\n"}
+          選択してください
+        </Text>
+      </TouchableOpacity>
+      {/* search Btn */}
+      <View style={styles.searchContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            searchModeController.startSearchMode();
+          }}
+        >
+          <FontAwesome
+            name="search"
+            size={windowWidth * 0.07}
+            // color={backgroundColor}
+            color="#FFF"
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+
+  // foods FlatList
+  const FoodList: React.FC = React.memo(() => <FlatList
+    data={foodsController.foods}
+    extraData={foodsController.foods}
+    onEndReached={() => foodsController.foodPageAdd()}
+    keyExtractor={(item) => item.id}
+    style={styles.foodsContainer}
+    columnWrapperStyle={{ justifyContent: "space-evenly" }}
+    numColumns={2}
+    renderItem={renderItemFood}
+  />,);
+
+  // !SECTION ============================================================
+
   return (
-    <SafeAreaProvider
-      style={{
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: submitStart ? backgroundColor : "#FFF",
-      }}
-    >
+    <SafeAreaProvider style={{ alignItems: "center", justifyContent: "center", backgroundColor: submitStart ? backgroundColor : "#FFF" }}>
       {submitStart ? (
-        <>
-          <ActivityIndicator size="large" color="#FFF"></ActivityIndicator>
-          <Text
-            style={{
-              color: "#FFF",
-              fontSize: windowWidth * 0.05,
-              marginTop: windowHeight * 0.03,
-            }}
-          >
-            {loadingText}
-          </Text>
-        </>
+        <SubmitStatus loadingText={loadingText} />
       ) : (
         <SafeAreaView style={styles.safeArea}>
-          {/* header */}
-          <TouchableOpacity
-            style={styles.header}
-            onPress={() => {
-              console.log(foodsController.foods.filter((food) => food.checked === true).map((food) => food.name));
-            }}
-          >
-            <Text style={styles.headerFont}>
-              お気入り料理を{"\n"}
-              選択してください
-            </Text>
-          </TouchableOpacity>
-          {/* search Btn */}
-          <View style={styles.searchContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                searchModeController.startSearchMode();
-              }}
-            >
-              <FontAwesome
-                name="search"
-                size={windowWidth * 0.07}
-                // color={backgroundColor}
-                color="#FFF"
-              />
-            </TouchableOpacity>
-          </View>
-          {/*ANCHOR FlatList => Food */}
+          <Header />
+          {/* ANCHOR foods FlatList */}
           <FlatList
             data={foodsController.foods}
             extraData={foodsController.foods}
@@ -134,40 +139,36 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             numColumns={2}
             renderItem={renderItemFood}
           />
-          {/* footer */}
-          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({tags:route.params.TargetTags, foods:foodsController.foods, getSelectedFoods:foodsController.getSelectedFoods})} skipFunc={() => submit({})} />
-          {searchModeController.searchMode ? (
-            <Modal isVisible={searchModeController.searchMode} onBackdropPress={searchModeController.endSearchMode} style={styles.modal}>
-              <View style={styles.modalBackground}>
-                <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input:string) => searchFoodsController.debounceSearchFoodFunction(input)}></SearchBar>
-                {/*ANCHOR FlatList => SearchFoods */}
-                <FlatList
-                  data={searchFoodsController.searchFoods}
-                  // extraData={searchFoods}
-                  keyExtractor={(item, index) => index.toString()}
-                  style={styles.foodsContainer}
-                  columnWrapperStyle={{ justifyContent: "space-evenly" }}
-                  numColumns={2}
-                  onEndReached={() => searchFoodsController.pageAdd()}
-                  renderItem={renderItemFoodSearch}
-                />
-                {/* modal footer */}
-                <View style={styles.modalFooter}>
-                  <TouchableOpacity
-                    onPress={searchModeController.endSearchMode}
-                    style={styles.modalSubmit}
-                  >
-                    <Text style={styles.modalSubmitText}>確定</Text>
-                  </TouchableOpacity>
-                </View>
+          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ tags: route.params.TargetTags, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
+          {/* ANCHOR Search food modal */}
+          {!searchModeController.searchMode ? <></> : <Modal isVisible={searchModeController.searchMode} onBackdropPress={searchModeController.endSearchMode} style={styles.modal}>
+            <View style={styles.modalBackground}>
+              <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input: string) => searchFoodsController.debounceSearchFoodFunction(input)}></SearchBar>
+              {/*ANCHOR FlatList => SearchFoods */}
+              <FlatList
+                data={searchFoodsController.searchFoods}
+                // extraData={searchFoods}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.foodsContainer}
+                columnWrapperStyle={{ justifyContent: "space-evenly" }}
+                numColumns={2}
+                onEndReached={() => searchFoodsController.pageAdd()}
+                renderItem={renderItemFoodSearch}
+              />
+              {/* modal footer */}
+              <View style={styles.modalFooter}>
+                <TouchableOpacity
+                  onPress={searchModeController.endSearchMode}
+                  style={styles.modalSubmit}
+                >
+                  <Text style={styles.modalSubmitText}>確定</Text>
+                </TouchableOpacity>
               </View>
-            </Modal>
-          ) : (
-            <></>
-          )}
+            </View>
+          </Modal>}
         </SafeAreaView>
       )}
-    </SafeAreaProvider>
+    </SafeAreaProvider >
   );
 };
 
