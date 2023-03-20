@@ -1,6 +1,5 @@
 // official const & function & types
 import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
 import {getItemAsync} from 'expo-secure-store';
 // custom const & function & types
 import normalAxios from '../Utils/normalAxios';
@@ -65,7 +64,6 @@ export default function useFoodFetch(tags: string[]): UseFoodFetchResponse {
       // NOTE if response.data.data.foods.length <= 0, then set food list end to true
       }else{
         setFoodListEnd(true);
-        return Alert.alert("You have reached the end of the list.");
       }
     } catch (error) {
       console.log("useFoodFetch:",error)
@@ -92,7 +90,7 @@ export default function useFoodFetch(tags: string[]): UseFoodFetchResponse {
     }else if(!foodListEnd && !firstLoading){
       fetchFoodData();
     }else{
-      return Alert.alert("You have reached the end of the foods list.");
+      console.log(`firstLoading: ${firstLoading}, foodListEnd: ${foodListEnd}, something wrong in useFoodFetch`);
     }
   }, [page, firstLoading]);
 
