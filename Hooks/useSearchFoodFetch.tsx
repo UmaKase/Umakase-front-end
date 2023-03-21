@@ -38,15 +38,15 @@ type UseSearchFoodFetchResponse = [
  */
 export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetchResponse {
   // SECTION State 
-  // NOTE decide modal be show or not, also control the reset mechanism
+  // decide modal be show or not, also control the reset mechanism
   const [searchMode, setSearchMode] = useState(false);
-  // NOTE foods array with checked value
+  // foods array with checked value
   const [searchFoods, setSearchFoods] = useState<FoodCheck[]>([]);
-  // NOTE text input for InputText component
+  // text input for InputText component
   const [input, setInput] = useState<string>("");
-  // NOTE control which page of the API pagination currently on
+  // control which page of the API pagination currently on
   const [page, setPage] = useState(1);
-  // NOTE a switch to check if the end of the API pagination is reached
+  // a switch to check if the end of the API pagination is reached
   const [searchFoodListEnd, setSearchFoodListEnd] = useState(false);
   // !SECTION
 
