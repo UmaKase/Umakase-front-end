@@ -2,21 +2,23 @@ import React, { useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { windowWidth, backgroundColor, windowHeight } from "../../Constants/cssConst";
 import ToggleFood from "../../Components/InitialStep/ToggleFood";
 import Footer from "../../Components/InitialStep/Footer";
 import { FoodCheck } from "../../Types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
-import Modal from "react-native-modal";
 import ToggleFoodForSearch from "../../Components/InitialStep/ToggleFoodForSearch";
 import useFoodFetch from "../../Hooks/useFoodFetch";
 import useSearchFoodFetch from "../../Hooks/useSearchFoodFetch";
 import useSubmit from "../../Hooks/InitialStage/useSubmit";
 import SubmitStatus from "../../Components/InitialStep/SubmitStatus";
+import FoodList from "../../Components/InitialStep/FoodList";
+import SearchModal from "../../Components/Universal/SearchModal";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
+
 
 const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
@@ -107,17 +109,26 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     </View>
   )
 
-  // foods FlatList
-  const FoodList: React.FC = React.memo(() => <FlatList
-    data={foodsController.foods}
-    extraData={foodsController.foods}
-    onEndReached={() => foodsController.foodPageAdd()}
-    keyExtractor={(item) => item.id}
-    style={styles.foodsContainer}
-    columnWrapperStyle={{ justifyContent: "space-evenly" }}
-    numColumns={2}
-    renderItem={renderItemFood}
-  />,);
+  // ModalFooter
+  const ModalFooter: React.FC = () => (
+    <View style={styles.modalFooter}>
+      <TouchableOpacity
+        onPress={searchModeController.endSearchMode}
+        style={styles.modalSubmit}
+      >
+        <Text style={styles.modalSubmitText}>確定</Text>
+      </TouchableOpacity>
+    </View>
+  )
+
+  // foods FlatList footer component depends on foodsController.foodListEnd to show the end of the list or activity indicator
+  const FoodListFooterComponent: React.FC = () => (
+    foodsController.foodListEnd ?
+      <View style={{ height: windowHeight * 0.1, alignItems: "center", justifyContent: "center" }}>
+        <Text style={{ color: "#FFF" }}>You have reached the end of the foods list.</Text>
+      </View> :
+      <ActivityIndicator size="large" color={"#FFF"} />
+  )
 
   // !SECTION ============================================================
 
@@ -129,48 +140,32 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         <SafeAreaView style={styles.safeArea}>
           <Header />
           {/* ANCHOR foods FlatList */}
-          <FlatList
-            data={foodsController.foods}
-            extraData={foodsController.foods}
-            onEndReached={() => foodsController.foodPageAdd()}
-            keyExtractor={(item) => item.id}
-            style={styles.foodsContainer}
-            columnWrapperStyle={{ justifyContent: "space-evenly" }}
-            numColumns={2}
+          <FoodList
+            foods={foodsController.foods}
+            onEndReached={foodsController.foodPageAdd}
             renderItem={renderItemFood}
+            listFooterComponent={FoodListFooterComponent}
           />
           <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ tags: route.params.TargetTags, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
           {/* ANCHOR Search food modal */}
-          {!searchModeController.searchMode ? <></> : <Modal isVisible={searchModeController.searchMode} onBackdropPress={searchModeController.endSearchMode} style={styles.modal}>
-            <View style={styles.modalBackground}>
-              <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input: string) => searchFoodsController.debounceSearchFoodFunction(input)}></SearchBar>
-              {/*ANCHOR FlatList => SearchFoods */}
-              <FlatList
-                data={searchFoodsController.searchFoods}
-                // extraData={searchFoods}
-                keyExtractor={(item, index) => index.toString()}
-                style={styles.foodsContainer}
-                columnWrapperStyle={{ justifyContent: "space-evenly" }}
-                numColumns={2}
-                onEndReached={() => searchFoodsController.pageAdd()}
-                renderItem={renderItemFoodSearch}
-              />
-              {/* modal footer */}
-              <View style={styles.modalFooter}>
-                <TouchableOpacity
-                  onPress={searchModeController.endSearchMode}
-                  style={styles.modalSubmit}
-                >
-                  <Text style={styles.modalSubmitText}>確定</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>}
+          <SearchModal visible={searchModeController.searchMode} onBackdropPress={searchModeController.endSearchMode} >
+            <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input: string) => searchFoodsController.debounceSearchFoodFunction(input)} />
+            {/*ANCHOR FlatList => SearchFoods */}
+            <FoodList
+              foods={searchFoodsController.searchFoods}
+              onEndReached={() => searchFoodsController.pageAdd()}
+              renderItem={renderItemFoodSearch}
+              listFooterComponent={() => <></>}
+            />
+            <ModalFooter />
+          </SearchModal>
         </SafeAreaView>
       )}
     </SafeAreaProvider >
   );
 };
+
+
 
 export default SelectFoodScreen;
 
