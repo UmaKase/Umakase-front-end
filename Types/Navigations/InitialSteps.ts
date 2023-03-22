@@ -1,3 +1,5 @@
+import { TagCheck } from "../InitialSteps";
+
 export type InitialStepsProps = {
   //Navigation
   HomeTabNavigation: undefined;
@@ -5,6 +7,7 @@ export type InitialStepsProps = {
   IntroScreen: undefined;
   SelectTagScreen: undefined;
   SelectFoodScreen: {
-    TargetTags: string[];
+    tags:TagCheck[];
+    tagIds: string[];
   };
 };

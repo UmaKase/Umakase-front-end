@@ -20,7 +20,7 @@ normalAxios.interceptors.response.use(
         // NOTE check if tagIds & foodIds array length > 0
         if (data.tagIds.length > 0 || data.selectedFoods.length > 0) {
           if(data.tagIds.length > 0){
-            setItemAsync(INITIAL_STAGE_TAG, JSON.stringify(data.tagIds));
+            setItemAsync(INITIAL_STAGE_TAG, JSON.stringify(data.selectedTags));
           }
           if(data.foodIds.length > 0){
             setItemAsync(INITIAL_STAGE_FOOD, JSON.stringify(data.selectedFoods));

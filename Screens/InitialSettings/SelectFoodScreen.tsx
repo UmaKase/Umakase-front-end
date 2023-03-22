@@ -24,7 +24,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // SECTION custom hooks => Logic control
   // food and search food custom hook
-  const [foodsController] = useFoodFetch(route.params.TargetTags);
+  const [foodsController] = useFoodFetch(route.params.tagIds);
   const [searchModeController, searchFoodsController] = useSearchFoodFetch(foodsController.foods);
   // useSubmit custom hook
   const [submitStart, loadingText, submit] = useSubmit();
@@ -75,8 +75,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           })
         } else {
           foodsController.setFoods((prev) => {
-            const newState = [...prev];
-            newState.splice(index, 1, { ...item, checked: !item.checked });
+            const newState = [...prev, { ...item, checked: !item.checked}];
             return newState;
           });
         }
@@ -163,7 +162,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             renderItem={renderItemFood}
             listFooterComponent={FoodListFooterComponent}
           />
-          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ tags: route.params.TargetTags, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
+          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ selectedTags:route.params.tags , selectedTagsId: route.params.tagIds, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
           {/* ANCHOR Search food modal */}
           <SearchModal visible={searchModeController.searchMode} onBackdropPress={searchModeController.endSearchMode} >
             <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input: string) => searchFoodsController.debounceSearchFoodFunction(input)} />

@@ -1,20 +1,21 @@
 import { CommonActions } from "@react-navigation/native";
 import { setItemAsync } from "expo-secure-store";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AuthAPI } from "../../Constants/backendAPI";
 import { ACCESS_KEY, CONFIG_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
 import { rootNavigationRef } from "../../Ref";
-import { FoodCheck } from "../../Types/InitialSteps";
+import { FoodCheck, TagCheck } from "../../Types/InitialSteps";
 import normalAxios from "../../Utils/normalAxios";
 
 type ReturnType = [
   submitStart:boolean,
   loadingText: "Creating new account" | "Login process",
-  submit:({ tags, foods, getSelectedFoods }: SubmitFunctionInput)=> Promise<void>
+  submit:({ selectedTagsId, foods, getSelectedFoods }: SubmitFunctionInput)=> Promise<void>
 ];
 
 type SubmitFunctionInput = {
-  tags?:string[]
+  selectedTags?: TagCheck[],
+  selectedTagsId?:string[]
   foods?:FoodCheck[],
   getSelectedFoods?: ()=>FoodCheck[];
 }
@@ -29,11 +30,12 @@ export default function useSubmit():ReturnType{
   const [loadingText, setLoadingText] = useState<"Creating new account"|"Login process">("Creating new account");
 
   /**
-   * @param tags - tag id array from selectTagScreen || set as [] if skip
+   * @param selectedTags - selected tags from selectTagScreen || set as [] if skip
+   * @param selectedTagsId - tag id array from selectTagScreen || set as [] if skip
    * @param foods - foods state from useFoodFetch custom hook || set as [] if skip
    * @param getSelectedFoods - get selected foods from foodController.foods || set as [] if skip
    */
-  async function submit({tags, foods, getSelectedFoods}:SubmitFunctionInput){
+  async function submit({selectedTags, selectedTagsId, foods, getSelectedFoods}:SubmitFunctionInput){
     setSubmitStart(true);
     let tempData = undefined;
     // reset function
@@ -46,7 +48,8 @@ export default function useSubmit():ReturnType{
           isTemp: true,
           foodIds: foods !== undefined? [...foods.filter((food) => food.checked === true).map((food) => food.id)] : [],
           name: "__default",
-          tagIds:tags ?? [],
+          tagIds:selectedTagsId ?? [],
+          selectedTags: selectedTags ?? [],
           selectedFoods: getSelectedFoods !== undefined? getSelectedFoods() : [],
         },
       });

@@ -4,6 +4,10 @@ export interface Tag {
   food: TagsOnFoods[];
 }
 
+export interface TagCheck extends Tag {
+  checked?: boolean;
+}
+
 export interface TagsOnFoods {
   tagId: string;
   foodId: string;
