@@ -90,7 +90,7 @@ export default function useFoodFetch(tags: string[]): UseFoodFetchResponse {
     }else if(!foodListEnd && !firstLoading){
       fetchFoodData();
     }else{
-      console.log(`firstLoading: ${firstLoading}, foodListEnd: ${foodListEnd}, something wrong in useFoodFetch`);
+      console.log(`firstLoading: ${firstLoading}, foodListEnd: ${foodListEnd}, reached the end of the food list`);
     }
   }, [page, firstLoading]);
 
