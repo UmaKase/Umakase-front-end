@@ -32,7 +32,7 @@ export default function useTagFetch(): UseTagFetchResponse {
 
   //SECTION fetch tag data function
   async function fetchTagData() {
-    if (tags.length !== 0 && firstLoading) {
+    if (tags.length > 0 && page === 1) {
       rootNavigationRef.current?.navigate("SelectFoodScreen", { tags: tags, tagIds: tags.map(tag => tag.id) });
     }
     try {
