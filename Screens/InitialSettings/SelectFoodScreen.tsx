@@ -28,6 +28,17 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const [searchModeController, searchFoodsController] = useSearchFoodFetch(foodsController.foods);
   // useSubmit custom hook
   const [submitStart, loadingText, submit] = useSubmit();
+  // empty FoodCheck as fake data for food list while the length%2 !== 0
+  const emptyFood: FoodCheck = {
+    altName: "",
+    country: "",
+    createdAt: "",
+    id: "",
+    img: "",
+    name: "",
+    updatedAt: "",
+    checked: false,
+  }
   // !SECTION ============================================================
 
   // SECTION FlatList render item
@@ -37,8 +48,9 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       function onFoodPressHandler() {
         // set foods checked status
         foodsController.setFoods((prev) => {
-          prev.splice(index, 1, { ...item, checked: !item.checked });
-          return [...prev];
+          const newState = [...prev];
+          newState.splice(index, 1, { ...item, checked: !item.checked });
+          return newState;
         });
       }
       return <ToggleFood food={item} onPressHandler={onFoodPressHandler} />;
@@ -55,19 +67,24 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
         // NOTE setFoods function change due to the food is in the list or not
         if (itemAlreadyInFoods) {
           // set food checked to opposite if the food match itemAlreadyInFoods
-          foodsController.setFoods(prev => prev.map((food) => {
-            if (food.id === itemAlreadyInFoods.id) {
-              return { ...food, checked: !food.checked };
-            }
-            return food
-          }))
+          foodsController.setFoods(prev => {
+            const newState = [...prev];
+            const foodIndex = newState.findIndex((food) => food.id === item.id);
+            newState.splice(foodIndex, 1, { ...item, checked: !item.checked });
+            return newState;
+          })
         } else {
-          foodsController.setFoods((prev) => [...prev, { ...item, checked: !item.checked }]);
+          foodsController.setFoods((prev) => {
+            const newState = [...prev];
+            newState.splice(index, 1, { ...item, checked: !item.checked });
+            return newState;
+          });
         }
         // NOTE setSearchFoods
         searchFoodsController.setSearchFoods((prev) => {
-          prev.splice(index, 1, { ...item, checked: !item.checked });
-          return [...prev]
+          const newState = [...prev];
+          newState.splice(index, 1, { ...item, checked: !item.checked });
+          return newState;
         })
       }
       return <ToggleFoodForSearch food={item} onPressHandler={onSearchFoodPressHandler}></ToggleFoodForSearch>;
@@ -139,9 +156,9 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
       ) : (
         <SafeAreaView style={styles.safeArea}>
           <Header />
-          {/* ANCHOR foods FlatList */}
+          {/* ANCHOR foods FoodList */}
           <FoodList
-            foods={foodsController.foods}
+            foods={foodsController.foods.length % 2 === 0 ? foodsController.foods : [...foodsController.foods, emptyFood]}
             onEndReached={foodsController.foodPageAdd}
             renderItem={renderItemFood}
             listFooterComponent={FoodListFooterComponent}
@@ -150,9 +167,9 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           {/* ANCHOR Search food modal */}
           <SearchModal visible={searchModeController.searchMode} onBackdropPress={searchModeController.endSearchMode} >
             <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input: string) => searchFoodsController.debounceSearchFoodFunction(input)} />
-            {/*ANCHOR FlatList => SearchFoods */}
+            {/*ANCHOR search foods FoodList */}
             <FoodList
-              foods={searchFoodsController.searchFoods}
+              foods={searchFoodsController.searchFoods.length % 2 === 0 ? searchFoodsController.searchFoods : [...searchFoodsController.searchFoods, emptyFood]}
               onEndReached={() => searchFoodsController.pageAdd()}
               renderItem={renderItemFoodSearch}
               listFooterComponent={() => <></>}
@@ -192,22 +209,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingRight: windowWidth * 0.1,
   },
-  foodsContainer: {
-    flex: 1,
-  },
 
   // modal
-  modal: {
-    margin: 0,
-    justifyContent: "flex-end",
-  },
-  modalBackground: {
-    flex: 0.75,
-    height: windowHeight * 0.75, //giving the height because of the flatlist need a fix height to be scrollable
-    backgroundColor: "#FFF",
-    borderTopLeftRadius: windowWidth * 0.05,
-    borderTopRightRadius: windowWidth * 0.05,
-  },
   modalFooter: {
     width: windowWidth,
     height: windowHeight * 0.15,
