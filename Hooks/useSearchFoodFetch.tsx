@@ -60,24 +60,25 @@ export default function useSearchFoodFetch(foods:FoodCheck[]): UseSearchFoodFetc
           excludeFoods: [],
         }
       })
-      // check if there is still any foods in the response
-      if(response.data.data.foods.length > 0){
 
-        const preProcessResponse = response.data.data.foods.map((sFood:FoodCheck)=>{
-          const foodAlreadyInList = foods.find((food)=>food.id === sFood.id);
-          sFood.checked = foodAlreadyInList?.checked ?? false;
-          return sFood;
-        });
-
-        // NOTE preprocess food data to add checked value and set to searchFoods State
-        setSearchFoods((prev)=>{
-          // process foods from response add checked with default value false          
-          prev = [...prev, ...preProcessResponse];
-          return prev
-        })
-      }else{
+      // check if there is still any foods in the response if not set the end of the list to true
+      if(response.data.data.foods.length <= 0){
         setSearchFoodListEnd(true);
+        return;
       }
+
+      // NOTE preprocess food data to add checked value and set to searchFoods State
+      const preProcessResponse = response.data.data.foods.map((sFood:FoodCheck)=>{
+        const foodAlreadyInList = foods.find((food)=>food.id === sFood.id);
+        sFood.checked = foodAlreadyInList?.checked ?? false;
+        return sFood;
+      });
+
+      // NOTE combine the new response with the previous state
+      setSearchFoods((prev)=>{
+        const newState = [...prev, ...preProcessResponse];
+        return newState;
+      })
     } catch (error) {
       console.log("useSearchFoodFetch:",error)
     }
