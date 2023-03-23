@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   // modal
   modalFooter: {
     width: windowWidth,
-    height: windowHeight * 0.15,
+    height: windowHeight * 0.1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
