@@ -63,6 +63,12 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const renderItemFoodSearch = useCallback(
     ({ item, index }: { item: FoodCheck; index: number }) => {
       function onSearchFoodPressHandler() {
+        // NOTE setSearchFoods
+        searchFoodsController.setSearchFoods((prev) => {
+          const newState = [...prev];
+          newState.splice(index, 1, { ...item, checked: !item.checked });
+          return newState;
+        })
         // NOTE Check if the search food is already in the food list
         const itemAlreadyInFoods = foodsController.foods.find((food) => food.id === item.id);
         // NOTE setFoods function change due to the food is in the list or not
@@ -76,16 +82,10 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           })
         } else {
           foodsController.setFoods((prev) => {
-            const newState = [...prev, { ...item, checked: !item.checked}];
+            const newState = [...prev, { ...item, checked: !item.checked }];
             return newState;
           });
         }
-        // NOTE setSearchFoods
-        searchFoodsController.setSearchFoods((prev) => {
-          const newState = [...prev];
-          newState.splice(index, 1, { ...item, checked: !item.checked });
-          return newState;
-        })
       }
       return <ToggleFoodForSearch food={item} onPressHandler={onSearchFoodPressHandler}></ToggleFoodForSearch>;
     },
@@ -97,17 +97,12 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   // Header
   const Header: React.FC = () => (
     <View>
-      <TouchableOpacity
-        style={styles.header}
-        onPress={() => {
-          console.log(foodsController.foods.filter((food) => food.checked === true).map((food) => food.name));
-        }}
-      >
+      <View style={styles.header}>
         <Text style={styles.headerFont}>
           お気入り料理を{"\n"}
           選択してください
         </Text>
-      </TouchableOpacity>
+      </View>
       {/* search Btn */}
       <View style={styles.searchContainer}>
         <TouchableOpacity
@@ -152,11 +147,11 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             foods={foodsController.foods.length % 2 === 0 ? foodsController.foods : [...foodsController.foods, emptyFood]}
             onEndReached={foodsController.foodPageAdd}
             renderItem={renderItemFood}
-            listFooterComponent={()=>{
+            listFooterComponent={() => {
               return <ListFooterComponent reachedEnd={foodsController.foodListEnd} reachedEndText={"You have reached the end of the foods list"} />
             }}
           />
-          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ selectedTags:route.params.tags , selectedTagsId: route.params.tagIds, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
+          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ selectedTags: route.params.tags, selectedTagsId: route.params.tagIds, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
           {/* ANCHOR Search food modal */}
           <SearchModal visible={searchModeController.searchMode} onBackdropPress={searchModeController.endSearchMode} >
             <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input: string) => searchFoodsController.debounceSearchFoodFunction(input)} />
