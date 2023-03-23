@@ -2,21 +2,22 @@ import React, { useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { backgroundColor, windowHeight, windowWidth } from "../../Constants/cssConst";
 import { FlatList } from "react-native-gesture-handler";
 import Footer from "../../Components/InitialStep/Footer";
 import { FontAwesome } from "@expo/vector-icons";
 import ToggleTag from "../../Components/InitialStep/ToggleTag";
-import { Tag, TagCheck } from "../../Types/InitialSteps";
+import { TagCheck } from "../../Types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import _ from "lodash";
 import ToggleTagForSearch from "../../Components/InitialStep/ToggleTagForSearch";
-import Modal from "react-native-modal";
 import useTagFetch from "../../Hooks/useTagFetch";
 import useSearchTagFetch from "../../Hooks/useSearchTagFetch";
 import useSubmit from "../../Hooks/InitialStage/useSubmit";
 import ListFooterComponent from "../../Components/Universal/ListFooterComponent";
+import SubmitStatus from "../../Components/InitialStep/SubmitStatus";
+import SearchModal from "../../Components/Universal/SearchModal";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
@@ -28,6 +29,13 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // useSubmit to control submit process
   const [submitStart, loadingText, submit] = useSubmit();
 
+  // emtpy TagCheck as fake data for tag list while the length%2 !== 0\
+  const emptyTag: TagCheck = {
+    id: "",
+    name: "",
+    food: [],
+    checked: false,
+  }
 
   // next step function
   const goNextStep = async () => {
@@ -83,54 +91,56 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
 
 
   // SECTION components for SelectTagScreen
+
+  const Header: React.FC = () => {
+    return (
+      <View>
+        {/* header */}
+        <View style={styles.header}>
+          <Text style={styles.headerFont}>
+            お気入り料理の種類を{"\n"}
+            選択してください
+          </Text>
+        </View>
+        {/* search Btn */}
+        <View style={styles.searchContainer}>
+          <TouchableOpacity onPress={searchModeController.searchModeStart}>
+            <FontAwesome
+              name="search"
+              size={windowWidth * 0.07}
+              // color={backgroundColor}
+              color="#FFF"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
+
+  const ModalFooter: React.FC = () => {
+    return (
+      <View style={styles.modalFooter}>
+        <TouchableOpacity
+          onPress={searchModeController.searchModeEnd}
+          style={styles.modalSubmit}
+        >
+          <Text style={styles.modalSubmitText}>確定</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
   // !SECTION ==========================================================================================================
 
   return (
-    <SafeAreaProvider
-      style={{
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: submitStart ? backgroundColor : "#FFF",
-      }}
-    >
+    <SafeAreaProvider style={{ alignItems: "center", justifyContent: "center", backgroundColor: submitStart ? backgroundColor : "#FFF" }}>
       {submitStart ? (
-        <>
-          <ActivityIndicator size="large" color="#FFF"></ActivityIndicator>
-          <Text
-            style={{
-              color: "#FFF",
-              fontSize: windowWidth * 0.05,
-              marginTop: windowHeight * 0.03,
-            }}
-          >
-            {loadingText}
-          </Text>
-        </>
+        <SubmitStatus loadingText={loadingText} />
       ) : (
-        <SafeAreaView
-          style={[styles.safeArea, { opacity: searchModeController.searchMode ? 0.7 : 1 }]}
-        >
-          {/* header */}
-          <View style={styles.header}>
-            <Text style={styles.headerFont}>
-              お気入り料理の種類を{"\n"}
-              選択してください
-            </Text>
-          </View>
-          {/* search Btn */}
-          <View style={styles.searchContainer}>
-            <TouchableOpacity onPress={searchModeController.searchModeStart}>
-              <FontAwesome
-                name="search"
-                size={windowWidth * 0.07}
-                // color={backgroundColor}
-                color="#FFF"
-              />
-            </TouchableOpacity>
-          </View>
-          {/* card container */}
+        <SafeAreaView style={[styles.safeArea, { opacity: searchModeController.searchMode ? 0.7 : 1 }]}>
+          <Header />
+          {/* NOTE Tags List */}
           <FlatList
-            data={tags}
+            data={tags.length % 2 === 0 ? tags : [...tags, emptyTag]}
             extraData={tags}
             keyExtractor={(item, index) => index.toString()}
             style={styles.tagContainer}
@@ -148,38 +158,21 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
             goNextFunc={() => goNextStep()}
             skipFunc={() => submit({})}
           />
-          {/* modal */}
-          <Modal
-            isVisible={searchModeController.searchMode}
-            onBackdropPress={searchModeController.searchModeEnd}
-            style={styles.modal}
-          >
-            <View style={styles.modalBackground}>
-              <SearchBar
-                input={searchTagController.input}
-                setInput={searchTagController.setInput}
-                placeholderText="種類を入力してください"
-                searchFunction={(input: string) => searchTagController.debounceSearchFunction(input)}
-              ></SearchBar>
-              <FlatList
-                data={searchTagController.searchTags}
-                keyExtractor={(item, index) => index.toString()}
-                style={styles.tagContainer}
-                columnWrapperStyle={{ justifyContent: "space-evenly" }}
-                numColumns={2}
-                onEndReached={searchTagController.searchPageAdd}
-                renderItem={renderItemTagSearch}
-              />
-              <View style={styles.modalFooter}>
-                <TouchableOpacity
-                  onPress={searchModeController.searchModeEnd}
-                  style={styles.modalSubmit}
-                >
-                  <Text style={styles.modalSubmitText}>確定</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
+          {/* search modal */}
+          <SearchModal visible={searchModeController.searchMode} onBackdropPress={searchModeController.searchModeEnd} >
+            <SearchBar input={searchTagController.input} setInput={searchTagController.setInput} placeholderText="種類を入力してください" searchFunction={(input: string) => searchTagController.debounceSearchFunction(input)} />
+            {/* NOTE Search Tags List */}
+            <FlatList
+              data={searchTagController.searchTags.length % 2 === 0 ? searchTagController.searchTags : [...searchTagController.searchTags, emptyTag]}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.tagContainer}
+              columnWrapperStyle={{ justifyContent: "space-evenly" }}
+              numColumns={2}
+              onEndReached={searchTagController.searchPageAdd}
+              renderItem={renderItemTagSearch}
+            />
+            <ModalFooter />
+          </SearchModal>
         </SafeAreaView>
       )}
     </SafeAreaProvider>
