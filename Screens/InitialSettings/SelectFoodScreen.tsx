@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { windowWidth, backgroundColor, windowHeight } from "../../Constants/cssConst";
 import ToggleFood from "../../Components/InitialStep/ToggleFood";
@@ -16,6 +16,7 @@ import useSubmit from "../../Hooks/InitialStage/useSubmit";
 import SubmitStatus from "../../Components/InitialStep/SubmitStatus";
 import FoodList from "../../Components/InitialStep/FoodList";
 import SearchModal from "../../Components/Universal/SearchModal";
+import ListFooterComponent from "../../Components/Universal/ListFooterComponent";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
@@ -137,15 +138,6 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
     </View>
   )
 
-  // foods FlatList footer component depends on foodsController.foodListEnd to show the end of the list or activity indicator
-  const FoodListFooterComponent: React.FC = () => (
-    foodsController.foodListEnd ?
-      <View style={{ height: windowHeight * 0.1, alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ color: "#FFF" }}>You have reached the end of the foods list.</Text>
-      </View> :
-      <ActivityIndicator size="large" color={"#FFF"} />
-  )
-
   // !SECTION ============================================================
 
   return (
@@ -160,7 +152,9 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             foods={foodsController.foods.length % 2 === 0 ? foodsController.foods : [...foodsController.foods, emptyFood]}
             onEndReached={foodsController.foodPageAdd}
             renderItem={renderItemFood}
-            listFooterComponent={FoodListFooterComponent}
+            listFooterComponent={()=>{
+              return <ListFooterComponent reachedEnd={foodsController.foodListEnd} reachedEndText={"You have reached the end of the foods list"} />
+            }}
           />
           <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ selectedTags:route.params.tags , selectedTagsId: route.params.tagIds, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
           {/* ANCHOR Search food modal */}
