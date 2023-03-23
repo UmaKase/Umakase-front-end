@@ -6,21 +6,20 @@ import {
   windowHeight,
   windowWidth,
 } from "../../Constants/cssConst";
-import { Tag } from "../../Types/InitialSteps";
+import { TagCheck } from "../../Types/InitialSteps";
 
 type Props = {
-  tag: Tag;
-  check: boolean;
+  tag: TagCheck;
   onPressHandler: () => void;
 };
 
-const ToggleTag: React.FC<Props> = ({ tag, check, onPressHandler }) => {
+const ToggleTag: React.FC<Props> = ({ tag, onPressHandler }) => {
   return (
     <TouchableOpacity
-      style={[styles.tag, { borderColor: check ? drawerColor : "#FFF" }]}
+      style={[styles.tag, { borderColor: tag.checked ? drawerColor : "#FFF" }]}
       onPress={() => onPressHandler()}
     >
-      <Text style={[styles.tagFont, { color: check ? drawerColor : "#000" }]}>
+      <Text style={[styles.tagFont, { color: tag.checked ? drawerColor : "#000" }]}>
         {tag.name}
       </Text>
     </TouchableOpacity>

@@ -1,227 +1,99 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import {
-  ActivityIndicator,
-  Alert,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import {
-  backgroundColor,
-  windowHeight,
-  windowWidth,
-} from "../../Constants/cssConst";
-import axios from "axios";
-import {
-  ACCESS_KEY,
-  CONFIG_KEY,
-  REFRESH_KEY,
-  TEMPUSERID_KEY,
-  TEMPUSERPASS_KEY,
-} from "../../Constants/securestoreKey";
-import { AuthAPI, TagAPI } from "../../Constants/backendAPI";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { backgroundColor, windowHeight, windowWidth } from "../../Constants/cssConst";
 import { FlatList } from "react-native-gesture-handler";
 import Footer from "../../Components/InitialStep/Footer";
-import { CommonActions } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
 import ToggleTag from "../../Components/InitialStep/ToggleTag";
-import { Tag } from "../../Types/InitialSteps";
+import { Tag, TagCheck } from "../../Types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
 import _ from "lodash";
 import ToggleTagForSearch from "../../Components/InitialStep/ToggleTagForSearch";
 import Modal from "react-native-modal";
-import { setItemAsync } from "expo-secure-store";
-import normalAxios from "../../Utils/normalAxios";
+import useTagFetch from "../../Hooks/useTagFetch";
+import useSearchTagFetch from "../../Hooks/useSearchTagFetch";
+import useSubmit from "../../Hooks/InitialStage/useSubmit";
+import ListFooterComponent from "../../Components/Universal/ListFooterComponent";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 
 const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
-  // tag var
-  const [tags, setTags] = useState<Tag[]>([]);
-  // selected tags id string[]
-  const [selectedTagId, setSelectedTagId] = useState<string[]>([]);
-  // text input state
-  const [inputText, setInputText] = useState<string>("");
-  // api request page number
-  const [page, setPage] = useState<number>(1);
-  // fetch tag API reached end page
-  const [tagEnd, setTagEnd] = useState(false);
 
-  // search tags
-  const [searchTags, setSearchTags] = useState<Tag[]>([]);
-  // search request page
-  const [searchPage, setSearchPage] = useState<number>(1);
-  // search API reached end page
-  const [searchEnd, setSearchEnd] = useState(false);
+  // useTagFetch to control food Page
+  const [tags, setTags, tagPageAdd, tagPageEnd] = useTagFetch();
+  const [searchModeController, searchTagController] = useSearchTagFetch(tags);
+  // useSubmit to control submit process
+  const [submitStart, loadingText, submit] = useSubmit();
 
-  // search mode contorller boolean
-  const [searchMode, setSearchMode] = useState(false);
 
-  const [startSubmit, setStartSubmit] = useState(false);
-  const [loadingText, setLoadingText] = useState("Creating new account");
-
-  // search tag http request
-  const debounceSearchTags = useCallback(
-    _.debounce((input: string) => {
-      if (input === "") {
-        setSearchTags([]);
-        setSearchPage(1);
-      } else {
-        axios({
-          method: "post",
-          url: `${TagAPI}/search?name=${input}&take=20&page=${searchPage}`,
-          data: {
-            excludes: selectedTagId,
-          },
-        })
-          .then((res) => {
-            setSearchTags(res.data.data.tags);
-            console.log(`${TagAPI}/?name=${input}&take=20&page=${searchPage}`);
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      }
-    }, 500),
-    []
-  );
-
-  // function activate after FlatList reached the end
-  const onScrollToBottom = () => {
-    setPage((prev) => prev + 1);
-  };
-
-  // search modal on reached end handler
-  const onModalScrollToBottom = () => {
-    setSearchPage((prev) => prev + 1);
-  };
-
-  // leave search mode
-  const leaveSearchMode = () => {
-    setSearchMode(false);
-    setInputText("");
-    setSearchTags([]);
-    setSearchPage(1);
-  };
-
-  // skip function
-  const skipSettingFunction = async () => {
-    setStartSubmit(true);
-    let tempData = undefined;
-    // phase 1 register a temp user
-    try {
-      const res = await axios({
-        method: "post",
-        url: `${AuthAPI}/register`,
-        data: {
-          isTemp: true,
-          foodIds: [],
-          name: "__default",
-        },
-      });
-      setItemAsync(TEMPUSERID_KEY, res.data.data.tmpId);
-      setItemAsync(TEMPUSERPASS_KEY, res.data.data.tmpPass);
-      tempData = {
-        id: res.data.data.tmpId,
-        pass: res.data.data.tmpPass,
-      };
-    } catch (error) {
-      setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 1");
-    }
-
-    // phase 2 login with temp user
-    // prettier-ignore
-    if(tempData === undefined){return console.log("Submit process failed with tempUserRegisterDate === undifined.")}
-    setLoadingText("Login process");
-    try {
-      const res = await axios({
-        method: "post",
-        url: `${AuthAPI}/login`,
-        data: {
-          username: tempData.id,
-          password: tempData.pass,
-        },
-      });
-      setItemAsync(ACCESS_KEY, res.data.data.accessToken);
-      setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
-      setItemAsync(CONFIG_KEY, "Completed");
-      console.log("saved");
-      navigation.dispatch(
-        CommonActions.reset({
-          routes: [{ name: "HomeDrawerNavigation" }],
-        })
-      );
-    } catch (error) {
-      setStartSubmit(false);
-      return Alert.alert("Submit Error", "Submit failed in phase 2");
-    }
-  };
   // next step function
   const goNextStep = async () => {
-    navigation.navigate("SelectFoodScreen", { TargetTags: selectedTagId });
+    const selectedTags = tags.filter((tag) => tag.checked === true);
+    navigation.navigate("SelectFoodScreen", { tags: selectedTags, tagIds: selectedTags.map((tag) => tag.id) });
   };
 
-  //ANCHOR fetch tags function (base on page change)
-  useEffect(() => {
-    if (!tagEnd) {
-      normalAxios({
-        method: "post",
-        url: `${TagAPI}/?take=20&page=${page}`,
-        data: {
-          excludes: selectedTagId,
-        },
-      })
-        .then((res) => {
-          if (res.data.data.tags[0]) {
-            setTags((prev) => [...prev, ...res.data.data.tags]);
-          } else {
-            setTagEnd(true);
-          }
-          console.log(`${TagAPI}/?take=20&page=${page}`);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    }
-  }, [page]);
 
-  // search tag on reachend handler
-  useEffect(() => {
-    if (searchPage !== 1 && !searchEnd) {
-      normalAxios({
-        method: "post",
-        url: `${TagAPI}/search?name=${inputText}&take=20&page=${searchPage}`,
-        data: {
-          excludes: selectedTagId,
-        },
+  // SECTION renderItem of FlatList for tag & searchTag
+  // NOTE render item for tag FlatList
+  const renderItemTag = useCallback(({ item, index }: { item: TagCheck; index: number }) => {
+    function onPressHandler() {
+      setTags((prev) => {
+        const newState = [...prev];
+        newState[index].checked = !item.checked;
+        return newState;
       })
-        .then((res) => {
-          if (res.data.data.tags[0]) {
-            setSearchTags((prev) => [...prev, ...res.data.data.tags]);
-          } else {
-            setSearchEnd(true);
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
     }
-  }, [searchPage]);
+    return <ToggleTag tag={item} onPressHandler={onPressHandler}></ToggleTag>
+  }, [tags])
+
+  // NOTE render item for search tag FlatList
+  const renderItemTagSearch = useCallback(({ item, index }: { item: TagCheck; index: number }) => {
+    function onPressHandler() {
+      // NOTE check if the tag is already in the list
+      const tagAlreadyExist = tags.find((tag) => tag.id === item.id);
+      // NOTE if the tag is already in the list, then change the searchTags checked status to match the tag in the list
+      if (tagAlreadyExist) {
+        setTags((prev) => {
+          const newState = [...prev];
+          const tagIndex = newState.findIndex((tag) => tag.id === item.id);
+          newState[tagIndex].checked = !item.checked;
+          return newState;
+        });
+      } else {
+        // NOTE if the tag is not in the list, then add it to the list and set checked value to false
+        setTags((prev) => {
+          const newState = [...prev, { ...item, checked: false }];
+          return newState;
+        });
+      }
+
+      // NOTE change the searchTags checked status
+      searchTagController.setSearchTags((prev) => {
+        const newState = [...prev];
+        newState[index].checked = !item.checked;
+        return newState;
+      })
+    }
+    return <ToggleTagForSearch tag={item} onPressHandler={onPressHandler} ></ToggleTagForSearch>
+  }, [searchTagController.searchTags])
+  // !SECTION ==========================================================================================================
+
+
+  // SECTION components for SelectTagScreen
+  // !SECTION ==========================================================================================================
 
   return (
     <SafeAreaProvider
       style={{
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: startSubmit ? backgroundColor : "#FFF",
+        backgroundColor: submitStart ? backgroundColor : "#FFF",
       }}
     >
-      {startSubmit ? (
+      {submitStart ? (
         <>
           <ActivityIndicator size="large" color="#FFF"></ActivityIndicator>
           <Text
@@ -236,7 +108,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
         </>
       ) : (
         <SafeAreaView
-          style={[styles.safeArea, { opacity: searchMode ? 0.7 : 1 }]}
+          style={[styles.safeArea, { opacity: searchModeController.searchMode ? 0.7 : 1 }]}
         >
           {/* header */}
           <View style={styles.header}>
@@ -247,11 +119,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
           </View>
           {/* search Btn */}
           <View style={styles.searchContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                setSearchMode((prev) => !prev);
-              }}
-            >
+            <TouchableOpacity onPress={searchModeController.searchModeStart}>
               <FontAwesome
                 name="search"
                 size={windowWidth * 0.07}
@@ -268,99 +136,43 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
             style={styles.tagContainer}
             columnWrapperStyle={{ justifyContent: "space-evenly" }}
             numColumns={2}
-            onEndReached={() => onScrollToBottom()}
-            renderItem={({ item, index }) => {
-              const tempTag = tags[index];
-              const isChecked = selectedTagId.find((tagId) => tagId === item.id)
-                ? true
-                : false;
-              return (
-                <ToggleTag
-                  tag={item}
-                  check={isChecked}
-                  onPressHandler={() => {
-                    if (isChecked) {
-                      setSelectedTagId((prev) =>
-                        prev.filter((id) => id !== item.id)
-                      );
-                    } else {
-                      setSelectedTagId((prev) => [...prev, item.id]);
-                      setTags((prev) => {
-                        return [
-                          tempTag,
-                          ...prev.filter((target) => target.id != tempTag.id),
-                        ];
-                      });
-                    }
-                  }}
-                ></ToggleTag>
-              );
+            onEndReached={() => tagPageAdd()}
+            renderItem={renderItemTag}
+            ListFooterComponent={() => {
+              return <ListFooterComponent reachedEnd={tagPageEnd} reachedEndText={"this is the end of the tags list."} />
             }}
           />
           {/* footer */}
           <Footer
             goBackFunc={() => navigation.goBack()}
             goNextFunc={() => goNextStep()}
-            skipFunc={() => skipSettingFunction()}
+            skipFunc={() => submit({})}
           />
           {/* modal */}
           <Modal
-            isVisible={searchMode}
-            onBackdropPress={() => leaveSearchMode()}
+            isVisible={searchModeController.searchMode}
+            onBackdropPress={searchModeController.searchModeEnd}
             style={styles.modal}
           >
             <View style={styles.modalBackground}>
               <SearchBar
-                input={inputText}
-                setInput={setInputText}
+                input={searchTagController.input}
+                setInput={searchTagController.setInput}
                 placeholderText="種類を入力してください"
-                searchFunction={(input: string) => debounceSearchTags(input)}
+                searchFunction={(input: string) => searchTagController.debounceSearchFunction(input)}
               ></SearchBar>
               <FlatList
-                data={searchTags}
-                extraData={searchTags}
+                data={searchTagController.searchTags}
                 keyExtractor={(item, index) => index.toString()}
                 style={styles.tagContainer}
                 columnWrapperStyle={{ justifyContent: "space-evenly" }}
                 numColumns={2}
-                onEndReached={() => onModalScrollToBottom()}
-                renderItem={({ item, index }) => {
-                  const isChecked = selectedTagId.find(
-                    (tagId) => tagId === item.id
-                  )
-                    ? true
-                    : false;
-                  return (
-                    <ToggleTagForSearch
-                      tag={item}
-                      check={isChecked}
-                      onPressHandler={() => {
-                        const tempSearchTag = searchTags[index];
-                        if (isChecked) {
-                          setSelectedTagId((prev) =>
-                            prev.filter((id) => id !== item.id)
-                          );
-                        } else {
-                          setSelectedTagId((prev) => [...prev, item.id]);
-                          setTags((prev) => {
-                            return [
-                              tempSearchTag,
-                              ...prev.filter(
-                                (target) => target.id != tempSearchTag.id
-                              ),
-                            ];
-                          });
-                        }
-                      }}
-                    ></ToggleTagForSearch>
-                  );
-                }}
+                onEndReached={searchTagController.searchPageAdd}
+                renderItem={renderItemTagSearch}
               />
               <View style={styles.modalFooter}>
                 <TouchableOpacity
-                  onPress={() => {
-                    leaveSearchMode();
-                  }}
+                  onPress={searchModeController.searchModeEnd}
                   style={styles.modalSubmit}
                 >
                   <Text style={styles.modalSubmitText}>確定</Text>

@@ -3,10 +3,10 @@ import { getItemAsync, setItemAsync } from "expo-secure-store";
 import { AuthAPI } from "../Constants/backendAPI";
 import { ACCESS_KEY, REFRESH_KEY } from "../Constants/securestoreKey";
 
-const authAxiosInstance = axios.create();
+const customAxiosInstance = axios.create();
 
 // Request interceptor for API calls
-authAxiosInstance.interceptors.request.use(
+customAxiosInstance.interceptors.request.use(
   async (config) => {
     let accessToken;
     try {
@@ -28,7 +28,7 @@ authAxiosInstance.interceptors.request.use(
 );
 
 // Response interceptor for API calls
-authAxiosInstance.interceptors.response.use(
+customAxiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -61,4 +61,4 @@ authAxiosInstance.interceptors.response.use(
   }
 );
 
-export default authAxiosInstance;
+export default customAxiosInstance;
