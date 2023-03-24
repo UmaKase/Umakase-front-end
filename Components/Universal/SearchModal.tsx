@@ -12,7 +12,7 @@ type SearchModalType = {
 // create a SearchModal component have multiple React.FC components inside as children
 const SearchModal: React.FC<SearchModalType> = ({ children, visible, onBackdropPress }) => {
   return (
-    <Modal isVisible={visible} onBackdropPress={onBackdropPress} style={styles.modal}>
+    <Modal isVisible={visible} onBackdropPress={onBackdropPress} style={styles.modal} avoidKeyboard={true}>
       <View style={styles.modalBackground}>
         {children}
       </View>

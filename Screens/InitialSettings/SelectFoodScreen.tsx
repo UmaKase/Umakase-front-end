@@ -20,6 +20,17 @@ import ListFooterComponent from "../../Components/Universal/ListFooterComponent"
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
+// empty FoodCheck as fake data for food list while the length%2 !== 0
+const emptyFood: FoodCheck = {
+  altName: "",
+  country: "",
+  createdAt: "",
+  id: "",
+  img: "",
+  name: "",
+  updatedAt: "",
+  checked: false,
+}
 
 const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
@@ -29,17 +40,6 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const [searchModeController, searchFoodsController] = useSearchFoodFetch(foodsController.foods);
   // useSubmit custom hook
   const [submitStart, loadingText, submit] = useSubmit();
-  // empty FoodCheck as fake data for food list while the length%2 !== 0
-  const emptyFood: FoodCheck = {
-    altName: "",
-    country: "",
-    createdAt: "",
-    id: "",
-    img: "",
-    name: "",
-    updatedAt: "",
-    checked: false,
-  }
   // !SECTION ============================================================
 
   // SECTION FlatList render item
@@ -95,43 +95,47 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // SECTION Components
   // Header
-  const Header: React.FC = () => (
-    <View>
-      <View style={styles.header}>
-        <Text style={styles.headerFont}>
-          お気入り料理を{"\n"}
-          選択してください
-        </Text>
+  const Header: React.FC = React.memo(() => {
+    return (
+      <View>
+        <View style={styles.header}>
+          <Text style={styles.headerFont}>
+            お気入り料理を{"\n"}
+            選択してください
+          </Text>
+        </View>
+        {/* search Btn */}
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              searchModeController.startSearchMode();
+            }}
+          >
+            <FontAwesome
+              name="search"
+              size={windowWidth * 0.07}
+              // color={backgroundColor}
+              color="#FFF"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-      {/* search Btn */}
-      <View style={styles.searchContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            searchModeController.startSearchMode();
-          }}
-        >
-          <FontAwesome
-            name="search"
-            size={windowWidth * 0.07}
-            // color={backgroundColor}
-            color="#FFF"
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  )
+    )
+  })
 
   // ModalFooter
-  const ModalFooter: React.FC = () => (
-    <View style={styles.modalFooter}>
-      <TouchableOpacity
-        onPress={searchModeController.endSearchMode}
-        style={styles.modalSubmit}
-      >
-        <Text style={styles.modalSubmitText}>確定</Text>
-      </TouchableOpacity>
-    </View>
-  )
+  const ModalFooter: React.FC = React.memo(() => {
+    return (
+      <View style={styles.modalFooter}>
+        <TouchableOpacity
+          onPress={searchModeController.endSearchMode}
+          style={styles.modalSubmit}
+        >
+          <Text style={styles.modalSubmitText}>確定</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  })
 
   // !SECTION ============================================================
 

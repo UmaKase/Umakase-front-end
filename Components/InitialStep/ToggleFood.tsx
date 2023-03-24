@@ -35,7 +35,7 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({ food, onPressHandler }) => {
   );
 };
 
-export default ToggleFood;
+export default React.memo(ToggleFood);
 
 const width = windowWidth * 0.35;
 const height = (width * 4) / 3;
