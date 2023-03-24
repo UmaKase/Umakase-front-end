@@ -1,12 +1,11 @@
 import { StyleSheet, TextInput, View } from "react-native";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   windowWidth,
   windowHeight,
   drawerColor,
   backgroundColor,
 } from "../../Constants/cssConst";
-import { FontAwesome } from "@expo/vector-icons";
 
 type Props = {
   placeholderText: string;
@@ -21,12 +20,20 @@ const SearchBar: React.FC<Props> = ({
   placeholderText,
   searchFunction,
 }) => {
+  const textInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if(textInputRef.current !== null){
+      setTimeout(()=>{textInputRef.current!.focus();}, 40)
+    }
+  }, [textInputRef.current])
+  
   return (
     <View style={styles.searchbarContainer}>
       <TextInput
+        ref={textInputRef}
         style={styles.searchbar}
         value={input}
-        autoFocus={true}
         onChangeText={(newText) => {
           setInput(newText);
           searchFunction(newText);

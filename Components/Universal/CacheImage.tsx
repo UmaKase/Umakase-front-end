@@ -50,7 +50,7 @@ const CacheImage: React.FC<Props> = ({ url, style }) => {
   );
 };
 
-export default CacheImage;
+export default React.memo(CacheImage);
 
 const styles = StyleSheet.create({
   centerObject: {

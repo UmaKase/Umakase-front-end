@@ -20,6 +20,17 @@ import ListFooterComponent from "../../Components/Universal/ListFooterComponent"
 
 type Props = NativeStackScreenProps<InitialStepsProps, "SelectFoodScreen">;
 
+// empty FoodCheck as fake data for food list while the length%2 !== 0
+const emptyFood: FoodCheck = {
+  altName: "",
+  country: "",
+  createdAt: "",
+  id: "",
+  img: "",
+  name: "",
+  updatedAt: "",
+  checked: false,
+}
 
 const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
@@ -29,17 +40,6 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const [searchModeController, searchFoodsController] = useSearchFoodFetch(foodsController.foods);
   // useSubmit custom hook
   const [submitStart, loadingText, submit] = useSubmit();
-  // empty FoodCheck as fake data for food list while the length%2 !== 0
-  const emptyFood: FoodCheck = {
-    altName: "",
-    country: "",
-    createdAt: "",
-    id: "",
-    img: "",
-    name: "",
-    updatedAt: "",
-    checked: false,
-  }
   // !SECTION ============================================================
 
   // SECTION FlatList render item
@@ -63,6 +63,12 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   const renderItemFoodSearch = useCallback(
     ({ item, index }: { item: FoodCheck; index: number }) => {
       function onSearchFoodPressHandler() {
+        // NOTE setSearchFoods
+        searchFoodsController.setSearchFoods((prev) => {
+          const newState = [...prev];
+          newState.splice(index, 1, { ...item, checked: !item.checked });
+          return newState;
+        })
         // NOTE Check if the search food is already in the food list
         const itemAlreadyInFoods = foodsController.foods.find((food) => food.id === item.id);
         // NOTE setFoods function change due to the food is in the list or not
@@ -76,16 +82,10 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           })
         } else {
           foodsController.setFoods((prev) => {
-            const newState = [...prev, { ...item, checked: !item.checked}];
+            const newState = [...prev, { ...item, checked: !item.checked }];
             return newState;
           });
         }
-        // NOTE setSearchFoods
-        searchFoodsController.setSearchFoods((prev) => {
-          const newState = [...prev];
-          newState.splice(index, 1, { ...item, checked: !item.checked });
-          return newState;
-        })
       }
       return <ToggleFoodForSearch food={item} onPressHandler={onSearchFoodPressHandler}></ToggleFoodForSearch>;
     },
@@ -95,48 +95,47 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // SECTION Components
   // Header
-  const Header: React.FC = () => (
-    <View>
-      <TouchableOpacity
-        style={styles.header}
-        onPress={() => {
-          console.log(foodsController.foods.filter((food) => food.checked === true).map((food) => food.name));
-        }}
-      >
-        <Text style={styles.headerFont}>
-          お気入り料理を{"\n"}
-          選択してください
-        </Text>
-      </TouchableOpacity>
-      {/* search Btn */}
-      <View style={styles.searchContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            searchModeController.startSearchMode();
-          }}
-        >
-          <FontAwesome
-            name="search"
-            size={windowWidth * 0.07}
-            // color={backgroundColor}
-            color="#FFF"
-          />
-        </TouchableOpacity>
+  const Header: React.FC = React.memo(() => {
+    return (
+      <View>
+        <View style={styles.header}>
+          <Text style={styles.headerFont}>
+            お気入り料理を{"\n"}
+            選択してください
+          </Text>
+        </View>
+        {/* search Btn */}
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              searchModeController.startSearchMode();
+            }}
+          >
+            <FontAwesome
+              name="search"
+              size={windowWidth * 0.07}
+              // color={backgroundColor}
+              color="#FFF"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  )
+    )
+  })
 
   // ModalFooter
-  const ModalFooter: React.FC = () => (
-    <View style={styles.modalFooter}>
-      <TouchableOpacity
-        onPress={searchModeController.endSearchMode}
-        style={styles.modalSubmit}
-      >
-        <Text style={styles.modalSubmitText}>確定</Text>
-      </TouchableOpacity>
-    </View>
-  )
+  const ModalFooter: React.FC = React.memo(() => {
+    return (
+      <View style={styles.modalFooter}>
+        <TouchableOpacity
+          onPress={searchModeController.endSearchMode}
+          style={styles.modalSubmit}
+        >
+          <Text style={styles.modalSubmitText}>確定</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  })
 
   // !SECTION ============================================================
 
@@ -152,11 +151,11 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
             foods={foodsController.foods.length % 2 === 0 ? foodsController.foods : [...foodsController.foods, emptyFood]}
             onEndReached={foodsController.foodPageAdd}
             renderItem={renderItemFood}
-            listFooterComponent={()=>{
+            listFooterComponent={() => {
               return <ListFooterComponent reachedEnd={foodsController.foodListEnd} reachedEndText={"You have reached the end of the foods list"} />
             }}
           />
-          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ selectedTags:route.params.tags , selectedTagsId: route.params.tagIds, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
+          <Footer goBackFunc={() => navigation.pop()} goNextFunc={() => submit({ selectedTags: route.params.tags, selectedTagsId: route.params.tagIds, foods: foodsController.foods, getSelectedFoods: foodsController.getSelectedFoods })} skipFunc={() => submit({})} />
           {/* ANCHOR Search food modal */}
           <SearchModal visible={searchModeController.searchMode} onBackdropPress={searchModeController.endSearchMode} >
             <SearchBar input={searchFoodsController.input} setInput={searchFoodsController.setInput} placeholderText="料理を入力してください" searchFunction={(input: string) => searchFoodsController.debounceSearchFoodFunction(input)} />
@@ -206,7 +205,7 @@ const styles = StyleSheet.create({
   // modal
   modalFooter: {
     width: windowWidth,
-    height: windowHeight * 0.15,
+    height: windowHeight * 0.1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

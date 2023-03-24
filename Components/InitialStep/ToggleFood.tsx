@@ -18,12 +18,7 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({ food, onPressHandler }) => {
 
   return (
     food.id === "" ? <View style={styles.cardBackground}></View> :
-      <TouchableOpacity
-        onPress={() => {
-          onPressHandler();
-        }}
-        style={[styles.cardBackground, { backgroundColor: food.checked ? "#FFF" : backgroundColor }]}
-      >
+      <TouchableOpacity onPress={onPressHandler} style={[styles.cardBackground, { backgroundColor: food.checked ? "#FFF" : backgroundColor }]}>
         <View style={styles.imgContainer}>
           {food.img ? (
             <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
@@ -40,7 +35,7 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({ food, onPressHandler }) => {
   );
 };
 
-export default ToggleFood;
+export default React.memo(ToggleFood);
 
 const width = windowWidth * 0.35;
 const height = (width * 4) / 3;

@@ -77,6 +77,14 @@ export default function useSearchTagFetch(tags: TagCheck[]): useSearchTagFetchRe
 
   // !SECTION
 
+  // searchModeEnd function
+  const searchModeEnd = () => {
+    setSearchMode(false);
+    setSearchPage(1);
+    setInput("");
+    setSearchTags([]);
+  };
+
 
 
   // ANCHOR useEffect 
@@ -90,7 +98,7 @@ export default function useSearchTagFetch(tags: TagCheck[]): useSearchTagFetchRe
   const searchModeController = {
     searchMode: searchMode,
     searchModeStart: () => { setSearchMode(true) },
-    searchModeEnd: () => { setSearchMode(false) }
+    searchModeEnd: () => { searchModeEnd() }
   }
   const searchTagController = {
     searchTags: searchTags,

@@ -30,7 +30,7 @@ const ToggleFoodForSearch: React.FC<ToggleFoodProps> = ({ food, onPressHandler }
   );
 };
 
-export default ToggleFoodForSearch;
+export default React.memo(ToggleFoodForSearch);
 
 const width = windowWidth * 0.35;
 const height = (width * 4) / 3;

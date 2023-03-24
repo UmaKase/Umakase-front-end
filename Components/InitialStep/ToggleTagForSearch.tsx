@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 
 import {
@@ -15,14 +15,15 @@ type Props = {
 
 const ToggleTag: React.FC<Props> = ({ tag, onPressHandler }) => {
   return (
-    <TouchableOpacity
-      style={[styles.tag, { borderColor: tag.checked ? drawerColor : "#999" }]}
-      onPress={() => onPressHandler()}
-    >
-      <Text style={[styles.tagFont, { color: tag.checked ? drawerColor : "#000" }]}>
-        {tag.name}
-      </Text>
-    </TouchableOpacity>
+    tag.id === "" ? <View style={styles.tag}></View>
+      : <TouchableOpacity
+        style={[styles.tag, { backgroundColor: "#FFF", borderColor: tag.checked ? drawerColor : "#999", borderRadius: windowWidth * 0.05, borderWidth: 3 }]}
+        onPress={() => onPressHandler()}
+      >
+        <Text style={[styles.tagFont, { color: tag.checked ? drawerColor : "#000" }]}>
+          {tag.name}
+        </Text>
+      </TouchableOpacity>
   );
 };
 
@@ -32,9 +33,6 @@ const styles = StyleSheet.create({
   tag: {
     width: windowWidth * 0.4,
     height: windowHeight * 0.06,
-    borderRadius: windowWidth * 0.05,
-    borderWidth: 3,
-    backgroundColor: "#FFF",
     alignItems: "center",
     justifyContent: "center",
     marginTop: windowHeight * 0.03,
