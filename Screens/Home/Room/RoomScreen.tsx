@@ -14,6 +14,7 @@ import { profileScreenStr } from "../../../Constants/ProfileConst";
 import { User } from "../../../Types/types";
 import UserList from "../../../Components/Home/UserList";
 import { GlobalContext } from "../../../Context/GlobalContext";
+import { roomText } from "../../../Constants/roomConst";
 type RoomScreenProps = NativeStackScreenProps<RoomStackNavigationProps, "RoomScreen">;
 const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
   // const [Room, setRoom] = useState<>();
@@ -25,7 +26,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
 
   const [roomIsUsed, setRoomIsUsed] = useState<boolean>(false);
   const [roomName, setRoomName] = useState();
-  const [roomDescription, setRoomDescription] = useState("this is room description.");
+  const [roomDescription, setRoomDescription] = useState(roomText.defaultRoomDescription);
   const [roomMembers, setRoomMembers] = useState<User[]>([]);
 
   const settingRandomRoom = async () => {
@@ -49,7 +50,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
     })
       .then((res) => {
         console.log(res.data.data.room.user);
-        setRoomName(res.data.data.room.name === "__default" ? "Default" : res.data.data.room.name);
+        setRoomName(res.data.data.room.name === "__default" ? roomText.defaultRoomName : res.data.data.room.name);
         if (res.data.data.room.description) {
           setRoomDescription(res.data.data.room.description);
         }
@@ -80,7 +81,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
             {roomName}
           </Text>
         </View>
-        {roomName === "Default" ? (
+        {roomName === roomText.defaultRoomName ? (
           <></>
         ) : (
           <TouchableOpacity onPress={deleteRoomFunction} style={{ marginRight: windowWidth * 0.05 }}>
@@ -102,7 +103,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
       </View>
       <View style={[styles.title, { height: windowHeight * 0.1 }]}></View>
       <TouchableOpacity onPress={settingRandomRoom} style={styles.changeRoomButton}>
-        <Text style={{ fontSize: textMedium, color: lightTextColor }}>{roomId == currentRoomId ? "ルーム利用中" : "choose room"}</Text>
+        <Text style={{ fontSize: textMedium, color: lightTextColor }}>{roomId == currentRoomId ? roomText.roomPickingText : roomText.pickRoomText}</Text>
       </TouchableOpacity>
       <UserContext.Provider
         value={{
