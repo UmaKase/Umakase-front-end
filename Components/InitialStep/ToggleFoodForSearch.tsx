@@ -12,24 +12,25 @@ interface ToggleFoodProps {
 
 const ToggleFoodForSearch: React.FC<ToggleFoodProps> = ({ food, onPressHandler }) => {
   return (
-    <TouchableOpacity onPress={onPressHandler} style={[styles.cardBackground, { backgroundColor: food.checked ? backgroundColor : "#FFF" }]}>
-      <View style={styles.imgContainer}>
-        {food.img ? (
-          <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
-        ) : (
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ color: "#777" }}>No Image</Text>
-          </View>
-        )}
-      </View>
-      <View style={styles.nameContainer}>
-        <Text style={[styles.name, { color: food.checked ? "#FFF" : "#000" }]}>{food.name}</Text>
-      </View>
-    </TouchableOpacity>
+    food.id === "" ? <View style={styles.cardBackground}></View> :
+      <TouchableOpacity onPress={onPressHandler} style={[styles.cardBackground, { backgroundColor: food.checked ? backgroundColor : "#FFF" }]}>
+        <View style={styles.imgContainer}>
+          {food.img ? (
+            <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
+          ) : (
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+              <Text style={{ color: "#777" }}>No Image</Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.nameContainer}>
+          <Text style={[styles.name, { color: food.checked ? "#FFF" : "#000" }]}>{food.name}</Text>
+        </View>
+      </TouchableOpacity>
   );
 };
 
-export default ToggleFoodForSearch;
+export default React.memo(ToggleFoodForSearch);
 
 const width = windowWidth * 0.35;
 const height = (width * 4) / 3;

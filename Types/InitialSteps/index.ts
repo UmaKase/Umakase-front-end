@@ -4,17 +4,15 @@ export interface Tag {
   food: TagsOnFoods[];
 }
 
+export interface TagCheck extends Tag {
+  checked?: boolean;
+}
+
 export interface TagsOnFoods {
   tagId: string;
   foodId: string;
   food: Food;
   tag: Tag;
-}
-
-export interface FoodsList {
-  food: Food;
-  foodId: string;
-  roomId: string;
 }
 
 export interface Food {

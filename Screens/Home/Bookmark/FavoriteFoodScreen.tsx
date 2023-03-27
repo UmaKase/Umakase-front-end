@@ -225,12 +225,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
   return (
     <Background>
       {/* search bar */}
-      <SearchBarForBookMark
-        input={searchInput}
-        setInput={setSearchInput}
-        searchFunction={localSearchFunction}
-        placeholderText="料理名、食材を入力してください"
-      ></SearchBarForBookMark>
+      <SearchBarForBookMark input={searchInput} setInput={setSearchInput} searchFunction={localSearchFunction} placeholderText="料理名、食材を入力してください"></SearchBarForBookMark>
       {/* control bar */}
       <ControlBar
         favMode={favMode}
@@ -265,11 +260,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
       {/* <View style={styles.footerContainer}>
         
       </View> */}
-      {fetching ? (
-        <></>
-      ) : (
-        <Footer goBackFunc={() => navigation.goBack()} goNextFunc={() => console.log("no next step so far.")} skipFunc={skipFunc} />
-      )}
+      {fetching ? <></> : <Footer goBackFunc={() => navigation.goBack()} goNextFunc={() => console.log("no next step so far.")} skipFunc={skipFunc} />}
       {/* <TouchableOpacity
         onPress={() => optionHandler()}
         style={{
@@ -302,12 +293,7 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
         <Modal isVisible={searchMode} style={styles.modal} onBackdropPress={leaveSearchMode}>
           <View style={styles.modalBackground}>
             {/* ANCHOR search bar */}
-            <SearchBar
-              input={modalInputText}
-              setInput={setModalInputText}
-              placeholderText={"料理を入力してください"}
-              searchFunction={(input: string) => debounceSearchFood(input)}
-            />
+            <SearchBar input={modalInputText} setInput={setModalInputText} placeholderText={"料理を入力してください"} searchFunction={(input: string) => debounceSearchFood(input)} />
             {/* ANCHOR toggleFoods */}
             <FlatList
               data={modalFood}

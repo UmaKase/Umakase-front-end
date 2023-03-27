@@ -55,10 +55,7 @@ customAxiosInstance.interceptors.response.use(
         refreshTokenValidationResult = false;
       }
     }
-    console.log(
-      "Refresh Token Validation Result:",
-      refreshTokenValidationResult
-    );
+    console.log("Refresh Token Validation Result:", refreshTokenValidationResult);
     // prettier-ignore
     return refreshTokenValidationResult? axios(originalRequest) : Promise.reject(error);
   }

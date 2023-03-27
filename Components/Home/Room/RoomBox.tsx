@@ -60,17 +60,18 @@ const RoomBox: React.FC<Props> = ({
                   alignItems: "flex-end",
                 }}
               >
-                <FontAwesome
+                {roomies && roomies[1] ? <FontAwesome
                   name="user-circle"
                   size={innerContainerHeight / 2}
                   color="black"
-                />
-                <FontAwesome
+                /> : null
+                }
+                {roomies && roomies[2] ? <FontAwesome
                   name="user-circle"
                   size={innerContainerHeight / 2}
                   color="black"
-                  style={{ paddingLeft: windowWidth * 0.04 }}
-                />
+                /> : null
+                }
               </View>
             </View>
           </View>

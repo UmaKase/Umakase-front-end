@@ -14,7 +14,7 @@ import { profileScreenStr } from "../../../Constants/ProfileConst";
 import { User } from "../../../Types/types";
 import UserList from "../../../Components/Home/UserList";
 import { GlobalContext } from "../../../Context/GlobalContext";
-import { roomText } from "Constants/roomConst";
+import { roomText } from "../../../Constants/roomConst";
 type RoomScreenProps = NativeStackScreenProps<RoomStackNavigationProps, "RoomScreen">;
 const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
   // const [Room, setRoom] = useState<>();

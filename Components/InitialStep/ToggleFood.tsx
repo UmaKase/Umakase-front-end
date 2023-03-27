@@ -1,10 +1,9 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
-import { Food, FoodCheck } from "../../Types/InitialSteps";
+import React, { useEffect } from "react";
+import { FoodCheck } from "../../Types/InitialSteps";
 import { backgroundColor, drawerColor, windowHeight, windowWidth } from "../../Constants/cssConst";
 import { ImgAPI } from "../../Constants/backendAPI";
 import CacheImage from "../Universal/CacheImage";
-import { AuthInput, AuthInputWithErrMsg } from "@Components/Auth";
 
 interface ToggleFoodProps {
   food: FoodCheck;
@@ -18,29 +17,25 @@ const ToggleFood: React.FC<ToggleFoodProps> = ({ food, onPressHandler }) => {
   }, []);
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        onPressHandler();
-      }}
-      style={[styles.cardBackground, { backgroundColor: food.checked ? "#FFF" : backgroundColor }]}
-    >
-      <View style={styles.imgContainer}>
-        {food.img ? (
-          <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
-        ) : (
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ color: "#777" }}>No Image</Text>
-          </View>
-        )}
-      </View>
-      <View style={styles.nameContainer}>
-        <Text style={[styles.name, { color: food.checked ? backgroundColor : "#FFF" }]}>{food.name}</Text>
-      </View>
-    </TouchableOpacity>
+    food.id === "" ? <View style={styles.cardBackground}></View> :
+      <TouchableOpacity onPress={onPressHandler} style={[styles.cardBackground, { backgroundColor: food.checked ? "#FFF" : backgroundColor }]}>
+        <View style={styles.imgContainer}>
+          {food.img ? (
+            <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
+          ) : (
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+              <Text style={{ color: "#777" }}>No Image</Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.nameContainer}>
+          <Text style={[styles.name, { color: food.checked ? backgroundColor : "#FFF" }]}>{food.name}</Text>
+        </View>
+      </TouchableOpacity>
   );
 };
 
-export default ToggleFood;
+export default React.memo(ToggleFood);
 
 const width = windowWidth * 0.35;
 const height = (width * 4) / 3;

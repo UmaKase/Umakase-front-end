@@ -12,10 +12,7 @@ import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { ProfileContext } from "../../Context/ProfileContext";
 import { TipsContext } from "../../Context/TipsContext";
 import { functionCategory } from "../../Constants/homeConst";
-type ProfileScreenProps = NativeStackScreenProps<
-  ProfileStackProps,
-  "ProfileScreen"
->;
+type ProfileScreenProps = NativeStackScreenProps<ProfileStackProps, "ProfileScreen">;
 //get default room ID of user
 const getRoomIdCall = async (successCallBack: any, failCallback: any) => {
   // get default room id
@@ -50,12 +47,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={commonStyle.safeArea}>
-        <TipsContext.Provider
-          value={{ currentCategory: functionCategory.profile }}
-        >
-          <CustomHeader
-            toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-          ></CustomHeader>
+        <TipsContext.Provider value={{ currentCategory: functionCategory.profile }}>
+          <CustomHeader toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}></CustomHeader>
         </TipsContext.Provider>
         <ProfileContext.Provider
           value={{
@@ -65,11 +58,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
             setFirstName: setSurName,
           }}
         >
-          <ProfileInfo
-            userId={userId}
-            setUserId={setUserId}
-            navigation={navigation}
-          />
+          <ProfileInfo userId={userId} setUserId={setUserId} navigation={navigation} />
         </ProfileContext.Provider>
       </SafeAreaView>
     </SafeAreaProvider>
