@@ -12,7 +12,7 @@ import { registerError } from "../../Types/api";
 import AuthInput from "../../Components/Auth/AuthInput";
 import RegisterInput from "../../Components/Auth/RegisterInput";
 import SubmitButton from "../../Components/Auth/SubmitButton";
-import { registerErrorCategory, registerErrorMessage, registerResultTitle } from "../../Constants/homeConst";
+import { registerCheckCategory, registerCheckMessage, registerPopUp } from "../../Constants/homeConst";
 import { ACCESS_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import { CommonActions } from "@react-navigation/native";
@@ -60,13 +60,13 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     })
       .then(async (mergeResult) => {
         console.log(mergeResult);
-        Alert.alert("Success", "Merge user success");
+        Alert.alert(registerPopUp.registerSuccess.title, registerPopUp.registerSuccess.message);
         navigation.goBack();
       })
       .catch((e) => {
         console.log(e.response.data);
         console.log("merge user Error:", e.response.data.message);
-        return Alert.alert("Error", "cannot merge user");
+        return Alert.alert(registerPopUp.registerFailure.title, registerPopUp.registerFailure.message);
       });
   };
   const LoginProcess = async () => {
@@ -91,7 +91,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       })
       .catch((e) => {
         if (e.response.status == 400) {
-          Alert.alert("Login failed", e.response.data.message);
+          Alert.alert(registerPopUp.loginFailure.title, e.response.data.message);
         } else {
           console.log("login catch else error:", e.response.data.message);
         }
@@ -119,7 +119,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
     if (password != passwordCheck) {
       preCheck = false;
-      return Alert.alert(registerResultTitle.failure, registerErrorMessage[registerErrorCategory.passwordUnmatch]);
+      return Alert.alert(registerPopUp.registerFailure.title, registerCheckMessage[registerCheckCategory.passwordUnmatch]);
     }
     if (preCheck) {
       axios({
@@ -134,7 +134,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         },
       })
         .then((result) => {
-          return Alert.alert("Register", "Register success!", [{ text: "OK", onPress: () => LoginProcess() }]);
+          return Alert.alert(registerPopUp.registerSuccess.title, registerPopUp.registerSuccess.message, [{ text: "OK", onPress: () => LoginProcess() }]);
         })
         .catch((e) => {
           setEmailErr(false);
@@ -153,7 +153,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               errorMsg = `${errorMsg}\n${error.param}:${error.msg}`;
             }
           });
-          return Alert.alert(registerResultTitle.failure, errorMsg);
+          return Alert.alert(registerPopUp.registerFailure.title, errorMsg);
         });
     }
   };
@@ -178,7 +178,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setEmail}
               PlaceHolder="メールアドレス"
               PasswordMode={false}
-              errMsg={registerErrorMessage[registerErrorCategory.emailInput]}
+              errMsg={registerCheckMessage[registerCheckCategory.emailInput]}
               errorShow={emailErr}
             />
             <RegisterInput
@@ -186,7 +186,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setUsername}
               PlaceHolder="ユーザー名"
               PasswordMode={false}
-              errMsg={registerErrorMessage[registerErrorCategory.usernameInput]}
+              errMsg={registerCheckMessage[registerCheckCategory.usernameInput]}
               errorShow={usernameErr}
             />
             <RegisterInput
@@ -210,7 +210,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setPassword}
               PlaceHolder="パスワード"
               PasswordMode={true}
-              errMsg={registerErrorMessage[registerErrorCategory.passwordInput]}
+              errMsg={registerCheckMessage[registerCheckCategory.passwordInput]}
               errorShow={passwordErr}
             />
             <RegisterInput
@@ -218,7 +218,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setPasswordCheck}
               PlaceHolder="確認用パスワード"
               PasswordMode={true}
-              errMsg={registerErrorMessage[registerErrorCategory.confirmPasswordInput]}
+              errMsg={registerCheckMessage[registerCheckCategory.confirmPasswordInput]}
               errorShow={passwordCheckErr}
             />
           </View>
