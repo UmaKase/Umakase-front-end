@@ -3,7 +3,7 @@ import { setItemAsync } from "expo-secure-store";
 import { useState } from "react";
 import { AuthAPI } from "../../Constants/backendAPI";
 import { ACCESS_KEY, CONFIG_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
-import { rootNavigationRef } from "../../Ref";
+import { globalNavigationService } from "../../Ref";
 import { FoodCheck, TagCheck } from "../../Types/InitialSteps";
 import normalAxios from "../../Utils/normalAxios";
 
@@ -81,7 +81,7 @@ export default function useSubmit():ReturnType{
       await setItemAsync(REFRESH_KEY, res.data.data.refreshToken);
       await setItemAsync(CONFIG_KEY, "Completed");
       console.log("saved");
-      rootNavigationRef.current?.dispatch(
+      globalNavigationService("HomeStack")?.dispatch(
         CommonActions.reset({
           routes: [{ name: "HomeDrawerNavigation" }],
         })
