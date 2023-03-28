@@ -4,7 +4,7 @@ import { getItemAsync } from "expo-secure-store";
 // custom import
 import { TagAPI } from "../Constants/backendAPI";
 import { INITIAL_STAGE_TAG } from "../Constants/securestoreKey";
-import { rootNavigationRef } from "../Ref";
+import { globalNavigationService } from "../Ref";
 import { TagCheck } from "../Types/InitialSteps";
 import normalAxios from "../Utils/normalAxios";
 
@@ -33,7 +33,7 @@ export default function useTagFetch(): UseTagFetchResponse {
   //SECTION fetch tag data function
   async function fetchTagData() {
     if (tags.length > 0 && page === 1) {
-      rootNavigationRef.current?.navigate("SelectFoodScreen", { tags: tags, tagIds: tags.map(tag => tag.id) });
+      globalNavigationService("InitialSteps")?.navigate("SelectFoodScreen", { tags: tags, tagIds: tags.map(tag => tag.id) });
     }
     try {
       // NOTE API request

@@ -39,5 +39,10 @@ export const rootNavigationRef = React.createRef<NavigationContainerRef<Navigati
 
 export const globalNavigationService = <T extends keyof typeof NavigationProps>(navigationName: T) => {
   type CurrentNavigation = typeof NavigationProps[typeof navigationName];
-  return rootNavigationRef as React.RefObject<NavigationContainerRef<CurrentNavigation>>;
+  if(rootNavigationRef.current) {
+    return rootNavigationRef.current as NavigationContainerRef<CurrentNavigation>;
+  }else{
+    console.log("globalNavigationService: rootNavigationRef.current is null");
+    return
+  }
 }
