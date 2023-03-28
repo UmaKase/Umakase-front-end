@@ -15,14 +15,14 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "allowSyntheticDefaultImports": true,
     "removeComments": true,
-    "rootDir": ".",
-    "paths": {
-      "@Screen": ["src/Screen"],
-      "@Components/Auth": ["Components/Auth"]
-    }
+    "rootDir": "./",
+    // "paths": {
+    //   "@Screen": ["src/Screen"],
+    //   "@Components/Auth": ["Components/Auth"]
+    // }
   },
   "extends": "expo/tsconfig.base"
 }
