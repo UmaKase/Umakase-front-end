@@ -27,9 +27,11 @@ const CacheImage: React.FC<Props> = ({ url, style }) => {
     // ANCHOR find image in cache ============================================
     if (!image.exists) {
       // ANCHOR doesn't find image in cache ====================================
+      console.log("downloading image...")
       const newImage = await FileSystem.downloadAsync(encodeUrl, path);
       return newImage.uri;
     }
+    console.log("image found in cache...")
     return image.uri;
   };
 

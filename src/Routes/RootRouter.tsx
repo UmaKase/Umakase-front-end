@@ -11,7 +11,7 @@ import { RootNavigationProps } from "../Types/Navigations/Root";
 import customAxiosInstance from "../Utils/customAxiosInstance";
 import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import { ACCESS_KEY, CONFIG_KEY, INITIAL_STAGE_FOOD, INITIAL_STAGE_TAG, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../Constants/securestoreKey";
-import {rootNavigationRef} from '../Ref'
+import { rootNavigationRef } from '../Ref'
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
@@ -44,7 +44,7 @@ const RootRouter: React.FC = () => {
     }
   };
 
-  const testFunction = () => {
+  const testFunction = async() => {
     deleteItemAsync(CONFIG_KEY);
     deleteItemAsync(ACCESS_KEY);
     deleteItemAsync(REFRESH_KEY);

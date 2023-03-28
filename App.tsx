@@ -17,7 +17,7 @@ import {
 } from "@expo-google-fonts/dancing-script";
 // importing major-mono-display
 import { MajorMonoDisplay_400Regular as MajorMonoDisplay } from "@expo-google-fonts/major-mono-display";
-import RootRouter from "./Routes/RootRouter";
+import RootRouter from "./src/Routes/RootRouter";
 
 export default function App() {
   //start setting the font would use into the useFonts hook
