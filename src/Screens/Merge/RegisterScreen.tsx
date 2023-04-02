@@ -119,7 +119,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
     if (password != passwordCheck) {
       preCheck = false;
-      return Alert.alert(registerResultTitle.failure, registerErrorMessage[registerErrorCategory.passwordUnmatch]);
+      return Alert.alert(registerPopUp.registerFailure.title, registerCheckMessage[registerCheckCategory.passwordUnmatch]);
     }
     if (preCheck) {
       axios({
@@ -222,7 +222,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               SetInputState={setPasswordCheck}
               PlaceHolder="確認用パスワード"
               PasswordMode={true}
-              errMsg={registerErrorMessage[registerErrorCategory.confirmPasswordInput]}
+              errMsg={registerCheckMessage[registerCheckCategory.confirmPasswordInput]}
               errorShow={passwordCheckErr}
             />
           </View>
