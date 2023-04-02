@@ -1,0 +1,64 @@
+import axios from "axios";
+import { getItemAsync, setItemAsync } from "expo-secure-store";
+import { AuthAPI } from "../Constants/backendAPI";
+import { ACCESS_KEY, REFRESH_KEY } from "../Constants/securestoreKey";
+
+const customAxiosInstance = axios.create();
+
+// Request interceptor for API calls
+customAxiosInstance.interceptors.request.use(
+  async (config) => {
+    let accessToken;
+    try {
+      accessToken = await getItemAsync(ACCESS_KEY);
+    } catch (e) {
+      console.log("Interceptors request handler setting accessToken: " + e);
+    }
+
+    if (!!accessToken) {
+      if (!!config.headers) {
+        config.headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for API calls
+customAxiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    // the flag of refreshToken validate result
+    let refreshTokenValidationResult: boolean = false;
+    if (error.response.status === 401 || error.response.status === 400) {
+      let newAccessToken;
+      // refresh access token
+      const localRefreshToken = await getItemAsync(REFRESH_KEY);
+
+      try {
+        const res = await axios({
+          method: "post",
+          url: `${AuthAPI}/token/refresh`,
+          headers: { Authorization: `Bearer ${localRefreshToken}` },
+        });
+        newAccessToken = res.data.data.newAccessToken;
+        await setItemAsync(ACCESS_KEY, newAccessToken);
+        refreshTokenValidationResult = true;
+      } catch (error) {
+        console.log("Interceptor Catch Error:" + error);
+        refreshTokenValidationResult = false;
+      }
+    }
+    console.log("Refresh Token Validation Result:", refreshTokenValidationResult);
+    // prettier-ignore
+    return refreshTokenValidationResult? axios(originalRequest) : Promise.reject(error);
+  }
+);
+
+export default customAxiosInstance;
