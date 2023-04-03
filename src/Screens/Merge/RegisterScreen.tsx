@@ -1,23 +1,21 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Alert, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Platform } from "react-native";
-import { backgroundColor, cornerRadius, paddingLarge, windowHeight, windowWidth } from "../../Constants/cssConst";
-import { Fontisto, Feather, FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import { backgroundColor, paddingLarge, windowWidth } from "../../Constants/cssConst";
+import { registerCheckCategory, registerCheckMessage, registerPopUp } from "../../Constants/homeConst";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
+//props
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthNavigationProps } from "../../Types/Navigations/Auth";
-import AuthInputWithErrMsg from "../../Components/Auth/AuthInputWithErrMsg";
-import { registerError } from "../../Types/api";
-import AuthInput from "../../Components/Auth/AuthInput";
-import RegisterInput from "../../Components/Auth/RegisterInput";
-import SubmitButton from "../../Components/Auth/SubmitButton";
-import { registerCheckCategory, registerCheckMessage, registerPopUp } from "../../Constants/homeConst";
+//input component
+import { SubmitButton, RegisterInput } from "../../Components/Auth";
+
+//authentication setting
 import { ACCESS_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
-import { CommonActions } from "@react-navigation/native";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
-import { merge } from "lodash";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
