@@ -90,7 +90,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
         )}
       </View>
       <View style={[styles.title, { height: windowHeight * 0.01 }]}></View>
-      <View style={styles.title}>
+      <View style={[styles.title, {height:windowHeight * 0.085, borderWidth:1}]}>
         <Text
           style={{
             fontSize: textLarge,
