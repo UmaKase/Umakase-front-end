@@ -12,12 +12,20 @@ import CenterActivityIndicator from "../../../Components/Universal/CenterActivit
 import { Food } from "../../../Types/types";
 import { GlobalContext } from "../../../Context/GlobalContext";
 
+const Footer = (navigationFunction: () => void) => <View style={{ width: windowWidth, height: windowHeight * 0.1, borderWidth: 1 }}>
+  <TouchableOpacity onPress={navigationFunction}>
+    <FontAwesome name="home" size={windowWidth * 0.12} color="#FFF" />
+  </TouchableOpacity>
+</View>
+
 type RandomResultScreenProps = NativeStackScreenProps<RandomStackNavigationProps, "RandomResultScreen">;
 const RandomResultScreen: React.FC<RandomResultScreenProps> = ({ route, navigation }) => {
   // getting room id & name from the route
   const { currentRoomId } = useContext(GlobalContext);
   // fetching state
   const [fetching, setFetching] = useState<boolean>(true);
+  // if user do not have food in database
+  const [doNotHaveFood, setDoNotHaveFood] = useState<boolean>(false);
   // foods
   const [foods, setFoods] = useState<Food[]>([]);
   // food info
@@ -49,8 +57,12 @@ const RandomResultScreen: React.FC<RandomResultScreenProps> = ({ route, navigati
     })
       .then((res) => {
         console.log(res.data.data.randomFoods[0]);
-        setFoods(res.data.data.randomFoods);
-        setCurrentFood(0);
+        if (res.data.data.randomFoods.length === 0) {
+          setDoNotHaveFood(true);
+        } else {
+          setFoods(res.data.data.randomFoods);
+          setCurrentFood(0);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -60,7 +72,7 @@ const RandomResultScreen: React.FC<RandomResultScreenProps> = ({ route, navigati
   // useEffect for initial loading
   useEffect(() => {
     randomFoodFunction();
-    return () => {};
+    return () => { };
   }, []);
 
   // go back to random screen
@@ -73,28 +85,39 @@ const RandomResultScreen: React.FC<RandomResultScreenProps> = ({ route, navigati
         <CenterActivityIndicator size="large" color="#FFF" />
       ) : (
         <>
-          <View style={styles.foodCircle}>
+          {doNotHaveFood ? <></> : (<View style={styles.foodCircle}>
             <CacheImage url={`${ImgAPI}/food/${foods[currentFood].img}`} style={styles.foodImgStyle} />
-          </View>
-          <View style={styles.controlBar}>
+          </View>)}
+          <View style={[styles.controlBar, doNotHaveFood ? { marginTop: windowHeight * 0.05 } : {
+            position: "relative",
+            bottom: windowHeight * 0.37
+          }]}>
             <TouchableOpacity onPress={goBackRandomScreen}>
               <FontAwesome name="chevron-left" size={windowWidth * 0.08} color="#FFF" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("heart btn")}>
-              <FontAwesome5 name="heart" size={windowWidth * 0.08} color="#FFF" />
+            <TouchableOpacity onPress={() => console.log("heart btn")} disabled={doNotHaveFood}>
+              <FontAwesome5 name="heart" size={windowWidth * 0.08} color={doNotHaveFood ? "#777" : "#FFF"} />
             </TouchableOpacity>
           </View>
-          <Text style={styles.foodName}>{foods[currentFood].name}</Text>
-          <View style={styles.decisionBar}>
-            <TouchableOpacity disabled={disabledBtn} onPress={nextFood} style={[styles.decisionButton, { backgroundColor: "#ECAC72" }]}>
-              <Text style={styles.decisionButtonText}>次の料理</Text>
-            </TouchableOpacity>
-            <TouchableOpacity disabled={disabledBtn} onPress={() => console.log("削除する")} style={[styles.decisionButton, { backgroundColor: "#F44D4D" }]}>
-              <Text style={styles.decisionButtonText}>削除する</Text>
-            </TouchableOpacity>
-          </View>
+          {doNotHaveFood ? (
+            <View style={styles.noFoodContainer}>
+              <Text>You don't have any foods in your database.</Text>
+            </View>
+          ) :
+            <>
+              <Text style={styles.foodName}>{foods[currentFood].name}</Text>
+              <View style={styles.decisionBar}>
+                <TouchableOpacity disabled={disabledBtn} onPress={nextFood} style={[styles.decisionButton, { backgroundColor: "#ECAC72" }]}>
+                  <Text style={styles.decisionButtonText}>次の料理</Text>
+                </TouchableOpacity>
+                <TouchableOpacity disabled={disabledBtn} onPress={() => console.log("削除する")} style={[styles.decisionButton, { backgroundColor: "#F44D4D" }]}>
+                  <Text style={styles.decisionButtonText}>削除する</Text>
+                </TouchableOpacity>
+              </View>
+            </>}
         </>
-      )}
+      )
+      }
     </Background>
   );
 };
@@ -106,8 +129,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: windowWidth * 0.07,
-    position: "relative",
-    bottom: windowHeight * 0.37,
   },
 
   foodCircle: {
@@ -152,5 +173,12 @@ const styles = StyleSheet.create({
   decisionButtonText: {
     fontSize: textMedium,
     color: "#FFF",
+  },
+
+  // no food text container
+  noFoodContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
