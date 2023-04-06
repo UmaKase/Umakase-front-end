@@ -2,7 +2,7 @@ import { CommonActions } from "@react-navigation/native";
 import { setItemAsync } from "expo-secure-store";
 import { useState } from "react";
 import { AuthAPI } from "../../Constants/backendAPI";
-import { ACCESS_KEY, CONFIG_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
+import { ACCESS_KEY, CONFIG_KEY, CURRENTROOM_ID_KEY, CURRENTROOM_NAME_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
 import { globalNavigationService } from "../../Ref";
 import { FoodCheck, TagCheck } from "../../Types/InitialSteps";
 import normalAxios from "../../Utils/normalAxios";
@@ -55,6 +55,8 @@ export default function useSubmit():ReturnType{
       });
       await setItemAsync(TEMPUSERID_KEY, response.data.data.tmpId);
       await setItemAsync(TEMPUSERPASS_KEY, response.data.data.tmpPass);
+      await setItemAsync(CURRENTROOM_ID_KEY, response.data.data.defaultRoom.id);
+      await setItemAsync(CURRENTROOM_NAME_KEY, response.data.data.defaultRoom.name);
       tempData = {
         id: response.data.data.tmpId,
         pass: response.data.data.tmpPass,
