@@ -16,6 +16,7 @@ import { SubmitButton, RegisterInput } from "../../Components/Auth";
 import { ACCESS_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
+import { commonStyle } from "../../Style/CommonStyle";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
@@ -168,11 +169,17 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <FontAwesome name="angle-double-left" size={windowWidth * 0.1} color="#FFF" />
-            </TouchableOpacity>
-            <Text style={styles.headerText}>新規会員登録</Text>
+          <View style={[styles.header, { marginLeft: paddingLarge, marginRight: paddingLarge }]}>
+            <View style={{ position: "absolute" }}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <FontAwesome name="angle-double-left" size={windowWidth * 0.1} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+            <View style={commonStyle.rowContainer}>
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <Text style={styles.headerText}>新規会員登録</Text>
+              </View>
+            </View>
           </View>
           <View style={styles.inputContainer}>
             <RegisterInput

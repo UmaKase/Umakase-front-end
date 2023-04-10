@@ -17,6 +17,7 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-nativ
 import { functionCategory } from "../../../Constants/homeConst";
 import { drawerColor, lightTextColor, paddingLarge, windowHeight, windowWidth } from "../../../Constants/cssConst";
 import { reportScreenConst } from "../../../Constants/settingConst";
+import { SubmitButton } from "../../../Components/Auth";
 
 type ReportScreenProps = NativeStackScreenProps<SettingStackProps, "SettingScreen">;
 
@@ -36,6 +37,11 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           <CustomHeader toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}></CustomHeader>
         </TipsContext.Provider>
         <View style={commonStyle.mainContainer}>
+          <View style={{ position: "absolute" }}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <FontAwesome name="angle-double-left" size={windowWidth * 0.1} color="#FFF" />
+            </TouchableOpacity>
+          </View>
           <View style={[commonStyle.rowContainer, commonStyle.titleContainer]}>
             <Text style={[commonStyle.textContainer, commonStyle.titleText]}>{reportScreenConst.reportTitle}</Text>
           </View>
@@ -62,21 +68,9 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
             <TextInput style={styles.textbox} placeholder={reportScreenConst.reportTextHint} value={reportComment} multiline={true} numberOfLines={4} onChangeText={setReportComment}></TextInput>
           </View>
         </View>
-        <View style={[commonStyle.footer]}>
-          <View style={commonStyle.sideContainer}>
-            <TouchableOpacity
-              style={[styles.modeBtn]}
-              onPress={() => {
-                navigation.navigate("SettingScreen");
-              }}
-            >
-              <FontAwesome name="arrow-left" size={windowWidth * 0.09} color={lightTextColor} />
-            </TouchableOpacity>
-          </View>
-          <View style={commonStyle.sideContainer}>
-            <TouchableOpacity style={[styles.modeBtn]} onPress={() => {}}>
-              <FontAwesome name="check" size={windowWidth * 0.09} color={lightTextColor} />
-            </TouchableOpacity>
+        <View style={[commonStyle.footer, { justifyContent: "center" }]}>
+          <View style={styles.submitContainer}>
+            <SubmitButton text="投稿" onPressHandler={() => {}} />
           </View>
         </View>
       </SafeAreaView>
@@ -115,5 +109,9 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
     alignItems: "center",
     justifyContent: "center",
+  },
+  submitContainer: {
+    flex: 0.1,
+    alignItems: "center",
   },
 });

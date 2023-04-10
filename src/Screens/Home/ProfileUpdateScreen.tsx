@@ -171,11 +171,19 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
       <SafeAreaView style={commonStyle.safeArea}>
         <CustomHeader toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}></CustomHeader>
         <View style={[commonStyle.mainContainer]}>
-          <View style={[commonStyle.rowContainer, styles.header]}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+          <View style={{ position: "absolute" }}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
               <FontAwesome name="angle-double-left" size={windowWidth * 0.1} color="#FFF" />
             </TouchableOpacity>
-            <Text style={[commonStyle.textContainer, commonStyle.titleText, styles.headerText]}>{profileUpdateTitle[route.params.mode]}</Text>
+          </View>
+          <View style={[commonStyle.rowContainer, styles.header]}>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <Text style={[commonStyle.textContainer, commonStyle.titleText, styles.headerText]}>{profileUpdateTitle[route.params.mode]}</Text>
+            </View>
           </View>
           <View style={commonStyle.rowContainer}>
             <Text style={[commonStyle.textContainer, commonStyle.errText]}>{errMsg}</Text>
@@ -282,6 +290,5 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: windowWidth * 0.06,
     color: "#FFF",
-    marginLeft: windowWidth * 0.15,
   },
 });
