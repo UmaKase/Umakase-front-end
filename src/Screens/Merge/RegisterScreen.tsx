@@ -1,23 +1,22 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Alert, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Platform } from "react-native";
-import { backgroundColor, cornerRadius, paddingLarge, windowHeight, windowWidth } from "../../Constants/cssConst";
-import { Fontisto, Feather, FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import { backgroundColor, paddingLarge, windowWidth } from "../../Constants/cssConst";
+import { registerCheckCategory, registerCheckMessage, registerPopUp } from "../../Constants/homeConst";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
+//props
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthNavigationProps } from "../../Types/Navigations/Auth";
-import AuthInputWithErrMsg from "../../Components/Auth/AuthInputWithErrMsg";
-import { registerError } from "../../Types/api";
-import AuthInput from "../../Components/Auth/AuthInput";
-import RegisterInput from "../../Components/Auth/RegisterInput";
-import SubmitButton from "../../Components/Auth/SubmitButton";
-import { registerCheckCategory, registerCheckMessage, registerPopUp } from "../../Constants/homeConst";
+//input component
+import { SubmitButton, RegisterInput } from "../../Components/Auth";
+
+//authentication setting
 import { ACCESS_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
-import { CommonActions } from "@react-navigation/native";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
-import { merge } from "lodash";
+import { commonStyle } from "../../Style/CommonStyle";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
@@ -134,7 +133,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         },
       })
         .then((result) => {
-          return Alert.alert(registerPopUp.registerSuccess.title, registerPopUp.registerSuccess.message, [{ text: "OK", onPress: () => LoginProcess() }]);
+          // return Alert.alert(registerPopUp.registerSuccess.title, registerPopUp.registerSuccess.message, [{ text: "OK", onPress: () => LoginProcess() }]);
+          LoginProcess();
         })
         .catch((e) => {
           setEmailErr(false);
@@ -142,17 +142,20 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           setPasswordErr(false);
           setPasswordCheckErr(false);
           console.log("Register error");
-          console.log(e);
-          const errors = e.response.data.data.error as registerError[];
-          let errorMsg = "";
-          errors.forEach((error) => {
-            console.log(`$error:${error.msg}, param:${error.param}`);
-            if (errorMsg === "") {
-              errorMsg = `${errorMsg}${error.param}:${error.msg}`;
-            } else {
-              errorMsg = `${errorMsg}\n${error.param}:${error.msg}`;
-            }
-          });
+          // const errors = e.response.data.error as registerError[];
+          // console.log(e.response.data);
+          // let errorMsg = "";
+          // errors.forEach((error) => {
+          //   console.log(`$error:${error.msg}, param:${error.param}`);
+          //   if (errorMsg === "") {
+          //     errorMsg = `${errorMsg}${error.param}:${error.msg}`;
+          //   } else {
+          //     errorMsg = `${errorMsg}\n${error.param}:${error.msg}`;
+          //   }
+          // });
+          const error = e.response.data.error;
+          console.log(e.response.data);
+          const errorMsg = error.message;
           return Alert.alert(registerPopUp.registerFailure.title, errorMsg);
         });
     }
@@ -166,11 +169,17 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <FontAwesome name="angle-double-left" size={windowWidth * 0.1} color="#FFF" />
-            </TouchableOpacity>
-            <Text style={styles.headerText}>新規会員登録</Text>
+          <View style={[styles.header, { marginLeft: paddingLarge, marginRight: paddingLarge }]}>
+            <View style={{ position: "absolute" }}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <FontAwesome name="angle-double-left" size={windowWidth * 0.1} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+            <View style={commonStyle.rowContainer}>
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <Text style={styles.headerText}>新規会員登録</Text>
+              </View>
+            </View>
           </View>
           <View style={styles.inputContainer}>
             <RegisterInput

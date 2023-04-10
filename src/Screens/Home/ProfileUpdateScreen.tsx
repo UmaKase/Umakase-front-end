@@ -16,6 +16,7 @@ import { ACCESS_KEY, REFRESH_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import { FontAwesome } from "@expo/vector-icons";
 import { commonStyle } from "../../Style/CommonStyle";
+import SubmitButton from "../../Components/Auth/SubmitButton";
 
 type ProfileUpdateScreenProps = NativeStackScreenProps<ProfileStackProps, "ProfileUpdateScreen">;
 const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, route }) => {
@@ -25,12 +26,8 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
   const [confirmValue, setConfirmValue] = useState<string>("");
   const [oldPassword, setOldPassword] = useState<string>();
   const [errMsg, setErrMsg] = useState<string>("");
-  const originalLastName: string = route.params.lastName
-    ? route.params.lastName
-    : "";
-  const originalFirstName: string = route.params.firstName
-    ? route.params.firstName
-    : "";
+  const originalLastName: string = route.params.lastName ? route.params.lastName : "";
+  const originalFirstName: string = route.params.firstName ? route.params.firstName : "";
   //predefined function/processes
   //request api to update personal info
   const updateProcess = async (userId: string, mode: number, successCallBack: (res: AxiosResponse) => void, failCallback: (res: Error | AxiosError) => void) => {
@@ -174,29 +171,30 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
       <SafeAreaView style={commonStyle.safeArea}>
         <CustomHeader toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}></CustomHeader>
         <View style={[commonStyle.mainContainer]}>
-          <View style={commonStyle.rowContainer}>
-            <Text style={[commonStyle.textContainer, commonStyle.titleText]}>{profileUpdateTitle[route.params.mode]}</Text>
+          <View style={{ position: "absolute" }}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <FontAwesome name="angle-double-left" size={windowWidth * 0.1} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+          <View style={[commonStyle.rowContainer, styles.header]}>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <Text style={[commonStyle.textContainer, commonStyle.titleText, styles.headerText]}>{profileUpdateTitle[route.params.mode]}</Text>
+            </View>
           </View>
           <View style={commonStyle.rowContainer}>
             <Text style={[commonStyle.textContainer, commonStyle.errText]}>{errMsg}</Text>
           </View>
           {inputForm}
         </View>
-        <View style={[commonStyle.footer]}>
-          <View style={styles.sideContainer}>
-            <TouchableOpacity
-              style={[styles.modeBtn]}
-              onPress={() => {
-                navigation.navigate("ProfileScreen");
-              }}
-            >
-              <FontAwesome name="arrow-left" size={windowWidth * 0.09} color={lightTextColor} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.sideContainer}>
-            <TouchableOpacity
-              style={[styles.modeBtn]}
-              onPress={() => {
+        <View style={[commonStyle.footer, { justifyContent: "center" }]}>
+          <View style={styles.submitContainer}>
+            <SubmitButton
+              text="登録"
+              onPressHandler={() => {
                 //input verify
                 if (!verifyInput()) {
                   return;
@@ -239,9 +237,7 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
                   successCallback();
                 }
               }}
-            >
-              <FontAwesome name="check" size={windowWidth * 0.09} color={lightTextColor} />
-            </TouchableOpacity>
+            />
           </View>
         </View>
       </SafeAreaView>
@@ -281,5 +277,18 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
     alignItems: "center",
     justifyContent: "center",
+  },
+  submitContainer: {
+    flex: 0.1,
+    alignItems: "center",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  headerText: {
+    fontSize: windowWidth * 0.06,
+    color: "#FFF",
   },
 });
