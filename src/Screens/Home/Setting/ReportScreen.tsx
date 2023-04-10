@@ -1,34 +1,24 @@
-import { DrawerActions, useFocusEffect } from "@react-navigation/native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
-import { functionCategory } from "../../../Constants/homeConst";
-import { TipsContext } from "../../../Context/TipsContext";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { commonStyle } from "../../../Style/CommonStyle";
-import { SettingStackProps } from "../../../Types/Home/Setting/SettingStackProps";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import {
-  drawerColor,
-  lightTextColor,
-  paddingLarge,
-  windowHeight,
-  windowWidth,
-} from "../../../Constants/cssConst";
-import { reportScreenConst } from "../../../Constants/settingConst";
-import { RadioButton } from "react-native-paper";
+//business logic
 import React from "react";
+import { DrawerActions, useFocusEffect } from "@react-navigation/native";
+//container screen
+import CustomHeader from "../../../Components/HomeDrawer/CustomHeader";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { TipsContext } from "../../../Context/TipsContext";
+import { commonStyle } from "../../../Style/CommonStyle";
+//props
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { SettingStackProps } from "../../../Types/Home/Setting/SettingStackProps";
+//UI
+import { RadioButton } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
+//constant
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { functionCategory } from "../../../Constants/homeConst";
+import { drawerColor, lightTextColor, paddingLarge, windowHeight, windowWidth } from "../../../Constants/cssConst";
+import { reportScreenConst } from "../../../Constants/settingConst";
 
-type ReportScreenProps = NativeStackScreenProps<
-  SettingStackProps,
-  "SettingScreen"
->;
+type ReportScreenProps = NativeStackScreenProps<SettingStackProps, "SettingScreen">;
 
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const [typeChecked, setTypeChecked] = React.useState("comment");
@@ -42,78 +32,34 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={commonStyle.safeArea}>
-        <TipsContext.Provider
-          value={{ currentCategory: functionCategory.setting }}
-        >
-          <CustomHeader
-            toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-          ></CustomHeader>
+        <TipsContext.Provider value={{ currentCategory: functionCategory.setting }}>
+          <CustomHeader toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}></CustomHeader>
         </TipsContext.Provider>
         <View style={commonStyle.mainContainer}>
           <View style={[commonStyle.rowContainer, commonStyle.titleContainer]}>
-            <Text style={[commonStyle.textContainer, commonStyle.titleText]}>
-              {reportScreenConst.reportTitle}
-            </Text>
+            <Text style={[commonStyle.textContainer, commonStyle.titleText]}>{reportScreenConst.reportTitle}</Text>
           </View>
           <View style={[commonStyle.rowContainer, commonStyle.blockContainer]}>
-            <Text style={[commonStyle.textContainer, , { textAlign: "left" }]}>
-              {reportScreenConst.reportDesc}
-            </Text>
+            <Text style={[commonStyle.textContainer, , { textAlign: "left" }]}>{reportScreenConst.reportDesc}</Text>
           </View>
-          <View
-            style={[
-              commonStyle.rowContainer,
-              ,
-              commonStyle.blockContainer,
-              { justifyContent: "flex-start" },
-            ]}
-          >
-            <RadioButton.Group
-              onValueChange={(newValue) => setTypeChecked(newValue)}
-              value={typeChecked}
-            >
+          <View style={[commonStyle.rowContainer, , commonStyle.blockContainer, { justifyContent: "flex-start" }]}>
+            <RadioButton.Group onValueChange={(newValue) => setTypeChecked(newValue)} value={typeChecked}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <RadioButton value="comment" />
-                <Text
-                  style={[commonStyle.textContainer, { alignItems: "center" }]}
-                >
-                  ご意見・ご要望
-                </Text>
+                <Text style={[commonStyle.textContainer, { alignItems: "center" }]}>ご意見・ご要望</Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <RadioButton value="bug" />
-                <Text
-                  style={[commonStyle.textContainer, { alignItems: "center" }]}
-                >
-                  機能不具合
-                </Text>
+                <Text style={[commonStyle.textContainer, { alignItems: "center" }]}>機能不具合</Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <RadioButton value="report" />
-                <Text
-                  style={[commonStyle.textContainer, { alignItems: "center" }]}
-                >
-                  投稿への報告
-                </Text>
+                <Text style={[commonStyle.textContainer, { alignItems: "center" }]}>投稿への報告</Text>
               </View>
             </RadioButton.Group>
           </View>
-          <View
-            style={[
-              commonStyle.rowContainer,
-              ,
-              commonStyle.blockContainer,
-              { height: windowHeight * 0.06 },
-            ]}
-          >
-            <TextInput
-              style={styles.textbox}
-              placeholder={reportScreenConst.reportTextHint}
-              value={reportComment}
-              multiline={true}
-              numberOfLines={4}
-              onChangeText={setReportComment}
-            ></TextInput>
+          <View style={[commonStyle.rowContainer, , commonStyle.blockContainer, { height: windowHeight * 0.06 }]}>
+            <TextInput style={styles.textbox} placeholder={reportScreenConst.reportTextHint} value={reportComment} multiline={true} numberOfLines={4} onChangeText={setReportComment}></TextInput>
           </View>
         </View>
         <View style={[commonStyle.footer]}>
@@ -124,20 +70,12 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                 navigation.navigate("SettingScreen");
               }}
             >
-              <FontAwesome
-                name="arrow-left"
-                size={windowWidth * 0.09}
-                color={lightTextColor}
-              />
+              <FontAwesome name="arrow-left" size={windowWidth * 0.09} color={lightTextColor} />
             </TouchableOpacity>
           </View>
           <View style={commonStyle.sideContainer}>
             <TouchableOpacity style={[styles.modeBtn]} onPress={() => {}}>
-              <FontAwesome
-                name="check"
-                size={windowWidth * 0.09}
-                color={lightTextColor}
-              />
+              <FontAwesome name="check" size={windowWidth * 0.09} color={lightTextColor} />
             </TouchableOpacity>
           </View>
         </View>
