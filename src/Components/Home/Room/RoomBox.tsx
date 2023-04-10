@@ -1,13 +1,8 @@
-import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import { windowWidth, windowHeight } from "../../../Constants/cssConst";
+import { roomText } from "../../../Constants/roomConst";
 
 type Props = {
   onPressHandler: () => void;
@@ -15,21 +10,11 @@ type Props = {
   roomies?: string[];
   roomImg?: string[];
 };
-const RoomBox: React.FC<Props> = ({
-  onPressHandler,
-  roomName,
-  roomies,
-  roomImg,
-}) => {
+const RoomBox: React.FC<Props> = ({ onPressHandler, roomName, roomies, roomImg }) => {
   const image = require("../../../Image/TempRoomBlockImage.png");
   return (
     <TouchableOpacity onPress={onPressHandler} style={styles.container}>
-      <ImageBackground
-        source={image}
-        resizeMode="cover"
-        style={{ flex: 1 }}
-        imageStyle={{ borderRadius: borderRadius }}
-      >
+      <ImageBackground source={image} resizeMode="cover" style={{ flex: 1 }} imageStyle={{ borderRadius: borderRadius }}>
         <View style={styles.transparentLayer}>
           <View
             style={{
@@ -38,11 +23,7 @@ const RoomBox: React.FC<Props> = ({
               paddingHorizontal: windowWidth * 0.05,
             }}
           >
-            <FontAwesome
-              name="user-circle"
-              size={innerContainerHeight}
-              color="black"
-            />
+            <FontAwesome name="user-circle" size={innerContainerHeight} color="black" />
             <View style={{ flex: 1, paddingLeft: windowWidth * 0.04 }}>
               <Text
                 style={{
@@ -51,7 +32,7 @@ const RoomBox: React.FC<Props> = ({
                   fontWeight: "600",
                 }}
               >
-                {roomName === "__default" ? "My Room" : roomName}
+                {roomName === "__default" ? roomText.defaultRoomName : roomName}
               </Text>
               <View
                 style={{
@@ -60,18 +41,8 @@ const RoomBox: React.FC<Props> = ({
                   alignItems: "flex-end",
                 }}
               >
-                {roomies && roomies[1] ? <FontAwesome
-                  name="user-circle"
-                  size={innerContainerHeight / 2}
-                  color="black"
-                /> : null
-                }
-                {roomies && roomies[2] ? <FontAwesome
-                  name="user-circle"
-                  size={innerContainerHeight / 2}
-                  color="black"
-                /> : null
-                }
+                {roomies && roomies[1] ? <FontAwesome name="user-circle" size={innerContainerHeight / 2} color="black" /> : null}
+                {roomies && roomies[2] ? <FontAwesome name="user-circle" size={innerContainerHeight / 2} color="black" /> : null}
               </View>
             </View>
           </View>
