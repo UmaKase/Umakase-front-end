@@ -1,27 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Platform,
-} from "react-native";
-import {
-  backgroundColor,
-  cornerRadius,
-  paddingLarge,
-  windowHeight,
-  windowWidth,
-} from "../../Constants/cssConst";
-import {
-  Fontisto,
-  Feather,
-  FontAwesome,
-  FontAwesome5,
-} from "@expo/vector-icons";
+import { Alert, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Platform } from "react-native";
+import { backgroundColor, cornerRadius, paddingLarge, windowHeight, windowWidth } from "../../Constants/cssConst";
+import { Fontisto, Feather, FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthAPI } from "../../Constants/backendAPI";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -31,11 +12,7 @@ import { registerError } from "../../Types/api";
 import AuthInput from "../../Components/Auth/AuthInput";
 import RegisterInput from "../../Components/Auth/RegisterInput";
 import SubmitButton from "../../Components/Auth/SubmitButton";
-import {
-  registerErrorCategory,
-  registerErrorMessage,
-  registerResultTitle,
-} from "../../Constants/homeConst";
+import { registerCheckCategory, registerCheckMessage, registerResultTitle } from "../../Constants/homeConst";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
@@ -86,10 +63,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
     if (password != passwordCheck) {
       preCheck = false;
-      return Alert.alert(
-        registerResultTitle.failure,
-        registerErrorMessage[registerErrorCategory.passwordUnmatch]
-      );
+      return Alert.alert(registerResultTitle.failure, registerCheckMessage[registerCheckCategory.passwordUnmatch]);
     }
     if (preCheck) {
       axios({
@@ -104,9 +78,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         },
       })
         .then((result) => {
-          return Alert.alert("Register", "Register success!", [
-            { text: "OK", onPress: () => navigation.pop() },
-          ]);
+          return Alert.alert("Register", "Register success!", [{ text: "OK", onPress: () => navigation.pop() }]);
         })
         .catch((e) => {
           setEmailErr(false);
@@ -135,45 +107,32 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={{ flex: 1 }}
-        >
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <FontAwesome
-                name="angle-double-left"
-                size={windowWidth * 0.1}
-                color="#FFF"
-              />
+              <FontAwesome name="angle-double-left" size={windowWidth * 0.1} color="#FFF" />
             </TouchableOpacity>
             <Text style={styles.headerText}>新規会員登録</Text>
           </View>
           <View style={styles.inputContainer}>
             <RegisterInput
-              InputIcon={
-                <FontAwesome name="user" size={iconSize} color="#FFF" />
-              }
+              InputIcon={<FontAwesome name="user" size={iconSize} color="#FFF" />}
               SetInputState={setEmail}
               PlaceHolder="メールアドレス"
               PasswordMode={false}
-              errMsg={registerErrorMessage[registerErrorCategory.emailInput]}
+              errMsg={registerCheckMessage[registerCheckCategory.emailInput]}
               errorShow={emailErr}
             />
             <RegisterInput
-              InputIcon={
-                <FontAwesome name="user" size={iconSize} color="#FFF" />
-              }
+              InputIcon={<FontAwesome name="user" size={iconSize} color="#FFF" />}
               SetInputState={setUsername}
               PlaceHolder="ユーザー名"
               PasswordMode={false}
-              errMsg={registerErrorMessage[registerErrorCategory.usernameInput]}
+              errMsg={registerCheckMessage[registerCheckCategory.usernameInput]}
               errorShow={usernameErr}
             />
             <RegisterInput
-              InputIcon={
-                <FontAwesome name="user" size={iconSize} color="#FFF" />
-              }
+              InputIcon={<FontAwesome name="user" size={iconSize} color="#FFF" />}
               SetInputState={setFirstName}
               PlaceHolder="姓"
               PasswordMode={false}
@@ -181,9 +140,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               errorShow={firstNameErr}
             />
             <RegisterInput
-              InputIcon={
-                <FontAwesome name="user" size={iconSize} color="#FFF" />
-              }
+              InputIcon={<FontAwesome name="user" size={iconSize} color="#FFF" />}
               SetInputState={setLastName}
               PlaceHolder="名"
               PasswordMode={false}
@@ -191,25 +148,19 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               errorShow={lastNameErr}
             />
             <RegisterInput
-              InputIcon={
-                <FontAwesome5 name="unlock-alt" size={iconSize} color="#FFF" />
-              }
+              InputIcon={<FontAwesome5 name="unlock-alt" size={iconSize} color="#FFF" />}
               SetInputState={setPassword}
               PlaceHolder="パスワード"
               PasswordMode={true}
-              errMsg={registerErrorMessage[registerErrorCategory.passwordInput]}
+              errMsg={registerCheckMessage[registerCheckCategory.passwordInput]}
               errorShow={passwordErr}
             />
             <RegisterInput
-              InputIcon={
-                <FontAwesome5 name="unlock-alt" size={iconSize} color="#FFF" />
-              }
+              InputIcon={<FontAwesome5 name="unlock-alt" size={iconSize} color="#FFF" />}
               SetInputState={setPasswordCheck}
               PlaceHolder="確認用パスワード"
               PasswordMode={true}
-              errMsg={
-                registerErrorMessage[registerErrorCategory.confirmPasswordInput]
-              }
+              errMsg={registerCheckMessage[registerCheckCategory.confirmPasswordInput]}
               errorShow={passwordCheckErr}
             />
           </View>
