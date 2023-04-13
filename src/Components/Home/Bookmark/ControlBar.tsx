@@ -6,7 +6,7 @@ import {
   windowHeight,
   windowWidth,
 } from "../../../Constants/cssConst";
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
 type Props = {
   /**
@@ -20,22 +20,12 @@ type Props = {
   /**
    * handle add button function
    */
-  handleAdd: () => void;
-  /**
-   * handle trash button function
-   */
-  handleTrash: () => void;
-  /**
-   * (food[].length == 0)? true : false;
-   */
-  toggleFlag: boolean;
+  editButtonPress: () => void;
 };
 const ControlBar: React.FC<Props> = ({
   favMode,
   setFavMode,
-  handleAdd,
-  handleTrash,
-  toggleFlag,
+  editButtonPress,
 }) => {
   const iconSize = windowWidth * 0.08;
   return (
@@ -62,22 +52,10 @@ const ControlBar: React.FC<Props> = ({
       </View>
       <View style={[styles.subContainer, { justifyContent: "flex-end" }]}>
         <TouchableOpacity
-          onPress={() => handleAdd()}
-          disabled={!toggleFlag}
-          style={{ marginRight: windowWidth * 0.03 }}
+          onPress={editButtonPress}
+          style={{ marginRight: windowWidth * 0.01 }}
         >
-          <FontAwesome5
-            name="plus-circle"
-            size={iconSize * 0.9}
-            color={toggleFlag ? lightTextColor : "#D9D9D9"}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleTrash()} disabled={toggleFlag}>
-          <FontAwesome5
-            name="trash"
-            size={iconSize * 0.9}
-            color={toggleFlag ? "#D9D9D9" : lightTextColor}
-          />
+          <FontAwesome name="edit" size={iconSize} color={lightTextColor} />
         </TouchableOpacity>
       </View>
     </View>
