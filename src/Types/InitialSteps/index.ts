@@ -28,15 +28,9 @@ export interface FoodCheck extends Food {
   checked?: boolean;
 }
 
-export type BookMarkFood = {
-  altName: string;
-  country: string;
-  createdAt: string;
-  id: string;
-  img: string;
-  name: string;
-  tags: Tag[];
-  updatedAt: string;
+export interface FavoriteFoodInterface{
+  food: Food;
+  isFavorite: boolean;
 };
 
 export type BookMarkTag = {

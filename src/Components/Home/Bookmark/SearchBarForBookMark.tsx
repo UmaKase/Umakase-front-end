@@ -16,13 +16,11 @@ type Props = {
   placeholderText: string;
   input: string;
   setInput: (value: React.SetStateAction<string>) => void;
-  searchFunction: (value: string) => void;
 };
 const SearchBarForBookMark: React.FC<Props> = ({
   input,
   setInput,
   placeholderText,
-  searchFunction,
 }) => {
   return (
     <View style={styles.searchbarContainer}>
@@ -32,7 +30,6 @@ const SearchBarForBookMark: React.FC<Props> = ({
         autoFocus={false}
         onChangeText={(newText) => {
           setInput(newText);
-          searchFunction(newText);
         }}
         placeholder={placeholderText}
         placeholderTextColor="#E7E7E7"
