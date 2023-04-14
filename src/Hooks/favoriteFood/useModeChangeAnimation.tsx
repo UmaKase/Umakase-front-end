@@ -1,4 +1,4 @@
-import React, { memo, PropsWithChildren, useEffect } from "react";
+import React, { PropsWithChildren, useMemo } from "react";
 import { useRef } from "react";
 import { Animated } from "react-native";
 
@@ -55,22 +55,12 @@ export default function useModeChangeAnimation(): ModeChangeAnimationReturnType 
     ],
   };
 
-  useEffect(() => {
-    console.log('animation component mounted');
-    return () => {
-      console.log('animation component unmounted');
-    }
-  }, [])
-
-
   type ModeAnimatedViewProps = PropsWithChildren<{}>;
-  const ModeAnimatedView: React.FC<ModeAnimatedViewProps> = memo(({ children }) => {
-    return (
-      <Animated.View style={animatedStyles}>
-        {children}
-      </Animated.View>
-    )
-  });
+  const ModeAnimatedView = useMemo(() => {
+    return ({ children }: ModeAnimatedViewProps) => {
+      return <Animated.View style={animatedStyles}>{children}</Animated.View>;
+    };
+  }, []);
 
   return [ModeAnimatedView, startVibratingAnimation, stopVibratingAnimation];
 }

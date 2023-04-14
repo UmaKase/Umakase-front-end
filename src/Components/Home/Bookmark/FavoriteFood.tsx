@@ -5,55 +5,65 @@ import { backgroundColor, drawerColor, windowHeight, windowWidth } from "../../.
 import { ImgAPI } from "../../../Constants/backendAPI";
 import CacheImage from "../../Universal/CacheImage";
 import { FontAwesome } from "@expo/vector-icons";
+import useModeChangeAnimation from "../../../Hooks/favoriteFood/useModeChangeAnimation";
 
 interface FavoriteFoodProps {
   favFood: FavoriteFoodInterface;
   onLikePressHandler: () => void;
   onDeletePressHandler: () => void;
-  isEditing: boolean;
+  editMode: boolean;
 }
 
-const FavoriteFood: React.FC<FavoriteFoodProps> = ({ favFood, onLikePressHandler, onDeletePressHandler, isEditing }) => {
+const FavoriteFood: React.FC<FavoriteFoodProps> = React.memo(({ favFood, onLikePressHandler, onDeletePressHandler, editMode }) => {
+  // destructure favFood
   const { food, isFavorite } = favFood;
+  // useModeChangeAnimation hook
+  const [ModeAnimatedView, startVibratingAnimation, stopVibratingAnimation] = useModeChangeAnimation();
+
   useEffect(() => {
-    console.log(`favorite food mounted : ${food.name}`);
-    return () => console.log(`favorite food unmount : ${food.name}`);
-  }, []);
+    if (editMode) {
+      startVibratingAnimation();
+    } else {
+      stopVibratingAnimation();
+    }
+  }, [editMode]);
+
   return (
     food.id === "" ? <View style={styles.cardBackground}></View> :
-      <View style={[styles.cardBackground]}>
-        <View style={styles.imgContainer}>
-          {food.img ? (
-            <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
-          ) : (
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-              <Text style={{ color: "#777" }}>No Image</Text>
-            </View>
+      <ModeAnimatedView>
+        <View style={[styles.cardBackground]}>
+          <View style={styles.imgContainer}>
+            {food.img ? (
+              <CacheImage url={`${ImgAPI}/food/${food.img}`} style={styles.img} />
+            ) : (
+              <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                <Text style={{ color: "#777" }}>No Image</Text>
+              </View>
+            )}
+          </View>
+          <View style={styles.nameContainer}>
+            <Text style={styles.name}>{food.name}</Text>
+          </View>
+          {/* edit button */}
+          {editMode && (
+            <>
+              <TouchableOpacity onPress={onDeletePressHandler} style={[styles.editButton, { left: -10 }]}>
+                <FontAwesome name="minus" size={iconSize} color="#55F" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onLikePressHandler} style={[styles.editButton, { right: -10 }]}>
+                {isFavorite ? (
+                  <FontAwesome name="heart" size={iconSize} color="#F55" />
+                ) : (
+                  <FontAwesome name="heart-o" size={iconSize} color="#F55" />
+                )}
+              </TouchableOpacity>
+            </>
           )}
         </View>
-        <View style={styles.nameContainer}>
-          <Text style={styles.name}>{food.name}</Text>
-        </View>
-        {/* edit button */}
-        {isEditing && (
-          <>
-            <TouchableOpacity onPress={onDeletePressHandler} style={[styles.editButton, { left: -10 }]}>
-              <FontAwesome name="minus" size={iconSize} color="#55F" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onLikePressHandler} style={[styles.editButton, { right: -10 }]}>
-              {isFavorite ? (
-                <FontAwesome name="heart" size={iconSize} color="#F55" />
-              ) : (
-                <FontAwesome name="heart-o" size={iconSize} color="#F55" />
-              )}
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+      </ModeAnimatedView>
   );
-};
+});
 
-// export default React.memo(FavoriteFood);
 export default FavoriteFood;
 
 const width = windowWidth * 0.35;

@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { BookmarkedStackProps } from "../../../Types/Navigations/HomeDrawer/BookmarkedStack";
 import Background from "../../../Components/Universal/Background";
@@ -11,7 +11,6 @@ import _ from "lodash";
 import useFavoriteFoodFetch from "../../../Hooks/favoriteFood/useFavoriteFoodFetch";
 import useSearchFoodFetch from "../../../Hooks/useSearchFoodFetch";
 import { TagContext } from "../../../Context/TagContext";
-import useModeChangeAnimation from "../../../Hooks/favoriteFood/useModeChangeAnimation";
 import FavoriteFoodList from "../../../Components/Home/Bookmark/FavoriteFoodList";
 import ListFooterComponent from "../../../Components/Universal/ListFooterComponent";
 import FavoriteFood from "../../../Components/Home/Bookmark/FavoriteFood";
@@ -43,16 +42,9 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
   const [searchModeController, searchFoodsController] = useSearchFoodFetch(foods.map((food) => food.food));
   // useContext tags
   const { contextTags, setContextTags } = useContext(TagContext);
-  // useModeChangeAnimation
-  const [ModeAnimatedView, startVibratingAnimation, stopVibratingAnimation] = useModeChangeAnimation();
 
   useEffect(() => {
     setContextTags(tags);
-    if (editMode) {
-      startVibratingAnimation();
-    } else {
-      stopVibratingAnimation();
-    }
   }, [tags, editMode])
 
 
@@ -86,14 +78,12 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
         }
       }
       return (
-        <ModeAnimatedView>
-          <FavoriteFood
-            favFood={item}
-            onLikePressHandler={onLikePressHandler}
-            onDeletePressHandler={onDeletePressHandler}
-            isEditing={editMode}
-          />
-        </ModeAnimatedView>
+        <FavoriteFood
+          favFood={item}
+          onLikePressHandler={onLikePressHandler}
+          onDeletePressHandler={onDeletePressHandler}
+          editMode={editMode}
+        />
       )
     },
     [foods, showFoods, editMode],
