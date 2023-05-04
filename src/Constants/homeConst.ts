@@ -74,6 +74,6 @@ export const registerResultTitle = {
 };
 export const registerPopUp = {
   registerSuccess: { title: "登録成功", message: "新規会員登録完了しました。" },
-  registerFailure: { title: "登録失敗", message: "新規会員登録失敗しました。設定画面で" },
+  registerFailure: { title: "登録失敗", message: "新規会員登録失敗しました。設定画面でレポートしてください。" },
   loginFailure: { title: "ログイン失敗" },
 };
