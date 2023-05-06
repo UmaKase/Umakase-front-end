@@ -13,6 +13,7 @@ import AuthInput from "../../Components/Auth/AuthInput";
 import RegisterInput from "../../Components/Auth/RegisterInput";
 import SubmitButton from "../../Components/Auth/SubmitButton";
 import { registerCheckCategory, registerCheckMessage, registerResultTitle } from "../../Constants/homeConst";
+import { infoPopUp } from "../../Components/Universal/AlertControl";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
@@ -78,7 +79,9 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         },
       })
         .then((result) => {
-          return Alert.alert("Register", "Register success!", [{ text: "OK", onPress: () => navigation.pop() }]);
+          //return Alert.alert("Register", "Register success!", [{ text: "OK", onPress: () => navigation.pop() }]);
+          infoPopUp("I0002", [{ text: "OK", onPress: () => navigation.pop() }]);
+          return;
         })
         .catch((e) => {
           setEmailErr(false);
