@@ -14,6 +14,7 @@ import RoomBox from "../../../Components/Home/Room/RoomBox";
 import CenterActivityIndicator from "../../../Components/Universal/CenterActivityIndicator";
 import { TipsContext } from "../../../Context/TipsContext";
 import { functionCategory } from "../../../Constants/homeConst";
+import { errorPopUp } from "../../../Components/Universal/AlertControl";
 
 type Props = NativeStackScreenProps<RoomStackNavigationProps, "RoomListScreen">;
 
@@ -47,7 +48,8 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
         })
         .catch((e) => {
           console.log(e.response.data);
-          return Alert.alert("Error", "Getting room list failed.");
+          errorPopUp("E0111");
+          return;
         });
     });
     return unSubscribe;
@@ -63,12 +65,8 @@ const RoomListScreen: React.FC<Props> = ({ navigation, route }) => {
     <SafeAreaProvider>
       <SafeAreaView style={styles.background}>
         {/* header =========================================== */}
-        <TipsContext.Provider
-          value={{ currentCategory: functionCategory.room }}
-        >
-          <CustomHeader
-            toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-          ></CustomHeader>
+        <TipsContext.Provider value={{ currentCategory: functionCategory.room }}>
+          <CustomHeader toggleMenu={() => navigation.dispatch(DrawerActions.toggleDrawer())}></CustomHeader>
         </TipsContext.Provider>
         {/* mode  =========================================== */}
         {fetching ? (

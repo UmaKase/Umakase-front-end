@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 import { setItemAsync } from "expo-secure-store";
 import { rootNavigationRef } from "../Ref";
 import { INITIAL_STAGE_FOOD, INITIAL_STAGE_TAG } from "../Constants/securestoreKey";
+import { errorPopUp } from "../Components/Universal/AlertControl";
 
 const normalAxios = axios.create();
 
@@ -25,13 +26,12 @@ normalAxios.interceptors.response.use(
           if(data.foodIds.length > 0){
             setItemAsync(INITIAL_STAGE_FOOD, JSON.stringify(data.selectedFoods));
           }
-          Alert.alert("ERROR", "Previous setting had been saved, information will inject automatically on next time open the app, you can close the app safely. :D")
+          errorPopUp("E0119");
         } else {
           console.log("error: foodIds length is 0!")
         }
       } else {
-        return Alert.alert("OOPS", "Bad network, try again later");
-      }
+        return errorPopUp("E0120");
     }
   }
 )

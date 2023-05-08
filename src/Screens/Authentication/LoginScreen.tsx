@@ -28,7 +28,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const LoginProcess = async () => {
     console.log("fire");
     if (email == "" || password == "") {
-      //return Alert.alert("Error", "email or password input is missing!");
       errorPopUp("E0105");
       return;
     }
@@ -56,7 +55,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       })
       .catch((e) => {
         if (e.response.status == 400) {
-          Alert.alert("Login failed", e.response.data.message);
+          errorPopUp("E0106", [e.response.data.message]);
         } else {
           console.log("login catch else error:", e.response.data.message);
         }

@@ -16,6 +16,7 @@ import { SubmitButton, RegisterInput } from "../../Components/Auth";
 import { ACCESS_KEY, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../../Constants/securestoreKey";
 import * as SecureStore from "expo-secure-store";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
+import { errorPopUp, infoPopUp } from "../../Components/Universal/AlertControl";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
@@ -58,13 +59,13 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     })
       .then(async (mergeResult) => {
         console.log(mergeResult);
-        Alert.alert(registerPopUp.registerSuccess.title, registerPopUp.registerSuccess.message);
+        infoPopUp("I0106");
         navigation.goBack();
       })
       .catch((e) => {
         console.log(e.response.data);
         console.log("merge user Error:", e.response.data.message);
-        return Alert.alert(registerPopUp.registerFailure.title, registerPopUp.registerFailure.message);
+        return errorPopUp("E0116", [e.response.data.message]);
       });
   };
   const LoginProcess = async () => {
@@ -89,7 +90,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       })
       .catch((e) => {
         if (e.response.status == 400) {
-          Alert.alert(registerPopUp.loginFailure.title, e.response.data.message);
+          return errorPopUp("E0114", [e.response.data.message]);
         } else {
           console.log("login catch else error:", e.response.data.message);
         }
@@ -117,7 +118,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
     if (password != passwordCheck) {
       preCheck = false;
-      return Alert.alert(registerPopUp.registerFailure.title, registerCheckMessage[registerCheckCategory.passwordUnmatch]);
+      return errorPopUp("E115");
     }
     if (preCheck) {
       axios({
@@ -155,7 +156,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           const error = e.response.data.error;
           console.log(e.response.data);
           const errorMsg = error.message;
-          return Alert.alert(registerPopUp.registerFailure.title, errorMsg);
+          return errorPopUp("E0116", [errorMsg]);
         });
     }
   };

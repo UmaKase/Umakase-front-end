@@ -17,6 +17,7 @@ import * as SecureStore from "expo-secure-store";
 import { FontAwesome } from "@expo/vector-icons";
 import { commonStyle } from "../../Style/CommonStyle";
 import SubmitButton from "../../Components/Auth/SubmitButton";
+import { errorPopUp } from "../../Components/Universal/AlertControl";
 
 type ProfileUpdateScreenProps = NativeStackScreenProps<ProfileStackProps, "ProfileUpdateScreen">;
 const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, route }) => {
@@ -39,7 +40,8 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
     //refresh token error handler
     if (!localRefreshToken) {
       console.log("No local refresh token");
-      return Alert.alert("Error", "No local refresh token");
+      errorPopUp("E0110");
+      return;
     }
     console.log("lasyname" + newLastName);
     //update personal property

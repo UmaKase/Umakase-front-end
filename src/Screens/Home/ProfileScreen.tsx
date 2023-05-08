@@ -12,6 +12,7 @@ import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { ProfileContext } from "../../Context/ProfileContext";
 import { TipsContext } from "../../Context/TipsContext";
 import { functionCategory } from "../../Constants/homeConst";
+import { errorPopUp } from "../../Components/Universal/AlertControl";
 type ProfileScreenProps = NativeStackScreenProps<ProfileStackProps, "ProfileScreen">;
 //get default room ID of user
 const getRoomIdCall = async (successCallBack: any, failCallback: any) => {
@@ -26,7 +27,8 @@ const getRoomIdCall = async (successCallBack: any, failCallback: any) => {
     .catch((e) => {
       console.log("get rooms Error:", e.response.data.message);
       failCallback(e);
-      return Alert.alert("Error", "not getting default room!");
+      errorPopUp("E0109");
+      return;
     });
 };
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
