@@ -37,7 +37,7 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
     setCurrentRoom({ id: roomId, name: roomName });
     navigation.goBack();
     infoPopUp("");
-    return infoPopUp("I0103", [roomName]);
+    return infoPopUp("I0104", [roomName]);
   };
 
   const deleteRoomFunction = () => {
