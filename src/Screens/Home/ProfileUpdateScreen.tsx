@@ -55,8 +55,12 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
     }
     //update password
     else if (mode === profileUpdateMode.password) {
-      //incomplete
-      return;
+      requestMethod = "put";
+      requestUrl = `${UserAPI}/profile`;
+      requestData = {
+        password: confirmValue,
+        oldPassword: oldPassword,
+      };
     }
     //call update property api
     customAxiosInstance({
@@ -100,20 +104,25 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
   //verify input function
   const verifyInput = (): boolean => {
     if (route.params.mode == profileUpdateMode.password) {
+      //check "new password" & "confirm password" are inputed
       if (confirmValue == "" || newValue == "") {
         setErrMsg(profileUpdScreenStr.errMsgNotNull);
         return false;
+        //check "new password" is same as "confirm password"
       } else if (confirmValue != newValue) {
         setErrMsg(profileUpdScreenStr.errMsgUnequip);
         return false;
+        //if the above checks are passed, remove error message
       } else {
         setErrMsg(profileUpdScreenStr.errMsgEmpty);
         return true;
       }
     } else if (route.params.mode == profileUpdateMode.personalInfo) {
+      //check "last name" or "surname" is  inputed
       if (newLastName == "" && newSurName == "") {
         setErrMsg(profileUpdScreenStr.errMsgNotNull);
         return false;
+        //if the above checks is passes, remove error message
       } else {
         setErrMsg(profileUpdScreenStr.errMsgEmpty);
         return true;
