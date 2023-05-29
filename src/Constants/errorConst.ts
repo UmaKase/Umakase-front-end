@@ -9,16 +9,17 @@ const comMsg = {
   noLocalRefreshTokenMessage: `エラー発生しています。リポートでお問い合わせてください。\n(Error: local refresh token)`,
   passwordUnmatchMessage: `確認パスワードはパスポートと不一致です。もう一度入力してください。`,
   registerMemberMessage: "新規会員登録完了しました。",
+  InputRemindMessage: `を入力してください。`,
 };
 export const errorMessages = [
   { Code: "E0100", Title: comMsg.appErrTitle, Message: comMsg.noLocalRefreshTokenMessage },
-  { Code: "E0101", Title: comMsg.appErrTitle, Message: "下記の資料を入力してください。" },
+  { Code: "E0101", Title: comMsg.appErrTitle, Message: `下記の資料${comMsg.InputRemindMessage}` },
 
   { Code: "E0102", Title: comMsg.appErrTitle, Message: `${comMsg.appErrMessage}\n(Error: No current room been set)` },
   { Code: "E0103", Title: comMsg.appErrTitle, Message: comMsg.noLocalRefreshTokenMessage },
   { Code: "E0104", Title: comMsg.appErrTitle, Message: `${comMsg.appErrMessage}\n(Error: logout process failed)` },
 
-  { Code: "E0105", Title: comMsg.loginFailTitle, Message: `メールとパスワードを入力してください。` },
+  { Code: "E0105", Title: comMsg.loginFailTitle, Message: `メールとパスワード${comMsg.InputRemindMessage}` },
   { Code: "E0106", Title: comMsg.loginFailTitle, Message: `${comMsg.appErrMessage}\n([0])` },
 
   { Code: "E0107", Title: comMsg.registerFailTitle, Message: comMsg.passwordUnmatchMessage },
@@ -39,6 +40,9 @@ export const errorMessages = [
 
   { Code: "E0119", Title: comMsg.networkErrorTitle, Message: "設定が保存されています。アプリを再起動ください。" },
   { Code: "E0120", Title: comMsg.networkErrorTitle, Message: "インターネットに接続されていません。" },
+
+  { Code: "E0121", Title: comMsg.appErrTitle, Message: "不明なエラーが発生してます。後でやり直してください。" },
+  { Code: "E0122", Title: comMsg.appErrTitle, Message: `ご意見・ご要望${comMsg.InputRemindMessage}` },
 ];
 
 export const infoMessages = [

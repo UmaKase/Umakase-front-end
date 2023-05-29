@@ -5,3 +5,4 @@ export const FoodAPI = `${BackendUrl}/api/v1/food`;
 export const TagAPI = `${BackendUrl}/api/v1/tag`;
 export const ImgAPI = `${BackendUrl}/api/v1/img`;
 export const RoomAPI = `${BackendUrl}/api/v1/room`;
+export const FeedbackAPI = `${BackendUrl}/api/v1/feedback`;
