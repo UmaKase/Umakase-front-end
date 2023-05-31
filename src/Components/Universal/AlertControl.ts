@@ -10,12 +10,13 @@ import { Alert, AlertButton, AlertOptions } from "react-native";
 export const errorPopUp = (messageCode: string, parameters: string[] | undefined = undefined, buttons: AlertButton[] | undefined = undefined, options: AlertOptions | undefined = undefined) => {
   let errorMessage = errorMessages.find((e) => e.Code == messageCode);
   if (errorMessage) {
+    let emsg = errorMessage.Message;
     if (parameters) {
       parameters.forEach(function (p, i) {
-        errorMessage?.Message.replace(`[${i.toString()}]`, p);
+        emsg = emsg.replace(`[${i.toString()}]`, p);
       });
     }
-    Alert.alert(errorMessage.Title, errorMessage.Message, buttons, options);
+    Alert.alert(errorMessage.Title, emsg, buttons, options);
   } else {
     console.log(`error message "${messageCode}"cannot be find`);
   }
