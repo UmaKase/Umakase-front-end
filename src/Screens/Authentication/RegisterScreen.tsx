@@ -13,6 +13,7 @@ import AuthInput from "../../Components/Auth/AuthInput";
 import RegisterInput from "../../Components/Auth/RegisterInput";
 import SubmitButton from "../../Components/Auth/SubmitButton";
 import { registerCheckCategory, registerCheckMessage, registerResultTitle } from "../../Constants/homeConst";
+import { errorPopUp, infoPopUp } from "../../Components/Universal/AlertControl";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "RegisterScreen">;
 
@@ -63,7 +64,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
     if (password != passwordCheck) {
       preCheck = false;
-      return Alert.alert(registerResultTitle.failure, registerCheckMessage[registerCheckCategory.passwordUnmatch]);
+      errorPopUp("E0107");
+      return;
     }
     if (preCheck) {
       axios({
@@ -78,7 +80,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         },
       })
         .then((result) => {
-          return Alert.alert("Register", "Register success!", [{ text: "OK", onPress: () => navigation.pop() }]);
+          infoPopUp("I0102", undefined, [{ text: "OK", onPress: () => navigation.pop() }]);
+          return;
         })
         .catch((e) => {
           setEmailErr(false);
@@ -95,7 +98,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               errorMsg = `${errorMsg}\n${error.param}:${error.msg}`;
             }
           });
-          return Alert.alert(registerResultTitle.failure, errorMsg);
+          errorPopUp("E0108", [errorMsg]);
+          return;
         });
     }
   };

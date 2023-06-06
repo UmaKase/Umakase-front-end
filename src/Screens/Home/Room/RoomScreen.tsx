@@ -15,6 +15,7 @@ import { User } from "../../../Types/types";
 import UserList from "../../../Components/Home/UserList";
 import { GlobalContext } from "../../../Context/GlobalContext";
 import { roomText } from "../../../Constants/roomConst";
+import { infoPopUp } from "../../../Components/Universal/AlertControl";
 type RoomScreenProps = NativeStackScreenProps<RoomStackNavigationProps, "RoomScreen">;
 const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
   // const [Room, setRoom] = useState<>();
@@ -35,7 +36,8 @@ const RoomScreen: React.FC<RoomScreenProps> = ({ route, navigation }) => {
     }
     setCurrentRoom({ id: roomId, name: roomName });
     navigation.goBack();
-    return Alert.alert("Notification", `Change current room to ${roomName} success.`);
+    infoPopUp("");
+    return infoPopUp("I0104", [roomName]);
   };
 
   const deleteRoomFunction = () => {

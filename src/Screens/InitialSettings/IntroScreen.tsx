@@ -11,6 +11,7 @@ import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
 import { CONFIG_KEY, INITIAL_STAGE_FOOD, INITIAL_STAGE_TAG } from "../../Constants/securestoreKey";
 import useSubmit from "../../Hooks/InitialStage/useSubmit";
 import SubmitStatus from "../../Components/InitialStep/SubmitStatus";
+import { infoPopUp } from "../../Components/Universal/AlertControl";
 
 type Props = NativeStackScreenProps<InitialStepsProps, "IntroScreen">;
 
@@ -22,22 +23,22 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
     const prevTag = await getItemAsync(INITIAL_STAGE_TAG);
     const prevFood = await getItemAsync(INITIAL_STAGE_FOOD);
     if (prevTag || prevFood) {
-      Alert.alert("Notify", "You have a previous setting been saved, do you like to proceed with the previous setting?", [
+      infoPopUp("I0105", undefined, [
         {
           text: "No",
-          onPress: (async () => {
+          onPress: async () => {
             await deleteItemAsync(INITIAL_STAGE_TAG);
             await deleteItemAsync(INITIAL_STAGE_FOOD);
-          }),
-          style: "cancel"
+          },
+          style: "cancel",
         },
         {
           text: "Yes",
-          onPress: (async () => {
+          onPress: async () => {
             navigation.navigate("SelectTagScreen");
-          }),
-          style: "default"
-        }
+          },
+          style: "default",
+        },
       ]);
     }
   }
@@ -55,73 +56,66 @@ const IntroScreen: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     checkIfPreviousSetting();
-  }, [])
+  }, []);
 
   // SECTION components for IntroScreen
   const Header: React.FC = () => {
-    return <View style={styles.header}>
-      <View style={styles.iconConatiner}>
-        <Image
-          source={require("../../Image/Umakase.png")}
-          style={styles.icon}
-        ></Image>
+    return (
+      <View style={styles.header}>
+        <View style={styles.iconConatiner}>
+          <Image source={require("../../Image/Umakase.png")} style={styles.icon}></Image>
+        </View>
+        <View style={styles.headLine}>
+          <Text style={styles.headLineText}>ようこそ！</Text>
+        </View>
       </View>
-      <View style={styles.headLine}>
-        <Text style={styles.headLineText}>ようこそ！</Text>
-      </View>
-    </View>
-  }
+    );
+  };
 
   const Body: React.FC = () => {
-    return <View style={styles.directionsContainer}>
-      <Text style={styles.directionsFont}>
-        Umakaseをご使用いただき、{"\n"}
-        ありがとうございます。{"\n"}
-        これからお気入り料理の設定を{"\n"}
-        行います。{"\n"}
-        右ボタンをクリックして設定を{"\n"}
-        始めます。{"\n"}
-        スキップボタンをクリックして{"\n"}
-        設定をあと回します。
-      </Text>
-    </View>
-  }
+    return (
+      <View style={styles.directionsContainer}>
+        <Text style={styles.directionsFont}>
+          Umakaseをご使用いただき、{"\n"}
+          ありがとうございます。{"\n"}
+          これからお気入り料理の設定を{"\n"}
+          行います。{"\n"}
+          右ボタンをクリックして設定を{"\n"}
+          始めます。{"\n"}
+          スキップボタンをクリックして{"\n"}
+          設定をあと回します。
+        </Text>
+      </View>
+    );
+  };
 
   const LoginLink: React.FC = () => {
-    return <View style={styles.linkContainer}>
-      <TouchableOpacity
-        style={styles.loginLink}
-        onPress={() => accountLoginHandler()}
-      >
-        <Text style={styles.loginLinkFont}>アカウントをログイン</Text>
-      </TouchableOpacity>
-    </View>
-  }
+    return (
+      <View style={styles.linkContainer}>
+        <TouchableOpacity style={styles.loginLink} onPress={() => accountLoginHandler()}>
+          <Text style={styles.loginLinkFont}>アカウントをログイン</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   const Footer: React.FC = () => {
-    return <View style={styles.footer}>
-      <View style={styles.sideContainer}></View>
-      <View style={styles.btnContainer}>
-        <TouchableOpacity
-          style={styles.skipBtn}
-          onPress={() => submit({})}
-        >
-          <Text style={styles.skipBtnText}>スキップ</Text>
-        </TouchableOpacity>
+    return (
+      <View style={styles.footer}>
+        <View style={styles.sideContainer}></View>
+        <View style={styles.btnContainer}>
+          <TouchableOpacity style={styles.skipBtn} onPress={() => submit({})}>
+            <Text style={styles.skipBtnText}>スキップ</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.sideContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate("SelectTagScreen")}>
+            <FontAwesome name="arrow-circle-right" size={windowWidth * 0.145} color="#FFF" />
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.sideContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("SelectTagScreen")}
-        >
-          <FontAwesome
-            name="arrow-circle-right"
-            size={windowWidth * 0.145}
-            color="#FFF"
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  }
+    );
+  };
   // !SECTION ========================================================
 
   return (

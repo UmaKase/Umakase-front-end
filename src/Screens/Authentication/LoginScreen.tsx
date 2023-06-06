@@ -4,14 +4,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { AuthAPI, ImgAPI } from "../../Constants/backendAPI";
 //components
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Alert,
-  Image,
-} from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity, Alert, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AuthInput from "../../Components/Auth/AuthInput";
 //navigation
@@ -19,21 +12,12 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { CommonActions } from "@react-navigation/native";
 import { AuthNavigationProps } from "../../Types/Navigations/Auth";
 //css const
-import {
-  backgroundColor,
-  windowHeight,
-  windowWidth,
-} from "../../Constants/cssConst";
+import { backgroundColor, windowHeight, windowWidth } from "../../Constants/cssConst";
 //import vector icons
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons/";
-import {
-  ACCESS_KEY,
-  REFRESH_KEY,
-  SHOWNAME_KEY,
-  USERID_KEY,
-  USERNAME_KEY,
-} from "../../Constants/securestoreKey";
+import { ACCESS_KEY, REFRESH_KEY, SHOWNAME_KEY, USERID_KEY, USERNAME_KEY } from "../../Constants/securestoreKey";
 import SubmitButton from "../../Components/Auth/SubmitButton";
+import { errorPopUp } from "../../Components/Universal/AlertControl";
 
 type Props = NativeStackScreenProps<AuthNavigationProps, "LoginScreen">;
 
@@ -44,7 +28,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const LoginProcess = async () => {
     console.log("fire");
     if (email == "" || password == "") {
-      return Alert.alert("Error", "email or password input is missing!");
+      errorPopUp("E0105");
+      return;
     }
     axios({
       method: "post",
@@ -66,13 +51,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         // await SecureStore.setItemAsync(USERNAME_KEY, username);
 
         // await SecureStore.setItemAsync(SHOWNAME_KEY, loginResult.data.profile.showname);
-        navigation.dispatch(
-          CommonActions.reset({ routes: [{ name: "HomeStackNavigation" }] })
-        );
+        navigation.dispatch(CommonActions.reset({ routes: [{ name: "HomeStackNavigation" }] }));
       })
       .catch((e) => {
         if (e.response.status == 400) {
-          Alert.alert("Login failed", e.response.data.message);
+          errorPopUp("E0106", [e.response.data.message]);
         } else {
           console.log("login catch else error:", e.response.data.message);
         }
@@ -83,10 +66,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.logoContainer}>
-        <Image
-          source={require("../../Image/Umakase.png")}
-          style={styles.logo}
-        />
+        <Image source={require("../../Image/Umakase.png")} style={styles.logo} />
         <Text style={styles.logoText}>Umakase</Text>
       </View>
       <View style={styles.inputContainer}>
@@ -97,14 +77,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           PasswordMode={false}
           style={{ marginTop: windowHeight * 0.056 }}
         />
-        <AuthInput
-          SetInputState={setPassword}
-          PlaceHolder="パスワード"
-          InputIcon={
-            <FontAwesome5 name="unlock-alt" size={iconSize} color="#FFF" />
-          }
-          PasswordMode={true}
-        />
+        <AuthInput SetInputState={setPassword} PlaceHolder="パスワード" InputIcon={<FontAwesome5 name="unlock-alt" size={iconSize} color="#FFF" />} PasswordMode={true} />
         <SubmitButton
           onPressHandler={() => {
             LoginProcess();
@@ -115,10 +88,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             marginBottom: windowHeight * 0.04,
           }}
         />
-        <TouchableOpacity
-          style={{ borderBottomColor: "#FFF", borderBottomWidth: 1 }}
-          onPress={() => navigation.navigate("RegisterScreen")}
-        >
+        <TouchableOpacity style={{ borderBottomColor: "#FFF", borderBottomWidth: 1 }} onPress={() => navigation.navigate("RegisterScreen")}>
           <Text style={styles.registerText}>新規会員登録</Text>
         </TouchableOpacity>
       </View>
