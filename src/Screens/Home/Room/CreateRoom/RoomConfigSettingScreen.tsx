@@ -18,6 +18,7 @@ import { UserContext } from "../../../../Context/UserContext";
 import { profileScreenStr } from "../../../../Constants/ProfileConst";
 import { User } from "../../../../Types/types";
 import CenterActivityIndicator from "../../../../Components/Universal/CenterActivityIndicator";
+import { errorPopUp } from "../../../../Components/Universal/AlertControl";
 
 type RoomConfigSettingScreeProps = NativeStackScreenProps<RoomStackNavigationProps, "RoomConfigSettingScreen">;
 const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({ navigation }) => {
@@ -44,7 +45,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({ naviga
       })
       .catch((e) => {
         console.log(JSON.stringify(e.response));
-        return Alert.alert("Create room failed.", `${e.response.error}`);
+        return errorPopUp("E0113", [e.response.error]);
       });
   };
 
@@ -146,7 +147,7 @@ const RoomConfigSettingScreen: React.FC<RoomConfigSettingScreeProps> = ({ naviga
                   console.log(user.id);
                 },
                 handleSelect: () => {},
-                handleAdd: ()=>console.log("this is the problem!")
+                handleAdd: () => console.log("this is the problem!"),
               }}
             >
               <UserList />

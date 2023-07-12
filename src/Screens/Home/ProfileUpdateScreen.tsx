@@ -17,6 +17,7 @@ import * as SecureStore from "expo-secure-store";
 import { FontAwesome } from "@expo/vector-icons";
 import { commonStyle } from "../../Style/CommonStyle";
 import SubmitButton from "../../Components/Auth/SubmitButton";
+import { errorPopUp } from "../../Components/Universal/AlertControl";
 
 type ProfileUpdateScreenProps = NativeStackScreenProps<ProfileStackProps, "ProfileUpdateScreen">;
 const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, route }) => {
@@ -39,7 +40,8 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
     //refresh token error handler
     if (!localRefreshToken) {
       console.log("No local refresh token");
-      return Alert.alert("Error", "No local refresh token");
+      errorPopUp("E0110");
+      return;
     }
     console.log("lasyname" + newLastName);
     //update personal property
@@ -53,8 +55,12 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
     }
     //update password
     else if (mode === profileUpdateMode.password) {
-      //incomplete
-      return;
+      requestMethod = "put";
+      requestUrl = `${UserAPI}/profile`;
+      requestData = {
+        password: confirmValue,
+        oldPassword: oldPassword,
+      };
     }
     //call update property api
     customAxiosInstance({
@@ -98,20 +104,25 @@ const ProfileUpdateScreen: React.FC<ProfileUpdateScreenProps> = ({ navigation, r
   //verify input function
   const verifyInput = (): boolean => {
     if (route.params.mode == profileUpdateMode.password) {
+      //check "new password" & "confirm password" are inputed
       if (confirmValue == "" || newValue == "") {
         setErrMsg(profileUpdScreenStr.errMsgNotNull);
         return false;
+        //check "new password" is same as "confirm password"
       } else if (confirmValue != newValue) {
         setErrMsg(profileUpdScreenStr.errMsgUnequip);
         return false;
+        //if the above checks are passed, remove error message
       } else {
         setErrMsg(profileUpdScreenStr.errMsgEmpty);
         return true;
       }
     } else if (route.params.mode == profileUpdateMode.personalInfo) {
+      //check "last name" or "surname" is  inputed
       if (newLastName == "" && newSurName == "") {
         setErrMsg(profileUpdScreenStr.errMsgNotNull);
         return false;
+        //if the above checks is passes, remove error message
       } else {
         setErrMsg(profileUpdScreenStr.errMsgEmpty);
         return true;

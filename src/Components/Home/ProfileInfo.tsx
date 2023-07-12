@@ -7,13 +7,7 @@ import { REFRESH_KEY, CURRENTROOM_NAME_KEY } from "../../Constants/securestoreKe
 import * as SecureStore from "expo-secure-store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackProps } from "../../Types/Home/Profile/ProfileStackProps";
-import {
-  profileInfoNum,
-  profileInfoStr,
-  profileMembership,
-  profileUpdateMode,
-  profileUpdateTitle,
-} from "../../Constants/ProfileConst";
+import { profileInfoNum, profileInfoStr, profileMembership, profileUpdateMode, profileUpdateTitle } from "../../Constants/ProfileConst";
 import { AxiosResponse } from "axios";
 import { UserProfileContainer } from "../../Types/Home/Profile/ProfileScreen";
 import { FontAwesome } from "@expo/vector-icons";
@@ -21,6 +15,7 @@ import { commonStyle } from "../../Style/CommonStyle";
 import LoadingSpinner from "../../Components/Auth/LoadingSpinner";
 import { ProfileContext } from "../../Context/ProfileContext";
 import { useFocusEffect } from "@react-navigation/core";
+import { errorPopUp } from "../../Components/Universal/AlertControl";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -31,7 +26,7 @@ const profileProcess = async (successCallBack: any) => {
   const localRefreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
   if (!localRefreshToken) {
     console.log("No local refresh token");
-    return Alert.alert("Error", "No local refresh token");
+    errorPopUp("E0100");
   }
   customAxiosInstance({
     method: "get",
@@ -51,13 +46,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
   //state variable defined
   const [userProfileContainer, setUseProfileContainer] = useState<UserProfileContainer>();
   const [userName, setUserName] = useState<string>("");
-  const [membership, setMembership] = useState<number>(
-    profileInfoNum.membershipFree
-  );
+  const [membership, setMembership] = useState<number>(profileInfoNum.membershipFree);
   const [membershipText, setMembershipText] = useState<string>("");
-  const [currentRoomName, setCurrentRoomName] = useState<string>(
-    profileInfoStr.notSet
-  );
+  const [currentRoomName, setCurrentRoomName] = useState<string>(profileInfoStr.notSet);
   const [fetching, setFetching] = useState<boolean>(true);
 
   //current
@@ -65,24 +56,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
   getCurrentRoomName(setCurrentRoomName);
 
   const displayName = () => {
-    if (membership == profileInfoNum.memberUnregister)
-      return (
-        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-          {`${profileInfoStr.unregisterUserName}`}
-        </Text>
-      );
-    else if (lastName == "" && firstName == "")
-      return (
-        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-          {`${userName}`}
-        </Text>
-      );
-    else
-      return (
-        <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>
-          {`${lastName} ${firstName}`}
-        </Text>
-      );
+    if (membership == profileInfoNum.memberUnregister) return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.unregisterUserName}`}</Text>;
+    else if (lastName == "" && firstName == "") return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${userName}`}</Text>;
+    else return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${lastName} ${firstName}`}</Text>;
   };
   const profileSuccessHandler = (res: AxiosResponse<any, any>) => {
     try {
@@ -138,24 +114,16 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
         <View style={styles.infoRightView}>
           {displayName()}
           {membership == profileInfoNum.memberUnregister ? (
-            <Text
-              style={[commonStyle.textContainer, { fontSize: textLarge }]}
-            >{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
+            <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
           ) : (
-            <Text
-              style={[commonStyle.textContainer, { fontSize: textLarge }]}
-            >{`${profileInfoStr.IdHint}${userName}`}</Text>
+            <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.IdHint}${userName}`}</Text>
           )}
         </View>
       </View>
       {/* membership display*/}
       <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
-        <Text style={[commonStyle.textContainer, styles.membership]}>
-          {profileInfoStr.membershipHint}
-        </Text>
-        <Text style={[commonStyle.textContainer, styles.membership]}>
-          {membershipText}
-        </Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>{profileInfoStr.membershipHint}</Text>
+        <Text style={[commonStyle.textContainer, styles.membership]}>{membershipText}</Text>
       </View>
       {/* */}
       <View style={commonStyle.rowContainer}>
@@ -164,35 +132,20 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
       </View>
       {membership == profileInfoNum.memberUnregister ? (
         <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
-          <TouchableOpacity
-            style={commonStyle.button_active}
-            onPress={async () => navigation.navigate("RegisterScreen")}
-          >
-            <Text style={commonStyle.textContainer}>
-              {profileInfoStr.mergedUserRegisterBut}
-            </Text>
+          <TouchableOpacity style={commonStyle.button_active} onPress={async () => navigation.navigate("RegisterScreen")}>
+            <Text style={commonStyle.textContainer}>{profileInfoStr.mergedUserRegisterBut}</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <View style={[commonStyle.rowContainer, { paddingTop: paddingLarge }]}>
-          <TouchableOpacity
-            style={commonStyle.button_disable}
-            onPress={() => {}}
-            disabled
-          >
-            <Text style={commonStyle.textContainer}>
-              {profileInfoStr.premiumRegisterBut}
-            </Text>
+          <TouchableOpacity style={commonStyle.button_disable} onPress={() => {}} disabled>
+            <Text style={commonStyle.textContainer}>{profileInfoStr.premiumRegisterBut}</Text>
           </TouchableOpacity>
         </View>
       )}
       <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={
-            membership == profileInfoNum.memberUnregister
-              ? commonStyle.button_disable
-              : commonStyle.button_active
-          }
+          style={membership == profileInfoNum.memberUnregister ? commonStyle.button_disable : commonStyle.button_active}
           onPress={() =>
             navigation.navigate("ProfileUpdateScreen", {
               mode: profileUpdateMode.personalInfo,
@@ -211,11 +164,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
       </View>
       <View style={commonStyle.rowContainer}>
         <TouchableOpacity
-          style={
-            membership == profileInfoNum.memberUnregister
-              ? commonStyle.button_disable
-              : commonStyle.button_active
-          }
+          style={membership == profileInfoNum.memberUnregister ? commonStyle.button_disable : commonStyle.button_active}
           onPress={() =>
             navigation.navigate("ProfileUpdateScreen", {
               mode: profileUpdateMode.password,
