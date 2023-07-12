@@ -1,5 +1,5 @@
 import { paddingLarge, textLarge, textMedium, windowWidth } from "../../Constants/cssConst";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import customAxiosInstance from "../../Utils/customAxiosInstance";
 import { AuthAPI, UserAPI } from "../../Constants/backendAPI";
@@ -16,6 +16,7 @@ import LoadingSpinner from "../../Components/Auth/LoadingSpinner";
 import { ProfileContext } from "../../Context/ProfileContext";
 import { useFocusEffect } from "@react-navigation/core";
 import { errorPopUp } from "../../Components/Universal/AlertControl";
+import { last } from "lodash";
 
 interface ProfileInfoProps {
   userId: string | undefined;
@@ -42,6 +43,22 @@ const getCurrentRoomName = async (setter: React.Dispatch<React.SetStateAction<st
   const tempRoomName = await SecureStore.getItemAsync(CURRENTROOM_NAME_KEY);
   setter(tempRoomName != null ? tempRoomName : profileInfoStr.notSet);
 };
+const DisplayUserName = React.memo((props: { membership: number; userName: string }) => {
+  if (props.membership == profileInfoNum.memberUnregister) {
+    return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>;
+  } else {
+    return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.IdHint}${props.userName}`}</Text>;
+  }
+});
+const DisplayFirstLastName = React.memo((props: { membership: number; userName: string; lastName: string; firstName: string }) => {
+  if (props.membership == profileInfoNum.memberUnregister) {
+    return <Text></Text>;
+  } else if (props.lastName == "" && props.firstName == "") {
+    return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${props.userName}`}</Text>;
+  } else {
+    return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${props.lastName} ${props.firstName}`}</Text>;
+  }
+});
 const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation }) => {
   //state variable defined
   const [userProfileContainer, setUseProfileContainer] = useState<UserProfileContainer>();
@@ -55,11 +72,38 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
   const { lastName, firstName, setLastName, setFirstName } = useContext(ProfileContext);
   getCurrentRoomName(setCurrentRoomName);
 
-  const displayName = () => {
-    if (membership == profileInfoNum.memberUnregister) return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.unregisterUserName}`}</Text>;
-    else if (lastName == "" && firstName == "") return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${userName}`}</Text>;
-    else return <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${lastName} ${firstName}`}</Text>;
-  };
+  const accessUpdatePage = useCallback(() => {
+    navigation.navigate("ProfileUpdateScreen", {
+      mode: profileUpdateMode.personalInfo,
+      userId: userId ? userId : "",
+      userName: userName,
+      lastName: lastName,
+      firstName: firstName,
+      setLastName: setLastName,
+      setFirstName: setFirstName,
+    });
+  }, [userName, lastName, firstName]);
+
+  const accessPasswordPage = useCallback(() => {
+    navigation.navigate("ProfileUpdateScreen", {
+      mode: profileUpdateMode.password,
+      userName: userName,
+      userId: userId ? userId : "",
+    });
+  }, [userName]);
+  // const DisplayFirstLastName=React.memo((props: { lastName: string;firstName:string, userName: string })=>{
+  //   if (props.membership <> profileInfoNum.memberUnregister) {
+  //     return;
+  //   }else if (props.lastName == "" && props.firstName == "") {
+  //     return (
+  //         <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${userName}`}</Text>
+  //     );
+  //   } else {
+  //     return (
+  //         <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${lastName} ${firstName}`}</Text>
+  //     );
+  //   }
+  // });
   const profileSuccessHandler = (res: AxiosResponse<any, any>) => {
     try {
       //convert response to user profile type
@@ -112,12 +156,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
           <FontAwesome name="user-circle" size={windowWidth * 0.18} color="black" />
         </View>
         <View style={styles.infoRightView}>
-          {displayName()}
-          {membership == profileInfoNum.memberUnregister ? (
-            <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.IdHint}${profileInfoStr.IdMask}`}</Text>
-          ) : (
-            <Text style={[commonStyle.textContainer, { fontSize: textLarge }]}>{`${profileInfoStr.IdHint}${userName}`}</Text>
-          )}
+          <DisplayFirstLastName membership={membership} userName={userName} firstName={firstName} lastName={lastName} />
+          <DisplayUserName membership={membership} userName={userName} />
         </View>
       </View>
       {/* membership display*/}
@@ -146,17 +186,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
       <View style={commonStyle.rowContainer}>
         <TouchableOpacity
           style={membership == profileInfoNum.memberUnregister ? commonStyle.button_disable : commonStyle.button_active}
-          onPress={() =>
-            navigation.navigate("ProfileUpdateScreen", {
-              mode: profileUpdateMode.personalInfo,
-              userId: userId ? userId : "",
-              userName: userName,
-              lastName: lastName,
-              firstName: firstName,
-              setLastName: setLastName,
-              setFirstName: setFirstName,
-            })
-          }
+          onPress={accessUpdatePage}
           disabled={membership == profileInfoNum.memberUnregister}
         >
           <Text style={commonStyle.textContainer}>{profileUpdateTitle[profileUpdateMode.personalInfo]}</Text>
@@ -165,13 +195,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ userId, setUserId, navigation
       <View style={commonStyle.rowContainer}>
         <TouchableOpacity
           style={membership == profileInfoNum.memberUnregister ? commonStyle.button_disable : commonStyle.button_active}
-          onPress={() =>
-            navigation.navigate("ProfileUpdateScreen", {
-              mode: profileUpdateMode.password,
-              userName: userName,
-              userId: userId ? userId : "",
-            })
-          }
+          onPress={accessPasswordPage}
           disabled={membership == profileInfoNum.memberUnregister}
         >
           <Text style={commonStyle.textContainer}>{profileUpdateTitle[profileUpdateMode.password]}</Text>
