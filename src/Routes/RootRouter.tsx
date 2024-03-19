@@ -10,8 +10,11 @@ import LoadingSpinner from "../Components/Auth/LoadingSpinner";
 import { RootNavigationProps } from "../Types/Navigations/Root";
 import customAxiosInstance from "../Utils/customAxiosInstance";
 import { deleteItemAsync, getItemAsync } from "expo-secure-store";
-import { ACCESS_KEY, CONFIG_KEY, INITIAL_STAGE_FOOD, INITIAL_STAGE_TAG, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../Constants/securestoreKey";
+import { ACCESS_KEY, CONFIG_KEY, DEFAULT_ROOM_ID_KEY, INITIAL_STAGE_FOOD, INITIAL_STAGE_TAG, REFRESH_KEY, TEMPUSERID_KEY, TEMPUSERPASS_KEY } from "../Constants/securestoreKey";
 import { rootNavigationRef } from '../Ref'
+import { CURRENTROOM_ID_KEY } from "../Constants/securestoreKey";
+import { CURRENTROOM_NAME_KEY } from "../Constants/securestoreKey";
+import { StatusBar } from "expo-status-bar";
 
 const RootRouter: React.FC = () => {
   const Stack = createNativeStackNavigator<RootNavigationProps>();
@@ -52,6 +55,9 @@ const RootRouter: React.FC = () => {
     deleteItemAsync(TEMPUSERPASS_KEY);
     deleteItemAsync(INITIAL_STAGE_TAG);
     deleteItemAsync(INITIAL_STAGE_FOOD);
+    deleteItemAsync(DEFAULT_ROOM_ID_KEY);
+    deleteItemAsync(CURRENTROOM_ID_KEY);
+    deleteItemAsync(CURRENTROOM_NAME_KEY);
   };
 
   // initial token validation
@@ -73,6 +79,7 @@ const RootRouter: React.FC = () => {
     <LoadingSpinner />
   ) : (
     <NavigationContainer ref={rootNavigationRef}>
+      <StatusBar style="light" />
       <Stack.Navigator initialRouteName={access ? "HomeStackNavigation" : "AuthNavigation"} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
         <Stack.Screen name="HomeStackNavigation" component={HomeStackNavigation} />

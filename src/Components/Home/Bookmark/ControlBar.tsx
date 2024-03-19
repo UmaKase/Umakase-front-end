@@ -6,7 +6,7 @@ import {
   windowHeight,
   windowWidth,
 } from "../../../Constants/cssConst";
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 
 type Props = {
   /**
@@ -18,17 +18,17 @@ type Props = {
    */
   setFavMode: (value: React.SetStateAction<boolean>) => void;
   /**
-   * handle add button function
+   * select all food flag
+  */
+  selectAll: boolean;
+  /**
+   * setState of selectAll function
    */
   handleAdd: () => void;
   /**
    * handle trash button function
    */
-  handleTrash: () => void;
-  /**
-   * (food[].length == 0)? true : false;
-   */
-  toggleFlag: boolean;
+  editButtonPress: () => void;
 };
 const ControlBar: React.FC<Props> = ({
   favMode,
@@ -41,6 +41,7 @@ const ControlBar: React.FC<Props> = ({
   return (
     <View style={styles.container}>
       <View style={[styles.subContainer, { justifyContent: "flex-start" }]}>
+        {/* favorite checkbox */}
         <TouchableOpacity onPress={() => setFavMode(!favMode)}>
           {favMode ? (
             <MaterialCommunityIcons
@@ -59,6 +60,25 @@ const ControlBar: React.FC<Props> = ({
         <Text style={{ fontSize: textMedium, color: lightTextColor }}>
           お気入り
         </Text>
+        {/* select all checkbox */}
+        <TouchableOpacity onPress={() => { setSelectAll(prev => !prev) }}>
+          {selectAll ? (
+            <MaterialCommunityIcons
+              name="checkbox-marked-outline"
+              size={iconSize}
+              color={lightTextColor}
+            />
+          ) : (
+            <MaterialCommunityIcons
+              name="checkbox-blank"
+              size={iconSize}
+              color={lightTextColor}
+            />
+          )}
+        </TouchableOpacity>
+        {selectAll ? null : <Text style={{ fontSize: textMedium, color: lightTextColor }}>
+          全選択
+        </Text>}
       </View>
       <View style={[styles.subContainer, { justifyContent: "flex-end" }]}>
         <TouchableOpacity

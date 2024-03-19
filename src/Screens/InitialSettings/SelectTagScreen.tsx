@@ -3,10 +3,10 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { backgroundColor, windowHeight, windowWidth } from "../../Constants/cssConst";
+import { backgroundColor, lightTextColor, windowHeight, windowWidth } from "../../Constants/cssConst";
 import { FlatList } from "react-native-gesture-handler";
 import Footer from "../../Components/InitialStep/Footer";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import ToggleTag from "../../Components/InitialStep/ToggleTag";
 import { TagCheck } from "../../Types/InitialSteps";
 import SearchBar from "../../Components/InitialStep/SearchBar";
@@ -24,7 +24,7 @@ type Props = NativeStackScreenProps<InitialStepsProps, "SelectTagScreen">;
 const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // useTagFetch to control food Page
-  const [tags, setTags, tagPageAdd, tagPageEnd] = useTagFetch();
+  const [tags, setTags, tagPageAdd, tagPageEnd, selectAll, setSelectAll, setSelectAllSwitcher] = useTagFetch();
   const [searchModeController, searchTagController] = useSearchTagFetch(tags);
   // useSubmit to control submit process
   const [submitStart, loadingText, submit] = useSubmit();
@@ -40,7 +40,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // next step function
   const goNextStep = async () => {
     const selectedTags = tags.filter((tag) => tag.checked === true);
-    navigation.navigate("SelectFoodScreen", { tags: selectedTags, tagIds: selectedTags.map((tag) => tag.id) });
+    navigation.navigate("SelectFoodScreen", { selectAll: selectAll, tags: selectedTags, tagIds: selectedTags.map((tag) => tag.id) });
   };
 
 
@@ -93,6 +93,7 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
   // SECTION components for SelectTagScreen
 
   const Header: React.FC = () => {
+    const iconSize = windowWidth * 0.08;
     return (
       <View>
         {/* header */}
@@ -104,14 +105,40 @@ const SelectTagScreen: React.FC<Props> = ({ navigation, route }) => {
         </View>
         {/* search Btn */}
         <View style={styles.searchContainer}>
-          <TouchableOpacity onPress={searchModeController.searchModeStart}>
-            <FontAwesome
-              name="search"
-              size={windowWidth * 0.07}
-              // color={backgroundColor}
-              color="#FFF"
-            />
-          </TouchableOpacity>
+          <View style={[styles.searchSubContainer, { alignItems: "flex-start" }]}>
+            <TouchableOpacity onPress={() => {
+              setSelectAll(prev => !prev)
+              setSelectAllSwitcher(prev => !prev)
+            }}>
+              {selectAll ? (
+                <MaterialCommunityIcons
+                  name="checkbox-marked-outline"
+                  size={iconSize}
+                  color={lightTextColor}
+                />
+              ) : (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <MaterialCommunityIcons
+                    name="checkbox-blank"
+                    size={iconSize}
+                    color={lightTextColor}
+                  />
+                  <Text style={{ color: lightTextColor, fontSize: windowHeight * 0.02, marginLeft: windowWidth * 0.01 }}>全選択</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+          </View>
+          <View style={[styles.searchSubContainer, { alignItems: "flex-end", justifyContent: "center" }]}>
+            <TouchableOpacity onPress={searchModeController.searchModeStart}>
+              <FontAwesome
+                name="search"
+                size={windowWidth * 0.08}
+                // color={backgroundColor}
+                color="#FFF"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     )
@@ -199,9 +226,16 @@ const styles = StyleSheet.create({
   searchContainer: {
     width: windowWidth,
     height: windowHeight * 0.06,
-    alignItems: "flex-end",
+    alignItems: "center",
     justifyContent: "center",
-    paddingRight: windowWidth * 0.1,
+    paddingHorizontal: windowWidth * 0.08,
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: 'red',
+  },
+  searchSubContainer: {
+    flex: 0.5,
+    justifyContent: "center",
   },
   tagContainer: {
     flex: 1,

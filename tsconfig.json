@@ -15,7 +15,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
-    "baseUrl": "./src",
+    // "baseUrl": "./src",
     "allowSyntheticDefaultImports": true,
     "removeComments": true,
     "rootDir": "./",

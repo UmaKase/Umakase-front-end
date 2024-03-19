@@ -1,7 +1,9 @@
 export type BookmarkedStackProps = {
   BookmarkScreen: undefined;
   FavoriteFoodScreen: undefined;
-  SearchFoodTagScreen: {
+  SearchFoodTagScreen: undefined;
+  SearchFoodResultScreen: {
     tags: string[];
+    searchFood: string;
   };
 };

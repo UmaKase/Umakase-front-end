@@ -3,8 +3,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InitialStepsProps } from "../../Types/Navigations/InitialSteps";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { windowWidth, backgroundColor, windowHeight } from "../../Constants/cssConst";
+import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import { windowWidth, backgroundColor, windowHeight, lightTextColor } from "../../Constants/cssConst";
 import ToggleFood from "../../Components/InitialStep/ToggleFood";
 import Footer from "../../Components/InitialStep/Footer";
 import { FoodCheck } from "../../Types/InitialSteps";
@@ -36,7 +36,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
 
   // SECTION custom hooks => Logic control
   // food and search food custom hook
-  const [foodsController] = useFoodFetch(route.params.tagIds);
+  const [foodsController] = useFoodFetch(route.params.selectAll, route.params.tagIds);
   const [searchModeController, searchFoodsController] = useSearchFoodFetch(foodsController.foods);
   // useSubmit custom hook
   const [submitStart, loadingText, submit] = useSubmit();
@@ -94,6 +94,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
   // !SECTION ============================================================
 
   // SECTION Components
+  const iconSize = windowWidth * 0.08;
   // Header
   const Header: React.FC = React.memo(() => {
     return (
@@ -105,7 +106,7 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
           </Text>
         </View>
         {/* search Btn */}
-        <View style={styles.searchContainer}>
+        {/* <View style={styles.searchContainer}>
           <TouchableOpacity
             onPress={() => {
               searchModeController.startSearchMode();
@@ -118,6 +119,42 @@ const SelectFoodScreen: React.FC<Props> = ({ navigation, route }) => {
               color="#FFF"
             />
           </TouchableOpacity>
+        </View> */}
+        <View style={styles.searchContainer}>
+          <View style={[styles.searchSubContainer, { alignItems: "flex-start"}]}>
+            <TouchableOpacity onPress={() => {
+              foodsController.setSelectAllFoodSwitcher(prev => !prev);
+              foodsController.setSelectAllFood(prev => !prev);
+            }}>
+              {foodsController.selectAllFood ? (
+                <MaterialCommunityIcons
+                  name="checkbox-marked-outline"
+                  size={iconSize}
+                  color={lightTextColor}
+                />
+              ) : (
+                <View style={{ flexDirection: "row", alignItems: "center"}}>
+                  <MaterialCommunityIcons
+                    name="checkbox-blank"
+                    size={iconSize}
+                    color={lightTextColor}
+                  />
+                  <Text style={{ color: lightTextColor, fontSize: windowHeight * 0.02, marginLeft: windowWidth * 0.01 }}>全選択</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+          </View>
+          <View style={[styles.searchSubContainer, { alignItems: "flex-end", justifyContent:"center"}]}>
+            <TouchableOpacity onPress={searchModeController.startSearchMode}>
+              <FontAwesome
+                name="search"
+                size={windowWidth * 0.08}
+                // color={backgroundColor}
+                color="#FFF"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     )
@@ -194,12 +231,22 @@ const styles = StyleSheet.create({
     fontSize: windowWidth * 0.08,
     color: "#FFF",
   },
+  
+
+  // search bar
   searchContainer: {
     width: windowWidth,
     height: windowHeight * 0.06,
-    alignItems: "flex-end",
+    alignItems: "center",
+    justifyContent:"center",
+    paddingHorizontal: windowWidth * 0.08,
+    flexDirection: "row",
+    borderWidth:1,
+    borderColor:'red',
+  },
+  searchSubContainer: {
+    flex: 0.5,
     justifyContent: "center",
-    paddingRight: windowWidth * 0.1,
   },
 
   // modal

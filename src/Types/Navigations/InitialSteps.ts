@@ -7,6 +7,7 @@ export type InitialStepsProps = {
   IntroScreen: undefined;
   SelectTagScreen: undefined;
   SelectFoodScreen: {
+    selectAll: boolean;
     tags:TagCheck[];
     tagIds: string[];
   };

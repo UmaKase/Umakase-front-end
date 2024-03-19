@@ -4,7 +4,6 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { BookmarkedStackProps } from "../../../Types/Navigations/HomeDrawer/BookmarkedStack";
 import Background from "../../../Components/Universal/Background";
 import SearchBarForBookMark from "../../../Components/Home/Bookmark/SearchBarForBookMark";
-import { backgroundColor, windowHeight, windowWidth } from "../../../Constants/cssConst";
 import ControlBar from "../../../Components/Home/Bookmark/ControlBar";
 import { BookMarkFood, Food, FoodsList } from "../../../Types/InitialSteps";
 import customAxiosInstance from "../../../Utils/customAxiosInstance";
@@ -222,6 +221,53 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
   // delete food button action
   const deleteFoodHandler = () => {};
 
+  function addButtonPress() {
+    navigation.navigate("SearchFoodTagScreen");
+  };
+
+  function trashButtonPress() {
+    let chosenFoods = foods.filter((food) => food.chosen);
+    if (chosenFoods.length !== 0) {
+      return Alert.alert("Delete Food", `${chosenFoods.map((food) => food.food.name).join('\n')}`, [
+        {
+          text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "Confirm",
+          onPress: async () => {
+            try {
+              let chosenFoodsId = chosenFoods.map((food) => food.food.id);
+              const deleteFoodsResponse = await customAxiosInstance({
+                method: 'post',
+                url: `${RoomAPI}/event`,
+                data: {
+                  evnet: "update-food",
+                  roomId: await getItemAsync(DEFAULT_ROOM_ID_KEY),
+                  removeFoods: chosenFoodsId,
+                },
+              })
+              console.log(deleteFoodsResponse.data);
+              // FIXME 2023/06/07 suppose to have the response from the server, and then delete the food from the database
+              // if (deleteFoodsResponse.data.data.success) {
+              //   setFoods(prev => {
+              //     return prev.filter((food) => !chosenFoodsId.includes(food.food.id));
+              //   })
+              // }
+              console.log("delete food");
+            } catch (error) {
+              console.log('error from trashButtonPress :', error);
+            }
+          },
+          style: "destructive",
+        }
+      ]);
+    } else {
+      return Alert.alert("Delete Food", `Please choose the food you want to delete`);
+    }
+  }
+
   return (
     <Background>
       {/* search bar */}
@@ -348,44 +394,3 @@ const FavoriteFoodScreen: React.FC<Props> = ({ route, navigation }) => {
 };
 
 export default FavoriteFoodScreen;
-
-const styles = StyleSheet.create({
-  // footer
-  footerContainer: {
-    width: windowWidth,
-    height: windowHeight * 0.1,
-    borderWidth: 1,
-  },
-
-  // modal
-  modal: {
-    margin: 0,
-    justifyContent: "flex-end",
-  },
-  modalBackground: {
-    flex: 0.75,
-    height: windowHeight * 0.75, //giving the height because of the flatlist need a fix height to be scrollable
-    backgroundColor: "#FFF",
-    borderTopLeftRadius: windowWidth * 0.05,
-    borderTopRightRadius: windowWidth * 0.05,
-  },
-  modalFooter: {
-    width: windowWidth,
-    height: windowHeight * 0.15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalSubmit: {
-    width: windowWidth * 0.6,
-    height: windowHeight * 0.05,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: backgroundColor,
-    borderRadius: windowWidth * 0.03,
-  },
-  modalSubmitText: {
-    fontSize: windowWidth * 0.05,
-    color: "#FFF",
-  },
-});

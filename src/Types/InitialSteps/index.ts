@@ -39,6 +39,10 @@ export type BookMarkFood = {
   updatedAt: string;
 };
 
+export interface FavoriteFoodToggleInterface extends FavoriteFoodInterface{
+  chosen: boolean;
+}
+
 export type BookMarkTag = {
   foodId: string;
   tagId: string;
